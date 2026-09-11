@@ -1,6 +1,6 @@
 /**
  * POST /api/auth/verify  { email, token, turnstileToken }
- * Confirms a signup OTP issued by GoTrue. No session is created until this succeeds.
+ * Confirms a signup or recovery OTP issued by GoTrue.
  */
 import { verifySchema } from '../../src/lib/validation.ts';
 import { handle, json, readJson, methodNotAllowed, clientIp, error } from '../../src/lib/server/http.ts';
@@ -29,7 +29,7 @@ export default handle(async (req: Request) => {
   await verifyTurnstile(input.turnstileToken, ip, 'verify');
 
   const { status, data } = await gotrue<TokenResponse>('/verify', {
-    type: 'signup',
+    type: input.purpose,
     email: input.email,
     token: input.token,
   });
@@ -40,8 +40,10 @@ export default handle(async (req: Request) => {
     return error(401, 'invalid_code', 'Wrong or expired code.');
   }
 
-  const verified = Boolean(data.user.email_confirmed_at || data.user.confirmed_at);
-  if (!verified) return error(403, 'email_not_confirmed', 'Confirm your email first.');
+  if (input.purpose === 'signup') {
+    const verified = Boolean(data.user.email_confirmed_at || data.user.confirmed_at);
+    if (!verified) return error(403, 'email_not_confirmed', 'Confirm your email first.');
+  }
 
   const { data: profile } = await adminClient().from('profiles').select('is_admin, role').eq('id', data.user.id).maybeSingle();
   const isAdmin = Boolean(profile && (profile.is_admin || profile.role === 'admin'));

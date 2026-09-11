@@ -381,47 +381,47 @@
     "name": "Password reset",
     "trigger": "Auth: reset",
     "kind": "auto",
-    "subject": "Reset your password",
-    "preheader": "Link valid for 1 hour",
+    "subject": "Your password reset code: {{code}}",
+    "preheader": "Valid for 10 minutes",
     "eyebrow": "Account",
-    "title": "Reset your password",
+    "title": "Your password reset code",
     "blocks": [
       {
         "type": "p",
-        "text": "Someone asked to reset the password for <b style=\"color:#F2F4F8\">{{email}}</b>. If that was you, set a new one below."
+        "text": "Enter this code on the login page to choose a new password. It works once and expires in 10 minutes."
       },
       {
-        "type": "button",
-        "label": "Set a new password",
-        "href": "{{reset_url}}"
+        "type": "code",
+        "value": "{{code}}",
+        "note": "Requested from {{device}} · {{location}} · {{time}}"
       },
       {
         "type": "callout",
         "color": "#FBBF24",
         "label": "Not you?",
-        "text": "Ignore this email. Your password stays the same and the link expires in 1 hour."
+        "text": "Do not share this code with anyone. If you did not request it, you can ignore this email. Your password stays the same."
       }
     ],
     "unsubscribe": false,
     "ar": {
-      "subject": "إعادة تعيين كلمة المرور",
-      "preheader": "الرابط صالح لساعة واحدة",
+      "subject": "رمز إعادة تعيين كلمة المرور: {{code}}",
+      "preheader": "الرمز صالح لعشر دقائق",
       "eyebrow": "الأمان",
-      "title": "إعادة تعيين كلمة المرور",
+      "title": "رمز إعادة تعيين كلمة المرور",
       "blocks": [
         {
           "type": "p",
-          "text": "اضغط الزر لتعيين كلمة مرور جديدة. الرابط صالح لساعة واحدة"
+          "text": "أدخل هذا الرمز في صفحة تسجيل الدخول لتعيين كلمة مرور جديدة. الرمز يُستخدم مرة واحدة وينتهي خلال عشر دقائق"
         },
         {
-          "type": "button",
-          "label": "تعيين كلمة مرور جديدة",
-          "href": "{{reset_url}}"
+          "type": "code",
+          "value": "{{code}}",
+          "note": "{{device}} · {{location}} · {{time}}"
         },
         {
           "type": "callout",
           "label": "لم تطلب ذلك؟",
-          "text": "تجاهل هذه الرسالة. كلمة مرورك تبقى كما هي"
+          "text": "لا تشارك هذا الرمز مع أحد. إن لم تطلبه فتجاهل هذه الرسالة. كلمة مرورك تبقى كما هي"
         }
       ]
     }

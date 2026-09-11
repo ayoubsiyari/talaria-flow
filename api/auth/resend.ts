@@ -14,6 +14,14 @@ export default handle(async (req: Request) => {
   const ip = clientIp(req);
   await rateLimit('resend', ip, input.email);
   await verifyTurnstile(input.turnstileToken, ip, 'resend');
-  await gotrue('/resend', { type: 'signup', email: input.email });
+  if (input.purpose === 'recovery') {
+    try {
+      await gotrue('/recover', { email: input.email });
+    } catch { /* always 200 */ }
+  } else {
+    try {
+      await gotrue('/resend', { type: 'signup', email: input.email });
+    } catch { /* always 200 */ }
+  }
   return json({ ok: true });
 });

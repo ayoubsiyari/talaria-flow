@@ -274,8 +274,30 @@
     h.focus();
   }
 
-  function mountCodeForm(host, email, afterPath) {
+  function showResetVerify(form, email) {
+    var done = form.parentNode.querySelector('[data-reset-code]');
+    if (done) done.remove();
+    done = document.createElement('div');
+    done.setAttribute('data-reset-code', '1');
+    done.style.cssText = 'display:flex;flex-direction:column;gap:14px';
+    var h = document.createElement('h2');
+    h.style.cssText = 'font-size:22px;font-weight:700;letter-spacing:-0.02em;margin:0';
+    h.textContent = authMsg('signupDoneTitle');
+    var p = document.createElement('p');
+    p.style.cssText = 'margin:0;font-size:15px;line-height:1.55;color:#B7BCCB';
+    p.textContent = authMsg('signupDoneBody').replace('{email}', email);
+    done.appendChild(h);
+    done.appendChild(p);
+    mountCodeForm(done, email, '/login/', 'recovery');
+    form.style.display = 'none';
+    form.parentNode.insertBefore(done, form);
+    h.setAttribute('tabindex', '-1');
+    h.focus();
+  }
+
+  function mountCodeForm(host, email, afterPath, purpose) {
     if (host.querySelector('[data-verify-form]')) return;
+    purpose = purpose || 'signup';
     var wrap = document.createElement('form');
     wrap.setAttribute('data-verify-form', '1');
     wrap.setAttribute('novalidate', '');
@@ -319,12 +341,16 @@
       setPending(btn, true);
       try {
         var token = await window.TF.turnstile('verify');
-        var res = await window.TF.api('/api/auth/verify', { auth: false, body: { email: email, token: code, turnstileToken: token } });
+        var res = await window.TF.api('/api/auth/verify', { auth: false, body: { email: email, token: code, purpose: purpose, turnstileToken: token } });
         if (!res.ok) {
           setFieldError(input, err, res.body && res.body.error === 'rate_limited' ? apiErrorMsg(res) : authMsg('codeInvalid'));
           return;
         }
         await window.TF.adoptSession(res.body.session);
+        if (purpose === 'recovery') {
+          showLoginView('update');
+          return;
+        }
         var dest = (res.body.user && res.body.user.is_admin) ? '/admin/' : (afterPath || '/account/');
         location.href = dest;
       } catch (err2) {
@@ -337,7 +363,7 @@
       setPending(resend, true);
       try {
         var token = await window.TF.turnstile('resend');
-        var r = await window.TF.api('/api/auth/resend', { auth: false, body: { email: email, turnstileToken: token } });
+        var r = await window.TF.api('/api/auth/resend', { auth: false, body: { email: email, purpose: purpose, turnstileToken: token } });
         toast(r.ok ? authMsg('resent') : authMsg('uploadFailed'));
       } catch (err2) {
         toast(authMsg('uploadFailed'));
@@ -453,10 +479,9 @@
         var token = await window.TF.turnstile('reset');
         var res = await window.TF.api('/api/auth/reset', { auth: false, body: { email: email, redirectTo: location.origin + '/login/?type=recovery', turnstileToken: token } });
         if (!res.ok) { inlineError(resetIn, apiErrorMsg(res)); return; }
-      } catch (err) { inlineError(resetIn, authMsg('uploadFailed')); return; }
+        showResetVerify(resetForm, email);
+      } catch (err) { inlineError(resetIn, authMsg('uploadFailed')); }
       finally { setPending(btn, false); }
-      toast(authMsg('resetSent'));
-      showLoginView('login');
     });
 
     if (updateForm) {

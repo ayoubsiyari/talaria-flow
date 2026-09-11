@@ -11,7 +11,7 @@
     { id: '04', file: '04-approved', name: 'Approved', kind: 'auto', trigger: 'Status → approved', subject: 'Approved — you are in' },
     { id: '05', file: '05-needs-resubmission', name: 'Needs resubmission', kind: 'auto', trigger: 'Status → rejected', subject: 'We need a clearer screenshot' },
     { id: '06', file: '06-course-ready', name: 'Course ready', kind: 'campaign', trigger: 'Manual / scheduled', subject: 'Your course is ready' },
-    { id: '07', file: '07-password-reset', name: 'Password reset', kind: 'auto', trigger: 'Auth: reset', subject: 'Reset your password' },
+    { id: '07', file: '07-password-reset', name: 'Password reset', kind: 'auto', trigger: 'Auth: reset', subject: 'Your password reset code' },
     { id: '08', file: '08-newsletter', name: 'Newsletter', kind: 'campaign', trigger: 'Manual / scheduled', subject: 'Talaria Flow — this week in order flow' },
     { id: '09', file: '09-tools-suite-launch', name: 'Tools suite launch', kind: 'campaign', trigger: 'Manual / scheduled', subject: 'The Talaria Flow tools suite is live' },
   ];

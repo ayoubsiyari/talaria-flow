@@ -32,11 +32,13 @@ export const signupSchema = z.object({
 export const verifySchema = z.object({
   email,
   token: z.string().trim().regex(/^[A-Za-z0-9]{6,12}$/),
+  purpose: z.enum(['signup', 'recovery']).optional().default('signup'),
   turnstileToken,
 });
 
 export const resendSchema = z.object({
   email,
+  purpose: z.enum(['signup', 'recovery']).optional().default('signup'),
   turnstileToken,
 });
 
