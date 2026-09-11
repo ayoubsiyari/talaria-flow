@@ -48,7 +48,7 @@ function memoryIncr(key: string): { count: number; ttl: number } {
   return { count: cur.count, ttl: Math.ceil((cur.resetAt - now) / 1000) };
 }
 
-export type RateLimitAction = 'login' | 'signup' | 'reset' | 'waitlist' | 'proof' | 'unsubscribe' | 'admin-reset';
+export type RateLimitAction = 'login' | 'signup' | 'reset' | 'waitlist' | 'proof' | 'unsubscribe' | 'admin-reset' | 'verify' | 'resend';
 
 export async function rateLimit(action: RateLimitAction, ip: string, email: string): Promise<void> {
   if ((!env.redisUrl || !env.redisToken) && env.failClosed) {

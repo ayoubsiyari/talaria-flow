@@ -55,8 +55,12 @@ function headersFor(pathname) {
   if (out['Content-Security-Policy'] && sb && !/\.supabase\.co$/.test(new URL(sb).hostname)) {
     out['Content-Security-Policy'] = out['Content-Security-Policy'].replace(/connect-src ([^;]*)/, (m, list) => `connect-src ${list} ${sb} ${sb.replace(/^http/, 'ws')}`);
   }
-  // Production pins hashed assets for a year. Locally that makes every JS/CSS edit invisible.
-  if (/^\/(assets|fonts)\//.test(pathname)) out['Cache-Control'] = 'no-store';
+  // Production pins hashed assets for a year. Locally JS/CSS must not be cached; images in emails must be.
+  if (/^\/(assets|fonts)\//.test(pathname)) {
+    out['Cache-Control'] = /\.(png|jpe?g|webp|gif|ico|svg)$/i.test(pathname)
+      ? 'public, max-age=86400'
+      : 'no-store';
+  }
   return out;
 }
 function fileFor(pathname) {

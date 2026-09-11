@@ -33,6 +33,15 @@ async function notFound(req: Request): Promise<Response> {
   });
 }
 
+function publicUrl(req: Request): URL {
+  const url = new URL(req.url);
+  const proto = (req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '')).split(',')[0].trim();
+  const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || url.host).split(',')[0].trim();
+  url.protocol = proto === 'https' ? 'https:' : 'http:';
+  url.host = host;
+  return url;
+}
+
 function toLogin(url: URL): Response {
   const dest = new URL('/login/', url);
   dest.searchParams.set('redirect', url.pathname + url.search);
@@ -56,7 +65,7 @@ async function isAdminFor(token: string): Promise<'anon' | 'member' | 'admin' | 
 }
 
 export default async function middleware(req: Request): Promise<Response | undefined> {
-  const url = new URL(req.url);
+  const url = publicUrl(req);
   const adminArea = url.pathname === '/admin' || url.pathname.startsWith('/admin/');
   const token = readCookie(req, COOKIE);
 

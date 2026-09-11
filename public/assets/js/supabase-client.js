@@ -221,7 +221,10 @@
       return null;
     }
     client.auth.onAuthStateChange(function (event, session) {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') syncSessionCookie(session);
+      // INITIAL_SESSION fires with null on every page load before localStorage is read.
+      // Clearing the HttpOnly cookie then logs the visitor out immediately after /api/auth/login.
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') syncSessionCookie(session);
+      if (event === 'INITIAL_SESSION' && session) syncSessionCookie(session);
       if (event === 'SIGNED_OUT') syncSessionCookie(null);
       window.TF.refreshSession();
     });

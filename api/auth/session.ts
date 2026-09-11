@@ -19,6 +19,7 @@ export default handle(async (req: Request) => {
   const input = await readJson(req, sessionSchema);
   const caller = await callerFromToken(input.access_token);
   if (!caller) return error(401, 'unauthorized', 'Invalid session.');
+  if (!caller.emailVerified) return error(403, 'email_not_confirmed', 'Confirm your email first.');
 
   const exp = jwtExpiry(input.access_token) || input.expires_at || Math.floor(Date.now() / 1000) + 3600;
   const maxAge = Math.max(0, exp - Math.floor(Date.now() / 1000));

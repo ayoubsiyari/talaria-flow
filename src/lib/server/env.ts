@@ -13,8 +13,21 @@ export const env = {
   get supabaseServiceRoleKey() { return need('SUPABASE_SERVICE_ROLE_KEY'); },
   get turnstileSecret() { return process.env.TURNSTILE_SECRET_KEY || ''; },
   get resendApiKey() { return process.env.RESEND_API_KEY || ''; },
-  get resendFrom() { return process.env.RESEND_FROM || 'Talaria Flow <support@talaria-flow.com>'; },
+  get resendFrom() { return process.env.RESEND_FROM || process.env.SMTP_FROM_EMAIL || 'Talaria Flow <support@talaria-flow.com>'; },
   get resendWebhookSecret() { return process.env.RESEND_WEBHOOK_SECRET || ''; },
+  get smtpHost() { return process.env.SMTP_HOST || process.env.DOMAIN_EMAIL_SMTP_SERVER || ''; },
+  get smtpPort() { return Number(process.env.SMTP_PORT || process.env.DOMAIN_EMAIL_SMTP_PORT || 587) || 587; },
+  get smtpUser() { return process.env.SMTP_USER || process.env.DOMAIN_EMAIL_USERNAME || ''; },
+  get smtpPassword() { return process.env.SMTP_PASSWORD || process.env.DOMAIN_EMAIL_PASSWORD || ''; },
+  get smtpFrom() {
+    const raw = process.env.SMTP_FROM_EMAIL || process.env.RESEND_FROM || '';
+    if (raw.includes('<')) return raw;
+    if (raw) return `Talaria Flow <${raw}>`;
+    if (this.smtpUser) return `Talaria Flow <${this.smtpUser}>`;
+    return this.resendFrom;
+  },
+  get smtpEnabled() { return Boolean(this.smtpHost && this.smtpUser && this.smtpPassword); },
+  get sendEmailHookSecret() { return process.env.SEND_EMAIL_HOOK_SECRET || ''; },
   get cronSecret() {
     const v = process.env.CRON_SECRET || '';
     if (!v && this.failClosed) throw new Error('Missing environment variable CRON_SECRET');

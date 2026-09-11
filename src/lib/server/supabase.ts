@@ -47,6 +47,7 @@ export async function callerFromToken(token: string | null): Promise<Caller | nu
 export async function requireUser(req: Request): Promise<Caller> {
   const caller = await callerFromToken(bearer(req));
   if (!caller) throw new HttpError(401, 'unauthorized');
+  if (!caller.emailVerified) throw new HttpError(403, 'email_not_confirmed');
   return caller;
 }
 

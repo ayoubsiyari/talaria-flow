@@ -1,7 +1,7 @@
 /**
  * POST /api/auth/signup  { email, password, first_name, last_name, country, lang, redirectTo, turnstileToken }
- * Rate limited, Turnstile verified, zod validated. Supabase Auth hashes the password and sends the
- * confirmation email. The response never reveals whether the address already exists.
+ * Rate limited, Turnstile verified, zod validated. GoTrue creates an unconfirmed user and the
+ * send-email hook delivers a branded OTP. No session is returned until /api/auth/verify succeeds.
  */
 import { signupSchema } from '../../src/lib/validation.ts';
 import { handle, json, readJson, methodNotAllowed, clientIp, error } from '../../src/lib/server/http.ts';
@@ -67,17 +67,6 @@ export default handle(async (req: Request) => {
     return error(400, 'signup_failed', 'Could not create the account.');
   }
 
-  // Confirmation flow (recommended): GoTrue returns the user without a session.
-  if (!data.access_token || !data.refresh_token) return json({ ok: true, needsConfirmation: true });
-
-  return json({
-    ok: true,
-    needsConfirmation: false,
-    session: {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-      expires_in: Number(data.expires_in || 3600),
-      token_type: 'bearer',
-    },
-  });
+  // Never return a session here. Email confirmation (OTP) is required before login.
+  return json({ ok: true, needsConfirmation: true });
 });

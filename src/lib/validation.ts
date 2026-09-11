@@ -29,9 +29,14 @@ export const signupSchema = z.object({
   turnstileToken,
 });
 
-export const resetSchema = z.object({
+export const verifySchema = z.object({
   email,
-  redirectTo: z.string().url().optional(),
+  token: z.string().trim().regex(/^[A-Za-z0-9]{6,12}$/),
+  turnstileToken,
+});
+
+export const resendSchema = z.object({
+  email,
   turnstileToken,
 });
 

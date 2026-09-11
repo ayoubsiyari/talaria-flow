@@ -238,7 +238,7 @@
           location.href = '/account/';
           return;
         }
-        showSignupDone(form, email);
+        showSignupVerify(form, email);
         setNoindex();
       } catch (err) {
         setFieldError(emailIn, emailErr, authMsg('uploadFailed'));
@@ -250,11 +250,9 @@
     else redirectIfSignedIn('/account/');
   }
 
-  /** Replaces the signup form with a "check your inbox" state; the form stays in the DOM (hidden) for back navigation. */
-  function showSignupDone(form, email) {
+  function showSignupVerify(form, email) {
     var done = document.createElement('div');
     done.setAttribute('data-view', 'signup-done');
-    done.setAttribute('role', 'status');
     done.style.cssText = 'display:flex;flex-direction:column;gap:14px;padding:24px;background:#0E1017;border:1px solid rgba(46,232,255,0.35);border-radius:14px';
     var h = document.createElement('h2');
     h.style.cssText = 'font-size:22px;font-weight:700;letter-spacing:-0.02em;margin:0';
@@ -262,16 +260,93 @@
     var p = document.createElement('p');
     p.style.cssText = 'margin:0;font-size:15px;line-height:1.55;color:#B7BCCB';
     p.textContent = authMsg('signupDoneBody').replace('{email}', email);
+    done.appendChild(h);
+    done.appendChild(p);
+    mountCodeForm(done, email, '/account/');
     var a = document.createElement('a');
     a.href = '/login/';
     a.className = 'tf-text-link';
     a.style.cssText = 'font-size:14px;font-weight:600;color:#2EE8FF;width:max-content';
     a.textContent = authMsg('signupDoneLogin');
-    done.appendChild(h); done.appendChild(p); done.appendChild(a);
+    done.appendChild(a);
     form.style.display = 'none';
     form.parentNode.insertBefore(done, form);
-    done.focus && h.setAttribute('tabindex', '-1');
+    h.setAttribute('tabindex', '-1');
     h.focus();
+  }
+
+  function mountCodeForm(host, email, afterPath) {
+    if (host.querySelector('[data-verify-form]')) return;
+    var wrap = document.createElement('form');
+    wrap.setAttribute('data-verify-form', '1');
+    wrap.setAttribute('novalidate', '');
+    wrap.style.cssText = 'display:flex;flex-direction:column;gap:12px';
+    var label = document.createElement('label');
+    label.style.cssText = 'display:flex;flex-direction:column;gap:6px;font-family:Geist Mono,monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3';
+    var lab = document.createElement('span');
+    lab.textContent = authMsg('codeLabel');
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'text';
+    input.autocomplete = 'one-time-code';
+    input.maxLength = 12;
+    input.className = 'tf-input';
+    input.setAttribute('aria-label', authMsg('codeLabel'));
+    input.style.letterSpacing = '0.18em';
+    var err = document.createElement('span');
+    err.className = 'tf-field-err';
+    err.setAttribute('role', 'alert');
+    err.innerHTML = ERR_ICON;
+    label.appendChild(lab);
+    label.appendChild(input);
+    label.appendChild(err);
+    var btn = document.createElement('button');
+    btn.type = 'submit';
+    btn.className = 'btn-primary';
+    btn.style.cssText = 'height:48px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;font:600 15px Archivo,Cairo,sans-serif;cursor:pointer';
+    btn.textContent = authMsg('codeCta');
+    var resend = document.createElement('button');
+    resend.type = 'button';
+    resend.style.cssText = 'height:40px;padding:0;border:0;background:transparent;color:#2EE8FF;font:600 14px Archivo,Cairo,sans-serif;cursor:pointer;width:max-content';
+    resend.textContent = authMsg('codeResend');
+    wrap.appendChild(label);
+    wrap.appendChild(btn);
+    wrap.appendChild(resend);
+    host.appendChild(wrap);
+    wrap.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var code = (input.value || '').trim();
+      if (!/^[A-Za-z0-9]{6,12}$/.test(code)) { setFieldError(input, err, authMsg('codeInvalid')); return; }
+      setPending(btn, true);
+      try {
+        var token = await window.TF.turnstile('verify');
+        var res = await window.TF.api('/api/auth/verify', { auth: false, body: { email: email, token: code, turnstileToken: token } });
+        if (!res.ok) {
+          setFieldError(input, err, res.body && res.body.error === 'rate_limited' ? apiErrorMsg(res) : authMsg('codeInvalid'));
+          return;
+        }
+        await window.TF.adoptSession(res.body.session);
+        var dest = (res.body.user && res.body.user.is_admin) ? '/admin/' : (afterPath || '/account/');
+        location.href = dest;
+      } catch (err2) {
+        setFieldError(input, err, authMsg('codeInvalid'));
+      } finally {
+        setPending(btn, false);
+      }
+    });
+    resend.addEventListener('click', async function () {
+      setPending(resend, true);
+      try {
+        var token = await window.TF.turnstile('resend');
+        var r = await window.TF.api('/api/auth/resend', { auth: false, body: { email: email, turnstileToken: token } });
+        toast(r.ok ? authMsg('resent') : authMsg('uploadFailed'));
+      } catch (err2) {
+        toast(authMsg('uploadFailed'));
+      } finally {
+        setPending(resend, false);
+      }
+    });
+    setTimeout(function () { input.focus(); }, 50);
   }
 
   function initLogin() {
@@ -326,7 +401,11 @@
               t.textContent = apiErrorMsg(res);
               formErr.classList.add('is-on');
             }
-          } else if (code === 'email_not_confirmed') showLoginView('unverified');
+          } else if (code === 'email_not_confirmed') {
+            showLoginView('unverified');
+            var unv = document.querySelector('[data-view="unverified"]');
+            if (unv) mountCodeForm(unv, email, (params.get('redirect') && /^\/(?!\/)/.test(params.get('redirect')) ? params.get('redirect') : '/account/'));
+          }
           else if (code === 'turnstile_failed' || code === 'turnstile_required') setFieldError(emailIn, emailErr, authMsg('verify'));
           else setFieldError(pwIn, pwErr, authMsg('password'));
           return;
@@ -347,18 +426,16 @@
     if (resend) resend.addEventListener('click', async function () {
       var email = ((form.querySelector('input[type="email"]') || {}).value || '').trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        // The unverified view has no email field of its own: send the visitor back to the form to enter it.
         toast(authMsg('enterEmailFirst'));
         showLoginView('login');
         if (emailIn) emailIn.focus();
         return;
       }
-      var sb = window.TF.getClient();
-      if (!sb) return;
       setPending(resend, true);
       try {
-        var r = await sb.auth.resend({ type: 'signup', email: email, options: { emailRedirectTo: location.origin + '/account/' } });
-        toast(r && r.error ? authMsg('uploadFailed') : authMsg('resent'));
+        var token = await window.TF.turnstile('resend');
+        var r = await window.TF.api('/api/auth/resend', { auth: false, body: { email: email, turnstileToken: token } });
+        toast(r.ok ? authMsg('resent') : authMsg('uploadFailed'));
       } catch (err) {
         toast(authMsg('uploadFailed'));
       } finally {

@@ -393,7 +393,7 @@
       {
         "type": "button",
         "label": "Set a new password",
-        "href": "https://www.talaria-flow.com/login?reset={{token}}"
+        "href": "{{reset_url}}"
       },
       {
         "type": "callout",
@@ -416,7 +416,7 @@
         {
           "type": "button",
           "label": "تعيين كلمة مرور جديدة",
-          "href": "https://www.talaria-flow.com/login?reset={{token}}"
+          "href": "{{reset_url}}"
         },
         {
           "type": "callout",

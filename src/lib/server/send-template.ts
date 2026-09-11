@@ -7,11 +7,12 @@
  * recipient) means retries cannot double-send. Send failure is recorded and reported to Sentry;
  * callers must not fail their request because of it.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { env } from './env.ts';
+import { sendSmtp } from './smtp.ts';
 import { adminClient } from './supabase.ts';
 import { captureException } from './sentry.ts';
 import { unsubscribeKindFor, unsubscribeUrl } from './unsubscribe.ts';
@@ -122,10 +123,10 @@ export function localiseSpec(spec: TemplateSpec, lang: string): TemplateSpec {
 }
 
 /** Render a spec to { html, subject } with merge fields filled (escaped). */
-export function renderEmail(spec: TemplateSpec, lang: string, vars: Record<string, unknown>, subjectOverride?: string): { html: string; subject: string } {
+export function renderEmail(spec: TemplateSpec, lang: string, vars: Record<string, unknown>, subjectOverride?: string, extra?: { logoUrl?: string }): { html: string; subject: string } {
   const l = lang === 'ar' ? 'ar' : 'en';
   const localised = localiseSpec(spec, l);
-  const html = fill(loadRenderer().render(localised, { lang: l }), vars);
+  const html = fill(loadRenderer().render(localised, { lang: l, baseUrl: env.siteUrl + '/', logoUrl: extra?.logoUrl }), vars);
   const subject = fill(String(subjectOverride || localised.subject || spec.subject || ''), vars);
   return { html, subject };
 }
@@ -148,7 +149,27 @@ export function emailLinks(opts: { memberId?: string | null; email: string; temp
   return { unsubscribe_url: unsubscribe_url || preferences_url, preferences_url };
 }
 
-async function sendResend(opts: { to: string; subject: string; html: string; templateId: string }): Promise<{ id: string }> {
+const LOGO_CID = 'tf-logo';
+const LOGO_FILE = join(ROOT, 'public/assets/email-logo-2x.png');
+
+async function sendMail(opts: { to: string; subject: string; html: string; templateId: string }): Promise<{ id: string }> {
+  if (env.smtpEnabled) {
+    const inlineImages = existsSync(LOGO_FILE)
+      ? [{ cid: LOGO_CID, filename: 'email-logo-2x.png', contentType: 'image/png', data: readFileSync(LOGO_FILE) }]
+      : [];
+    return sendSmtp({
+      host: env.smtpHost,
+      port: env.smtpPort,
+      user: env.smtpUser,
+      password: env.smtpPassword,
+      from: env.smtpFrom,
+      replyTo: 'support@talaria-flow.com',
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+      inlineImages,
+    });
+  }
   if (!env.resendApiKey) {
     // Fail closed in production; locally and in tests a stand-in id keeps the flow observable.
     if (env.failClosed) throw new Error('RESEND_API_KEY is not set');
@@ -269,8 +290,8 @@ export async function sendTemplate(opts: SendTemplateOptions): Promise<SendResul
       ...emailLinks({ memberId: opts.memberId, email: opts.to, templateId }),
       ...(opts.vars || {}),
     };
-    const { html, subject } = renderEmail(spec, lang, vars, opts.subject || undefined);
-    const sent = await sendResend({ to: opts.to, subject, html, templateId });
+    const { html, subject } = renderEmail(spec, lang, vars, opts.subject || undefined, env.smtpEnabled ? { logoUrl: 'cid:' + LOGO_CID } : undefined);
+    const sent = await sendMail({ to: opts.to, subject, html, templateId });
 
     if (eventId) {
       await sb.from('email_events').update({ event: 'sent', status: 'sent', provider_id: sent.id }).eq('id', eventId);
