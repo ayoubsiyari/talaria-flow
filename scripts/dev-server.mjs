@@ -50,6 +50,8 @@ function fill(dest, match) {
 function headersFor(pathname) {
   const out = {};
   for (const h of HEADERS) if (h.re.test(pathname)) for (const kv of h.headers) out[kv.key] = kv.value;
+  // HTTP preview (raw VPS IP) must not set HSTS — browsers would then force HTTPS and hit a cert mismatch.
+  if (/^http:\/\//i.test(process.env.SITE_URL || '')) delete out['Strict-Transport-Security'];
   // vercel.json allows *.supabase.co; a local/self-hosted SUPABASE_URL (the test mock) must be reachable too.
   const sb = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
   if (out['Content-Security-Policy'] && sb && !/\.supabase\.co$/.test(new URL(sb).hostname)) {
