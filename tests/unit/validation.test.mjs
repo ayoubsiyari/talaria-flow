@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  loginSchema, signupSchema, waitlistSchema, proofFinishSchema, sniffImage, PROOF_MAX_FILES,
+  loginSchema, signupSchema, waitlistSchema, proofFinishSchema, resetSchema, sniffImage, PROOF_MAX_FILES,
 } from '../../src/lib/validation.ts';
 import { escapeHtml, fillTemplate } from '../../src/lib/escape.ts';
 import { rateLimit, RATE_LIMIT, _resetMemory } from '../../src/lib/server/ratelimit.ts';
@@ -22,6 +22,12 @@ test('signup: password >= 8, ISO country, names capped', () => {
   assert.equal(signupSchema.safeParse({ ...base, country: 'gbr' }).success, false);
   assert.equal(signupSchema.safeParse({ ...base, first_name: 'x'.repeat(121) }).success, false);
   assert.equal(signupSchema.parse(base).lang, 'en');
+});
+
+test('reset: email required, redirect optional', () => {
+  assert.equal(resetSchema.safeParse({ email: '  A@B.co ' }).success, true);
+  assert.equal(resetSchema.parse({ email: '  A@B.co ' }).email, 'a@b.co');
+  assert.equal(resetSchema.safeParse({ email: 'nope' }).success, false);
 });
 
 test('waitlist: source and lang are enums', () => {

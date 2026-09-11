@@ -23,6 +23,10 @@ export default handle(async (req: Request) => {
       if (u.host === new URL(env.siteUrl).host || /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(u.host)) redirect = u.toString();
     } catch { /* keep default */ }
   }
-  await gotrue(`/recover?redirect_to=${encodeURIComponent(redirect)}`, { email: input.email });
+  try {
+    await gotrue(`/recover?redirect_to=${encodeURIComponent(redirect)}`, { email: input.email });
+  } catch {
+    // Same 200 as a successful send so unknown emails cannot be enumerated.
+  }
   return json({ ok: true });
 });

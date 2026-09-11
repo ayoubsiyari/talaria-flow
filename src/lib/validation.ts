@@ -40,6 +40,12 @@ export const resendSchema = z.object({
   turnstileToken,
 });
 
+export const resetSchema = z.object({
+  email,
+  redirectTo: z.string().url().optional(),
+  turnstileToken,
+});
+
 export const sessionSchema = z.object({
   access_token: z.string().min(20).max(8192),
   expires_at: z.number().int().positive().optional(),

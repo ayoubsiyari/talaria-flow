@@ -20,9 +20,9 @@ interface HookBody {
 }
 
 function resetUrl(data: NonNullable<HookBody['email_data']>): string {
-  const site = (data.site_url || env.siteUrl).replace(/\/+$/, '');
-  const hash = data.token_hash || '';
-  const redirect = encodeURIComponent(data.redirect_to || `${env.siteUrl}/login/?type=recovery`);
+  const site = env.siteUrl.replace(/\/+$/, '');
+  const hash = data.token_hash || data.token || '';
+  const redirect = encodeURIComponent(data.redirect_to || `${site}/login/?type=recovery`);
   return `${site}/auth/v1/verify?token=${encodeURIComponent(hash)}&type=recovery&redirect_to=${redirect}`;
 }
 
