@@ -49,7 +49,7 @@ function toLogin(url: URL): Response {
 }
 
 async function isAdminFor(token: string): Promise<'anon' | 'member' | 'admin' | 'error'> {
-  const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const base = (process.env.SUPABASE_INTERNAL_URL || process.env.SUPABASE_URL || '').replace(/\/+$/, '');
   const anon = process.env.SUPABASE_ANON_KEY || '';
   if (!base || !anon) return 'error';
   const res = await fetch(`${base}/rest/v1/rpc/is_admin`, {

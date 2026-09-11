@@ -39,7 +39,7 @@
     var code = res && res.body && res.body.error;
     if (code === 'rate_limited') return authMsg('locked');
     if (code === 'turnstile_failed' || code === 'turnstile_required') return authMsg('verify');
-    if (code === 'turnstile_unconfigured' || code === 'ratelimit_unconfigured') return authMsg('unavailable');
+    if (code === 'turnstile_unconfigured' || code === 'ratelimit_unconfigured' || code === 'server_error' || code === 'signup_failed') return authMsg('unavailable');
     return authMsg(fallbackKey || 'uploadFailed');
   }
 
@@ -229,8 +229,7 @@
         if (!res.ok) {
           var code = res.body && res.body.error;
           if (code === 'weak_password') setFieldError(pwIn, pwErr, authMsg('short'));
-          else if (code === 'rate_limited' || code === 'turnstile_failed' || code === 'turnstile_required' || code === 'turnstile_unconfigured' || code === 'ratelimit_unconfigured') setFieldError(emailIn, emailErr, apiErrorMsg(res));
-          else setFieldError(emailIn, emailErr, authMsg('email'));
+          else setFieldError(emailIn, emailErr, apiErrorMsg(res, 'email'));
           return;
         }
         if (!res.body.needsConfirmation && res.body.session) {

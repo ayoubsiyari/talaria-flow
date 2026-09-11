@@ -8,7 +8,9 @@ function need(name: string): string {
 
 export const env = {
   get siteUrl() { return (process.env.SITE_URL || 'https://www.talaria-flow.com').replace(/\/+$/, ''); },
-  get supabaseUrl() { return need('SUPABASE_URL').replace(/\/+$/, ''); },
+  get supabaseUrl() {
+    return (process.env.SUPABASE_INTERNAL_URL || need('SUPABASE_URL')).replace(/\/+$/, '');
+  },
   get supabaseAnonKey() { return need('SUPABASE_ANON_KEY'); },
   get supabaseServiceRoleKey() { return need('SUPABASE_SERVICE_ROLE_KEY'); },
   get turnstileSecret() { return process.env.TURNSTILE_SECRET_KEY || ''; },
