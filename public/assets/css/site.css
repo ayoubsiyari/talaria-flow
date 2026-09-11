@@ -1,0 +1,516 @@
+@import "./tokens.css";
+@import "./transitions.css";
+@import "./fonts.css";
+@import "./fluid.css";
+
+html,body{overflow-x:hidden}
+
+/* Header — Site Header.dc.html */
+[data-menu]{display:none}
+@media (max-width:1000px){
+  /* [data-hd] a[data-signup] outranks the .btn-primary display rule below, so the header CTA really hides. */
+  [data-nav],[data-login],[data-signup],[data-hd] a[data-signup],[data-langbtn],[data-logout],[data-session-email],[data-hd] [data-session-chip]{display:none!important}
+  [data-menu]{display:inline-flex!important}
+  [data-brand]{font-size:16px!important}
+  [data-brand-home]{font-size:16px!important}
+  :root{--header-height:60px}
+  [data-hd]{gap:12px!important;height:60px!important}
+  .nav-ind{display:none!important}
+  [data-session-email]{display:none}
+}
+[data-session-email]{color:#8B90A3!important;font-family:var(--font-mono),monospace}
+[data-hd] [data-session-chip] button:hover,
+[data-hd] [data-user-wrap] > button:hover{border-color:#F2F4F8}
+[data-brand-home]:hover{background:rgba(255,255,255,0.05);color:#F2F4F8}
+[data-brand][data-split]:hover{background:rgba(255,255,255,0.06);color:#F2F4F8}
+[data-crumb]{
+  max-width:1180px;width:var(--container);margin:0 auto;padding:10px var(--gutter);
+  font-size:13px;color:#8B90A3;display:flex;flex-wrap:wrap;gap:8px;align-items:center
+}
+[data-crumb] a{color:#8B90A3}
+[data-crumb] a:hover{color:#F2F4F8}
+[data-account-mobile]{display:none}
+[data-howto-shot]{margin:0;max-width:720px}
+[data-howto-shot] > div{
+  border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:#0B0D13
+}
+[data-howto-shot] img{display:block;width:100%;height:auto}
+[data-howto-shot] figcaption{margin-top:10px;font-size:13px;color:#8B90A3;text-align:left}
+[data-user-menu] a:hover{background:rgba(255,255,255,0.06);color:#F2F4F8}
+.tf-input{
+  width:100%;height:46px;background:#0E1017;border:1px solid rgba(255,255,255,.16);border-radius:10px;
+  padding:0 14px;color:#F2F4F8;font-family:Archivo,Cairo,sans-serif;font-size:15px;outline:none;box-sizing:border-box;
+  transition:border-color .18s,box-shadow .18s
+}
+.tf-input:focus{border-color:#2EE8FF;box-shadow:0 0 0 3px rgba(46,232,255,.18)}
+.tf-input.is-invalid{border-color:#FF8AD0}
+select.tf-select,select.tf-input{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B90A3' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:14px 14px;padding-right:40px
+}
+@media (max-width:480px){[data-signup-row]{grid-template-columns:1fr!important}}
+.tf-input-wrap{position:relative}
+.tf-input-wrap .tf-input{padding-right:44px}
+.tf-pw-toggle{
+  position:absolute;right:6px;top:6px;width:34px;height:34px;border:0;border-radius:8px;background:transparent;
+  color:#8B90A3;cursor:pointer;display:grid;place-items:center
+}
+.tf-pw-toggle:hover{color:#F2F4F8;background:rgba(255,255,255,.06)}
+.tf-field-err{
+  display:none;align-items:center;gap:6px;font-family:Archivo,Cairo,sans-serif;font-size:12.5px;letter-spacing:0;
+  text-transform:none;color:#FF8AD0;text-align:left;margin-top:4px
+}
+.tf-field-err.is-on{display:flex}
+.tf-form-err{
+  display:none;gap:10px;align-items:flex-start;padding:12px 14px;background:rgba(255,55,176,.08);
+  border:1px solid rgba(255,138,208,.4);border-radius:10px;font-size:13.5px;color:#F2F4F8;text-align:left
+}
+.tf-form-err.is-on{display:flex}
+.tf-form-ok{
+  display:none;align-items:center;gap:8px;font-size:13px;color:#2EE8FF
+}
+.tf-form-ok.is-on{display:flex}
+.tf-spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:tf-spin .6s linear infinite}
+@keyframes tf-spin{to{transform:rotate(360deg)}}
+button[disabled] .tf-spin+*,button.is-pending{opacity:.7;pointer-events:none}
+.tf-tip{
+  position:fixed;z-index:80;max-width:240px;padding:6px 10px;background:#0E1017;border:1px solid rgba(255,255,255,.16);
+  border-radius:8px;color:#F2F4F8;font-family:Archivo,Cairo,sans-serif;font-size:12.5px;line-height:1.35;
+  pointer-events:none;opacity:0;transition:opacity .12s
+}
+.tf-tip.is-on{opacity:1}
+
+/* NAV-INDICATOR.md — one sliding cyan line, not per-link borders */
+[data-hd]{ position:relative }
+[data-nav]{ position:relative }
+[data-nav] a{ border-bottom:0 !important }
+/* The four primary links are one element with one style: text only, no padding, no background.
+   Hover and the active page both go to #F2F4F8; the cyan rule below is the .nav-ind indicator.
+   The link fills the 68px header height so its text centre is the header centre (y = 34). */
+[data-nav] a[data-key]{
+  display:flex; align-items:center; height:100%; position:relative; white-space:nowrap;
+  padding:0; margin:0; border:0; border-radius:0; background:transparent;
+  font-size:14px; font-weight:500; color:#B7BCCB;
+  transition:color 180ms ease;
+}
+[data-nav] a[data-key][aria-current="page"]{ color:#F2F4F8 }
+html body [data-nav] a[data-key]:is(:hover,:focus-visible,:active,[aria-current="page"]:hover){
+  color:#F2F4F8 !important; background:transparent !important; padding:0 !important; border-color:transparent !important;
+}
+/* Positioned on the header container's bottom edge (over the 1px header border), never on a link. */
+[data-hd] > .nav-ind, .nav-ind{
+  position:absolute; bottom:-1px; height:2px; background:#2EE8FF; left:0; width:0;
+  pointer-events:none; will-change:transform,width
+}
+.nav-ind.is-ready{
+  transition: transform 260ms cubic-bezier(.2,.7,.2,1), width 260ms cubic-bezier(.2,.7,.2,1), opacity 160ms ease
+}
+@media (prefers-reduced-motion:reduce){
+  .nav-ind, .nav-ind.is-ready{ transition:none }
+}
+
+/* Ledger rows — design px, never rem-collapsed */
+[data-row]{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) minmax(0,1.5fr);
+  gap:20px;
+  padding:26px 0 !important;
+  border-top:1px solid rgba(255,255,255,.08);
+  box-sizing:border-box;
+}
+[data-row]:last-child{ border-bottom:1px solid rgba(255,255,255,.08); }
+[data-mod],[data-sec],[data-topic]{ padding:26px 0 !important; box-sizing:border-box; }
+h2 + div:has([data-row]),
+h2 + div:has([data-mod]),
+h2 + div:has([data-sec]){ margin-top:40px !important; }
+[data-hero-pad]{ padding-top:clamp(48px, 6vw, 88px) !important; }
+[data-nav]{ gap:20px !important; }
+
+[data-drawer] .container > a:first-child{ border-top:0 }
+[data-drawer-lang-row]{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:52px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.lang-seg{
+  display:inline-flex;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;
+  overflow:hidden;
+}
+.lang-seg button{
+  height:36px;
+  padding:0 14px;
+  border:0;
+  background:transparent;
+  color:#8B90A3;
+  font-weight:600;
+  cursor:pointer;
+}
+.lang-seg button[lang="en"]{ font-family:Archivo,sans-serif; font-size:13.5px }
+.lang-seg button[lang="ar"]{ font-family:Cairo,Archivo,sans-serif; font-size:14px; border-left:1px solid rgba(255,255,255,.12) }
+.lang-seg button[aria-pressed="true"]{ background:rgba(255,255,255,.08); color:#F2F4F8 }
+.tf-text-link{
+  color:#2EE8FF;
+  border-bottom:1px solid rgba(46,232,255,.4);
+  text-decoration:none;
+}
+.tf-text-link:hover{ color:#2EE8FF; border-bottom-color:#2EE8FF }
+.btn-outline{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  height:52px;
+  padding:0 24px;
+  border:1px solid #2EE8FF;
+  color:#2EE8FF;
+  background:transparent;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:600;
+  text-decoration:none;
+}
+[dir="rtl"]{text-align:left}
+[dir="rtl"][data-i18n],
+[dir="rtl"][data-i18n-placeholder]{letter-spacing:0}
+[data-logout],[data-logout]:hover,[data-logout] *{color:#2EE8FF!important;background:transparent!important}
+/* Drawer markup: see [data-drawer] in Site Header.dc.html (open the reference at ≤1000px and tap the menu button, then copy the DOM) */
+
+/* Pages */
+@media (max-width:900px){
+  [data-hero],[data-split],[data-cols],[data-step],[data-check]{grid-template-columns:1fr}
+  [data-axis]{grid-template-columns:1fr;gap:16px}
+  [data-row]{grid-template-columns:48px 1fr} [data-row] > :last-child{grid-column:2}
+  [data-mod]{grid-template-columns:44px 1fr} [data-sec]{grid-template-columns:40px 1fr}
+  [data-cols] > div{border-left:0;padding-left:0;padding-right:0;border-top:1px solid rgba(255,255,255,0.08)}
+  [data-check] > div:last-child{border-left:0;border-top:1px solid rgba(255,255,255,0.08)}
+  [data-sticky]{position:static} [data-bands]{display:none} [data-first]{order:-1}
+  [data-timeline]{grid-template-columns:repeat(2,1fr)} [data-admin]{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  [data-axis]{gap:12px}
+  [data-kpi]{grid-template-columns:repeat(2,1fr)} [data-kpi] > div:nth-child(3){border-left:0;padding-left:0} [data-kpi] > div{border-bottom:1px solid rgba(255,255,255,0.08)}
+}
+@media (prefers-reduced-motion:reduce){[data-ticker]{animation:none}}
+
+/* Never wrap — every button, link-button, menu action. */
+.btn,
+button,
+a[class*="btn"],
+[data-signup],
+[data-login],
+[data-drawer-actions] a,
+[data-act],
+.dlg-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  white-space: nowrap !important;
+  flex: none !important;
+  line-height: 1;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box;
+}
+button span,
+a[class*="btn"] span,
+[data-signup] span,
+[data-login] span,
+[data-drawer-actions] a span,
+.btn span {
+  white-space: nowrap !important;
+  line-height: 1;
+}
+button[role="switch"] { gap: 0; }
+/* 390px: link-buttons keep one line but shrink so the longest label still fits the 358px column. */
+@media (max-width: 480px) {
+  main a[class*="btn"] {
+    max-width: 100%;
+    font-size: 14px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+[data-hd] [data-signup],
+[data-hd] [data-login],
+[data-hd] [data-langbtn],
+[data-hd] [data-menu],
+[data-hd] [data-user-wrap],
+[data-hd] [data-session-chip] { flex: none !important; }
+[data-nav] { min-width: 0; }
+[data-hd] [data-signup] [data-label-short] { display: none; }
+@media (max-width: 1100px) {
+  [data-hd] [data-signup] [data-label-full] { display: none !important; }
+  [data-hd] [data-signup] [data-label-short] { display: inline !important; }
+}
+
+/* Buttons — every state sets color. Generic a:hover / scp hover cannot reach them. */
+a:not([class*="btn"]):not([data-signup]):hover { color: #F2F4F8; }
+
+.btn-primary,
+.btn--primary,
+a.btn-primary,
+[data-signup],
+a[data-signup],
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  background: #2EE8FF !important;
+  color: #04141A !important;
+  border-radius: 10px;
+  border: 0;
+  opacity: 1 !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-weight: 600;
+  font-family: Archivo, Cairo, sans-serif;
+  gap: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:focus-visible, .btn-primary:active,
+.btn--primary:hover, .btn--primary:focus-visible, .btn--primary:active,
+a.btn-primary:hover, a.btn-primary:focus-visible, a.btn-primary:active,
+[data-signup]:hover, [data-signup]:focus-visible, [data-signup]:active,
+a[data-signup]:hover, a[data-signup]:focus-visible, a[data-signup]:active,
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover,
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):focus-visible,
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):active {
+  background: #8FF3FF !important;
+  color: #04141A !important;
+  opacity: 1 !important;
+}
+.btn-primary:active, .btn--primary:active, a.btn-primary:active,
+[data-signup]:active, html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):active {
+  transform: translateY(1px);
+}
+.btn-primary:disabled, .btn-primary.is-pending, .btn-primary.is-loading,
+.btn--primary:disabled, [data-signup]:disabled,
+html body form button[type="submit"]:disabled {
+  opacity: .5 !important;
+  color: #04141A !important;
+  background: #2EE8FF !important;
+  pointer-events: none;
+}
+.btn-primary *, .btn--primary *, a.btn-primary *, [data-signup] *, a[data-signup] *,
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral) * {
+  color: #04141A !important;
+  line-height: 1 !important;
+}
+.btn-primary svg, .btn--primary svg, [data-signup] svg, a.btn-primary svg {
+  width: 16px; height: 16px; flex: none;
+}
+
+.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 52px; padding: 0 24px;
+  border: 1px solid #2EE8FF; color: #2EE8FF; background: transparent;
+  border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none;
+  font-family: Archivo, Cairo, sans-serif; box-sizing: border-box; cursor: pointer;
+}
+.btn-outline:hover, .btn-outline:focus, .btn-outline:focus-visible, .btn-outline:active {
+  background: rgba(46,232,255,.14) !important; color: #2EE8FF !important; border-color: #2EE8FF !important;
+}
+.btn-outline:active { transform: translateY(1px); }
+.btn-outline:disabled, .btn-outline.is-pending, .btn-outline.is-loading {
+  opacity: .5; color: #2EE8FF !important; pointer-events: none;
+}
+.btn-outline * { color: #2EE8FF !important; }
+
+.btn-neutral {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 14px;
+  border: 1px solid rgba(255,255,255,.16); color: #F2F4F8; background: transparent;
+  border-radius: 10px; font-size: 13.5px; font-weight: 600; text-decoration: none;
+  font-family: Archivo, Cairo, sans-serif; box-sizing: border-box; cursor: pointer;
+}
+.btn-neutral:hover, .btn-neutral:focus, .btn-neutral:focus-visible, .btn-neutral:active {
+  border-color: #F2F4F8 !important; color: #F2F4F8 !important; background: transparent !important;
+}
+.btn-neutral:active { transform: translateY(1px); }
+.btn-neutral:disabled, .btn-neutral.is-pending, .btn-neutral.is-loading {
+  opacity: .5; color: #F2F4F8 !important; pointer-events: none;
+}
+.btn-neutral * { color: #F2F4F8 !important; }
+
+.btn-primary:focus-visible, .btn-outline:focus-visible, .btn-neutral:focus-visible,
+[data-signup]:focus-visible, html body form button[type="submit"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46,232,255,.18);
+}
+
+/* Visible keyboard focus for every other control; the buttons above use their own ring. */
+:where(a, button, [role="button"], [role="option"], [role="switch"], input, select, textarea, summary):focus-visible {
+  outline: 2px solid #2EE8FF;
+  outline-offset: 2px;
+}
+
+.tf-skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #F2F4F8;
+  color: #04141A;
+  font: 600 14px Archivo, Cairo, sans-serif;
+  transform: translateY(-200%);
+  opacity: 0;
+  transition: transform .15s, opacity .15s;
+}
+.tf-skip-link:focus, .tf-skip-link:focus-visible {
+  transform: none;
+  opacity: 1;
+  outline: 2px solid #2EE8FF;
+  outline-offset: 2px;
+}
+
+.btn-primary.is-loading::before, .btn-outline.is-loading::before, .btn-neutral.is-loading::before,
+.btn-primary.is-pending .tf-spin, button.is-pending .tf-spin {
+  flex: none;
+}
+.btn-primary.is-loading::before, .btn-outline.is-loading::before, .btn-neutral.is-loading::before {
+  content: "";
+  width: 16px; height: 16px;
+  border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: tf-spin .6s linear infinite;
+}
+
+[data-hd] [data-signup],
+[data-hd] a.btn-primary {
+  height: 36px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  font-size: 13.5px !important;
+}
+[data-drawer] .btn-primary,
+[data-drawer] a.btn-primary,
+form .btn-primary,
+form button[type="submit"] {
+  height: 48px !important;
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+  font-size: 15px !important;
+}
+html[data-lang="ar"] [data-hd] [data-signup],
+html[data-lang="ar"] [data-hd] a.btn-primary { font-size: 13.5px !important; }
+html[data-lang="ar"] .btn-primary span,
+html[data-lang="ar"] [data-signup] span {
+  transform: translateY(-0.07em);
+}
+html[data-lang="ar"] [data-drawer] .btn-primary,
+html[data-lang="ar"] form .btn-primary,
+html[data-lang="ar"] form button[type="submit"] { font-size: 15px !important; }
+
+/* Filled surfaces: hover must never paint text in the fill colour. */
+.tag:hover, .tag:hover *, [data-tag]:hover, [data-tag]:hover *,
+[data-status]:hover, [data-status]:hover * { color: inherit; }
+[role="menuitem"]:hover, [role="menuitem"]:focus-visible { color: #F2F4F8; background: rgba(255,255,255,.06); }
+[data-nav] a:hover, [data-nav] a[aria-current="page"]:hover { color: #F2F4F8; }
+[data-account-nav] a:hover, [data-account-nav] a[aria-current="page"]:hover { color: #F2F4F8; }
+.lang-seg button:hover { color: #F2F4F8; }
+.lang-seg button[aria-pressed="true"]:hover { color: #F2F4F8; background: rgba(255,255,255,.08); }
+[data-kpi] > div:hover, [data-kpi] > div:hover * { color: inherit; }
+table tbody tr:hover td { color: inherit; }
+[data-user-menu] a:hover { background: rgba(255,255,255,.06); color: #F2F4F8; }
+[role="switch"]:hover, [role="switch"]:focus-visible { color: inherit; }
+
+/* Beat per-page .scpN:hover !important on filled buttons */
+html body button.btn-primary:is(:hover,:focus,:focus-visible,:active),
+html body a.btn-primary:is(:hover,:focus,:focus-visible,:active),
+html body [data-signup]:is(:hover,:focus,:focus-visible,:active),
+html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):is(:hover,:focus,:focus-visible,:active) {
+  background: #8FF3FF !important;
+  color: #04141A !important;
+}
+/* Text on cyan is #04141A in every state, including the tutorial play button; and no leaked hover
+   rule may pour a cyan fill under the outline or neutral variants (where the text is white/cyan). */
+html body .btn-primary, html body .btn-primary *, html body a.btn-primary *, html body [data-signup] *,
+html body #guide .tf-tut-play, html body #guide .tf-tut-play *, html body [data-tf-bigplay], html body [data-tf-bigplay] * {
+  color: #04141A !important;
+}
+html body a.btn-neutral:is(:hover,:focus,:focus-visible,:active),
+html body button.btn-neutral:is(:hover,:focus,:focus-visible,:active) {
+  background: transparent !important;
+}
+html body a.btn-outline:is(:hover,:focus,:focus-visible,:active),
+html body button.btn-outline:is(:hover,:focus,:focus-visible,:active) {
+  background: rgba(46,232,255,.14) !important;
+}
+
+@media (max-width:900px){
+  [data-acc]{grid-template-columns:1fr!important}
+  [data-crumb]{display:none!important}
+  body:has([data-account]){--header-height:56px}
+  body:has([data-account]) > header,
+  body:has([data-account]) header{height:56px!important}
+  body:has([data-account]) [data-hd]{height:56px!important;gap:12px!important}
+  body:has([data-account]) [data-hd] [data-user-wrap],
+  body:has([data-account]) [data-hd] [data-session-chip],
+  body:has([data-account]) [data-hd] [data-langbtn],
+  body:has([data-account]) [data-hd] [data-nav],
+  body:has([data-account]) [data-hd] [data-login],
+  body:has([data-account]) [data-hd] [data-signup]{display:none!important}
+  body:has([data-account]) [data-menu]{display:inline-flex!important}
+  [data-account-mobile]{display:block}
+  [data-account] [data-account-nav],
+  [data-account] [data-subnav]{display:none!important}
+  [data-account-tabs]{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:0 16px 10px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  [data-account-tabs]::-webkit-scrollbar{display:none}
+  [data-two]{grid-template-columns:1fr!important}
+}
+[data-status]{white-space:nowrap}
+.scp-acc:hover{border-color:rgba(255,255,255,0.2)!important}
+
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+/* Legal pages: the Arabic view shows the binding note above section 01 and the English original under
+   each section; the English view shows each section once. Lives here, not in the page head, so it
+   survives soft navigation. */
+[data-ar-only],[data-en-orig]{display:none!important}
+html[data-lang="ar"] [data-ar-only],html[data-lang="ar"] [data-en-orig]{display:block!important}
+[data-en-orig] h3,[data-en-orig] p,[data-en-orig] ul{margin:0}
+[data-en-orig] p,[data-en-orig] ul{margin-top:6px}
+/* Arabic list items carry dir=rtl, so their markers sit on the right: move the indent with them. */
+html[data-lang="ar"] [data-sec] > div > ul{padding-left:0!important;padding-right:18px}
+#guide [data-om-starter]{background:#07080C!important}
+#guide [data-om-starter] > :last-child{display:none!important}
+#guide [data-tf-stage] svg{display:block}
+#guide [data-tf-poster][hidden],#guide[data-tutorial-playing="1"] [data-tf-poster]{display:none!important}
+/* Paused state: 64px cyan play circle centred on the stage; nothing on the stage while playing. */
+#guide [data-tf-bigplay]{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border:0;border-radius:50%;padding:0;background:#2EE8FF;color:#04141A;display:grid;place-items:center;cursor:pointer;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#guide [data-tf-bigplay]:hover{background:#8FF3FF}
+#guide[data-tutorial-playing="1"] [data-tf-bigplay]{display:none!important}
+#guide [data-player]{background:#07080C}
+/* Bottom bar: part of the stage card, same width as the stage, 16px side padding; time / 1x / full
+   screen sit against the stage's right edge. In fullscreen the stage letterboxes and the bar keeps
+   its width so both edges stay aligned. */
+#guide [data-tf-controls]{display:block;margin:0;padding:0;width:100%;box-sizing:border-box}
+#guide [data-tf-chrome]{width:100%;box-sizing:border-box;padding:0 16px;background:#0B0D13;border-top:1px solid rgba(255,255,255,.08)}
+#guide [data-tf-chrome] > :last-child{margin-right:0}
+#guide [data-player]:fullscreen{display:flex;flex-direction:column;justify-content:center;border:0;border-radius:0;background:#07080C}
+#guide [data-player]:fullscreen [data-tf-stage]{width:100%;max-width:calc((100vh - 56px) * 16 / 9);margin:0 auto}
+#guide [data-player]:fullscreen [data-tf-controls]{max-width:calc((100vh - 56px) * 16 / 9);margin:0 auto}
+#guide .tf-tut-play{width:36px;height:36px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;cursor:pointer;display:grid;place-items:center;padding:0;flex:none}
+#guide .tf-tut-play:hover{background:#8FF3FF}
+#guide .tf-tut-speed,#guide .tf-tut-full{height:32px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;font-family:'Geist Mono',monospace;font-size:12px;flex:none}
+#guide .tf-tut-speed{padding:0 10px}
+#guide .tf-tut-full{width:32px;padding:0;display:grid;place-items:center;color:#B7BCCB}
+#guide .tf-tut-speed:hover,#guide .tf-tut-full:hover{border-color:#F2F4F8}
+@media (max-width:640px){
+  #guide .tf-tut-speed{display:none}
+  #guide [data-tf-dur]{display:none}
+}
+#submit-proof:disabled{opacity:.5!important;cursor:not-allowed}
+@media (max-width:820px){
+  [data-vid]{grid-template-columns:1fr!important}
+}

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<base href="/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<meta charset="utf-8">
+<script>(function(){try{var a=/\/admin(?:\/|$)/.test(location.pathname),q=/[?&]lang=(en|ar)(?:&|$)/.exec(location.search),l=a?'en':(q?q[1]:(localStorage.getItem('tf-lang')||'en'));if(q&&!a)localStorage.setItem('tf-lang',l);document.documentElement.lang=l;document.documentElement.setAttribute('data-lang',l);if(l==='ar'){var p=document.createElement('link');p.rel='preload';p.as='font';p.type='font/woff2';p.crossOrigin='anonymous';p.href='/fonts/Cairo-wght.woff2';document.head.appendChild(p)}}catch(e){document.documentElement.setAttribute('data-lang','en')}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/Archivo-wdth-wght.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/GeistMono-wght.woff2">
+<title>Talaria Flow — Order flow tools and a free course for NinjaTrader</title>
+<meta name="description" content="Read the order flow, trade the structure. Open a NinjaTrader account through our partner link and get the full 30-video order flow course free, with written notes to your inbox.">
+<meta name="tf-seo" content="home">
+<link rel="canonical" href="https://www.talaria-flow.com/">
+<link rel="alternate" hreflang="en" href="https://www.talaria-flow.com/">
+<link rel="alternate" hreflang="ar" href="https://www.talaria-flow.com/?lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://www.talaria-flow.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Talaria Flow">
+<meta property="og:title" content="Talaria Flow — Order flow tools and a free course for NinjaTrader">
+<meta property="og:description" content="Read the order flow, trade the structure. Open a NinjaTrader account through our partner link and get the full 30-video order flow course free, with written notes to your inbox.">
+<meta property="og:url" content="https://www.talaria-flow.com/">
+<meta property="og:image" content="https://www.talaria-flow.com/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Talaria Flow">
+<meta property="og:locale" content="en_GB">
+<meta property="og:locale:alternate" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Talaria Flow — Order flow tools and a free course for NinjaTrader">
+<meta name="twitter:description" content="Read the order flow, trade the structure. Open a NinjaTrader account through our partner link and get the full 30-video order flow course free, with written notes to your inbox.">
+<meta name="twitter:image" content="https://www.talaria-flow.com/assets/og-default.png">
+<meta name="theme-color" content="#07080C">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="/assets/css/transitions.css">
+<link rel="stylesheet" href="/assets/css/fonts.css">
+<style>
+body{margin:0;background:#07080C;color:#F2F4F8;font-family:'Archivo','Cairo',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}a:not([class*="btn"]):hover{color:#F2F4F8}
+h1,h2,h3,p{margin:0}
+input::placeholder{color:#7C8296}
+@keyframes tf-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){[data-ticker]{animation:none!important}}
+@media (max-width:900px){[data-hero]{grid-template-columns:1fr!important}[data-axis]{grid-template-columns:1fr!important;gap:16px!important}[data-row]{grid-template-columns:48px 1fr!important}[data-row] > :last-child{grid-column:2}[data-split]{grid-template-columns:1fr!important}[data-bands]{display:none}}
+@media (max-width:640px){[data-axis]{gap:12px!important}}
+</style>
+<style>
+body{margin:0;background:#07080C;color:#F2F4F8;font-family:'Archivo','Cairo',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}a:not([class*="btn"]):hover{color:#F2F4F8}
+[data-menu]{display:none}
+@media (max-width:1000px){[data-nav],[data-login],[data-signup],[data-langbtn]{display:none!important}[data-menu]{display:inline-flex!important}[data-brand]{font-size:16px!important}[data-hd]{gap:12px!important;height:60px!important}}
+
+</style>
+<style>
+body{margin:0;background:#07080C;color:#F2F4F8;font-family:'Archivo','Cairo',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}a:not([class*="btn"]):hover{color:#F2F4F8}
+</style>
+<style>.scp0:hover { background: rgb(143, 243, 255) !important; color: rgb(4, 20, 26) !important; }
+.scp1:hover { background: rgba(46, 232, 255, 0.14) !important; color: rgb(46, 232, 255) !important; }
+.scp2:hover { border-bottom-color: rgb(46, 232, 255) !important; color: rgb(46, 232, 255) !important; }
+.scp3:focus { border-bottom-color: rgb(46, 232, 255) !important; }
+.scp4:hover { background: rgb(143, 243, 255) !important; }
+.scp5:hover { background: rgba(255, 255, 255, 0.05) !important; }
+.scp6:hover { background: rgba(255, 255, 255, 0.06) !important; }
+.scp7:hover { color: rgb(242, 244, 248) !important; }
+.scp8:hover { border-color: rgb(242, 244, 248) !important; }
+.scp9:hover { color: rgb(46, 232, 255) !important; }</style>
+<style>
+[data-menu]{display:none}
+@media (max-width:1000px){[data-nav],[data-login],[data-signup],[data-langbtn]{display:none!important}[data-menu]{display:inline-flex!important}[data-brand]{font-size:16px!important}[data-hd]{gap:12px!important;height:60px!important}}
+
+@media (max-width:900px){
+  [data-hero],[data-split],[data-cols],[data-step],[data-check]{grid-template-columns:1fr!important}
+  [data-axis]{grid-template-columns:1fr!important;gap:16px!important}
+  [data-row]{grid-template-columns:48px 1fr!important} [data-row] > :last-child{grid-column:2}
+  [data-mod]{grid-template-columns:44px 1fr!important} [data-sec]{grid-template-columns:40px 1fr!important}
+  [data-cols] > div{border-left:0!important;padding-left:0!important;padding-right:0!important;border-top:1px solid rgba(255,255,255,0.08)}
+  [data-check] > div:last-child{border-left:0!important;border-top:1px solid rgba(255,255,255,0.08)}
+  [data-sticky]{position:static!important} [data-bands]{display:none!important} [data-first]{order:-1}
+  [data-timeline]{grid-template-columns:repeat(2,1fr)!important} [data-admin]{grid-template-columns:1fr!important}
+}
+@media (max-width:640px){
+   
+   [data-axis]{gap:12px!important}
+  [data-kpi]{grid-template-columns:repeat(2,1fr)!important} [data-kpi] > div:nth-child(3){border-left:0!important;padding-left:0!important} [data-kpi] > div{border-bottom:1px solid rgba(255,255,255,0.08)}
+}
+</style>
+<style id="tf-cyan-btn">.btn-primary,.btn-primary:hover,.btn-primary:focus,.btn-primary:focus-visible,.btn-primary:active,.btn-primary:disabled,.btn-primary.is-pending,.btn-primary.is-loading,a.btn-primary,a.btn-primary:hover,a.btn-primary:focus-visible,a[data-signup],a[data-signup]:hover,a[data-signup]:focus,[data-signup],[data-signup]:hover,[data-signup] *,.btn-primary *,form button[type="submit"]:not(.btn-outline):not(.btn-neutral),form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover,form button[type="submit"]:not(.btn-outline):not(.btn-neutral):focus-visible{color:#04141A!important;opacity:1}.btn-outline,.btn-outline:hover,.btn-outline:focus-visible,.btn-outline:active,.btn-outline *{color:#2EE8FF!important}.btn-neutral,.btn-neutral:hover,.btn-neutral:focus-visible,.btn-neutral:active,.btn-neutral *{color:#F2F4F8!important}html body button.btn-primary:hover,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover{background:#8FF3FF!important;color:#04141A!important}</style>
+</head>
+<body>
+<header style="position: sticky; top: 0px; z-index: 50; height: 68px; background: rgba(7, 8, 12, 0.88); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+  <div class="container" data-hd="" style="width: var(--container); margin: 0px auto; padding: 0px var(--gutter); height: 68px; display: flex; align-items: center; gap: 32px;">
+    <div style="position: relative;">
+      <button id="brand-menu-btn" data-brand="" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Talaria sites" class="scp5" style="display: flex; align-items: center; gap: 12px; height: 40px; padding: 0px 8px; margin: 0px -8px; border: 0px; background: transparent; color: rgb(242, 244, 248); font-family: Archivo, Cairo, sans-serif; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; cursor: pointer; border-radius: 10px;">
+        <img src="assets/logo.svg" alt="Talaria Flow" width="24" height="27" style="max-width:100%;height:auto;display: block;">
+        <span><b style="font-weight: 700;">Talaria</b> <span style="font-weight: 400; color: rgb(139, 144, 163);">Flow</span></span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B90A3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+      </button><div id="brand-menu" role="menu" style="position: absolute; top: calc(100% + 6px); left: 0px; width: 200px; padding: 6px; background: rgb(14, 16, 23); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; z-index: 60;  flex-direction: column; gap: 2px;display:none">
+          <a role="menuitem" href="/" class="scp6" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0px 10px; border-radius: 8px; font-size: var(--fs-small); color: rgb(242, 244, 248);">
+            <img src="assets/logo.svg" alt="Talaria Flow" width="18" height="20" style="max-width:100%;height:auto;display: block;">
+            <span><b style="font-weight: 700;">Talaria</b> <span style="font-weight: 400; color: rgb(139, 144, 163);">Flow</span></span>
+            <span style="margin-left: auto; width: 6px; height: 6px; background: rgb(46, 232, 255); border-radius: 50%;"></span>
+          </a>
+          <a role="menuitem" href="https://www.talaria-log.com" target="_blank" rel="noopener" class="scp6" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0px 10px; border-radius: 8px; font-size: var(--fs-small); color: rgb(242, 244, 248);">
+            <img src="assets/logo-talaria-log.svg" alt="Talaria Log" width="18" height="20" style="max-width:100%;height:auto;display: block;">
+            <span><b style="font-weight: 700;">Talaria</b> <span style="font-weight: 400; color: rgb(139, 144, 163);">Log</span></span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B90A3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto;"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+          </a>
+        </div>
+      
+    </div>
+    <nav data-nav="" aria-label="Primary" style="display: flex; gap: 28px; align-items: stretch; height: 100%; margin-inline-start: 16px; position: relative;">
+      
+        <a href="/" data-key="home"><span dir="ltr"><span data-i18n="header.home">Home</span></span></a>
+      
+        <a href="/course/" data-key="course"><span dir="ltr"><span data-i18n="header.course">Free order flow course</span></span></a>
+<a href="/ninjatrader/" data-key="ninjatrader"><span dir="ltr"><span data-i18n="header.nt">NinjaTrader</span></span></a>
+      
+        <a href="/tools/" data-key="suite"><span dir="ltr"><span data-i18n="header.suite">Tools suite</span></span></a>
+      
+    </nav>
+    <span class="nav-ind" aria-hidden="true"></span>
+    <div style="display: flex; gap: 18px; align-items: center; margin-inline-start: auto;">
+      <div style="position: relative;">
+        <button id="lang-menu-btn" data-langbtn="" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language: EN" class="scp8" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0px 12px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px; background: transparent; color: rgb(242, 244, 248); font-family: Archivo, Cairo, sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+          <span><span data-i18n="header.lang">EN</span></span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+        </button><div id="lang-menu" role="listbox" style="position: absolute; top: calc(100% + 6px); right: 0px; width: 160px; padding: 6px; background: rgb(14, 16, 23); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; z-index: 60;  flex-direction: column; gap: 2px;display:none">
+            <button type="button" role="option" lang="en" aria-selected="true" class="scp6" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 40px; padding: 0px 10px; border: 0px; border-radius: 8px; background: transparent; color: rgb(242, 244, 248); font-family: Archivo, Cairo, sans-serif; font-size: var(--fs-small); font-weight: 500; cursor: pointer; text-align: left;"><span>English</span><span style="width: 6px; height: 6px; border-radius: 50%; background: rgb(46, 232, 255);"></span></button>
+            <button type="button" role="option" lang="ar" aria-selected="false" class="scp6" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 40px; padding: 0px 10px; border: 0px; border-radius: 8px; background: transparent; color: rgb(242, 244, 248); font-family: Cairo, Archivo, sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; text-align: left;"><span>العربية</span><span style="width: 6px; height: 6px; border-radius: 50%; background: transparent;"></span></button>
+          </div>
+        
+      </div>
+      <a data-login="" href="/login/" class="scp7" style="font-size: 14px; font-weight: 500; color: rgb(183, 188, 203); white-space: nowrap;"><span data-i18n="header.login">Log in</span></a>
+      <button id="menu-btn" data-menu="" type="button" aria-label="Menu" aria-expanded="false" style="width: 40px; height: 40px; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px; background: transparent; color: rgb(242, 244, 248); cursor: pointer; order: 9;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+      <a data-signup="" href="/signup/" class="btn btn-primary scp0" style="display: inline-flex; align-items: center; height: 36px; padding: 0px 16px; background: rgb(46, 232, 255); color: rgb(4, 20, 26); border-radius: 10px; font-size: 13.5px; font-weight: 600; white-space: nowrap; flex: none; transition: background 0.18s;"><span data-label-full="" data-i18n="header.signup">Create account</span><span data-label-short="" data-i18n="header.signupShort">Sign up</span></a>
+    </div>
+  </div>
+  <div data-drawer="" style="display:none;border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgb(7, 8, 12);">
+      <div class="container" style="width: var(--container); margin: 0px auto; padding: 8px var(--gutter) 20px; display: flex; flex-direction: column;">
+        
+          <a href="/" style="display: flex; align-items: center; justify-content: space-between; height: 52px; font-size: 17px; font-weight: 600; color: rgb(242, 244, 248); border-bottom: 1px solid rgba(255, 255, 255, 0.08);"><span dir="ltr"><span><span data-i18n="header.home">Home</span></span></span><span style="width: 6px; height: 6px; border-radius: 50%; background: rgb(46, 232, 255);"></span></a>
+        
+          <a href="/course/" data-key="course" style="display: flex; align-items: center; justify-content: space-between; height: 52px; font-size: 17px; font-weight: 500; color: rgb(183, 188, 203); border-bottom: 1px solid rgba(255, 255, 255, 0.08);"><span dir="ltr"><span><span data-i18n="header.course">Free order flow course</span></span></span><span style="width: 6px; height: 6px; border-radius: 50%; background: transparent;"></span></a>
+
+<a href="/ninjatrader/" style="display: flex; align-items: center; justify-content: space-between; height: 52px; font-size: 17px; font-weight: 500; color: rgb(183, 188, 203); border-bottom: 1px solid rgba(255, 255, 255, 0.08);"><span dir="ltr"><span><span data-i18n="header.nt">NinjaTrader</span></span></span><span style="width: 6px; height: 6px; border-radius: 50%; background: transparent;"></span></a>
+        
+          <a href="/tools/" style="display: flex; align-items: center; justify-content: space-between; height: 52px; font-size: 17px; font-weight: 500; color: rgb(183, 188, 203); border-bottom: 1px solid rgba(255, 255, 255, 0.08);"><span dir="ltr"><span><span data-i18n="header.suite">Tools suite</span></span></span><span style="width: 6px; height: 6px; border-radius: 50%; background: transparent;"></span></a>
+        
+        <div data-drawer-lang-row="">
+          <span style="font-size:15px;color:#8B90A3"><span data-i18n="header.language">Language</span></span>
+          <div data-drawer-lang="" role="radiogroup" class="lang-seg">
+            <button type="button" lang="en" aria-pressed="true">English</button>
+            <button type="button" lang="ar" aria-pressed="false">العربية</button>
+          </div>
+        </div>
+        <div data-drawer-actions="" style="display: flex; gap: 12px; margin-top: 16px;">
+          <a href="/login/" class="btn btn-neutral" style="display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px; font-size: 15px; font-weight: 600; color: rgb(242, 244, 248); white-space: nowrap; flex: none;"><span dir="ltr"><span><span data-i18n="header.login">Log in</span></span></span></a>
+          <a href="/signup/" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; background: rgb(46, 232, 255); color: rgb(4, 20, 26); border-radius: 10px; font-size: 15px; font-weight: 600; white-space: nowrap; flex: none;"><span dir="ltr"><span><span data-i18n="header.signup">Create account</span></span></span></a>
+        </div>
+      </div>
+    </div></header><main id="page"><section style="position: relative; overflow: hidden; border-bottom: 1px solid rgba(255, 255, 255, 0.08); min-height: min(90vh, 900px);">
+  
+    <img data-bands="" src="assets/logo-white.svg" alt="" aria-hidden="true" style="max-width:100%;height:auto;position: absolute; inset-inline-end: -6vw; top: -12%; width: min(52vw, 640px); opacity: 0.045; pointer-events: none;" width="640" height="720">
+  
+  <div class="container" data-hero-pad style="width: var(--container); margin: 0px auto; padding: var(--space-section) var(--gutter) var(--space-block);">
+    <div data-hero="" class="hero-grid" style="display: grid; grid-template-columns: minmax(0px, 1.15fr) minmax(0px, 0.85fr); gap: clamp(32px, 5vw, 80px); align-items: end;">
+      <div style="min-width: 0px;">
+        <div style="display: flex; align-items: center; gap: 12px; font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(139, 144, 163); margin-bottom: 28px;"><span style="display: inline-block; width: 24px; height: 1px; background: rgb(46, 232, 255);"></span><span dir="ltr" data-i18n="index.eyebrow">NinjaTrader Ecosystem partner</span></div>
+        <h1 dir="ltr" style="font-size: var(--fs-h1); line-height: 0.94; letter-spacing: -0.035em; text-wrap: balance; text-align: left;">
+          <span data-i18n="index.h1a" dir="ltr" style="display: block; font-weight: 800; font-stretch: 125%; text-align: left;">Read the order flow.</span>
+          <span data-i18n="index.h1b" dir="ltr" style="display: block; font-weight: 500; font-stretch: 100%; color: rgb(139, 144, 163); margin-top: 0.06em; text-align: left;">Trade the structure.</span>
+        </h1>
+        <p dir="ltr" data-i18n="index.lede" style="margin-top: 32px; font-size: var(--fs-lede); line-height: 1.6; color: rgb(183, 188, 203); max-width: 52ch; text-wrap: pretty; text-align: left;">Talaria Flow builds order flow tools for NinjaTrader and teaches the concepts behind them. Open your NinjaTrader account through our partner link and the full 30-video course is yours, free, with written materials and lesson notes sent to your inbox.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px;">
+          <a href="/course/" class="btn-primary scp0" style="display: inline-flex; align-items: center; gap: 12px; height: 52px; padding: 0px 24px; background: rgb(46, 232, 255); color: rgb(4, 20, 26); border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.18s;"><span dir="ltr"><span data-i18n="index.ctaCourse">Get the free course</span></span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: none;"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          <a href="https://ninjatraderdomesticvendor.sjv.io/xJnDGk" target="_blank" rel="sponsored noopener" class="btn-outline scp1" style="display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0px 24px; border: 1px solid rgb(46, 232, 255); color: rgb(46, 232, 255); border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.18s;"><span dir="ltr"><span data-i18n="index.ctaNT">Open a NinjaTrader account</span></span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: none;"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); margin-top: 48px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="padding: 16px 0px 0px; padding-inline-end: 20px; border-inline-end: 1px solid rgba(255, 255, 255, 0.08);"><div dir="ltr" style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; text-align: left;"><span data-i18n="index.f1">30 videos + notes</span></div><div dir="ltr" style="font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.04em; color: rgb(139, 144, 163); margin-top: 4px; text-align: left;"><span data-i18n="index.f1s">Written materials and lesson notes to your inbox</span></div></div>
+          <div style="padding: 16px 0px 0px; padding-inline-start: 20px;"><div data-tip-i18n="tip.deposit" data-tip="$0 / no deposit — you do not need to fund the account to get the course." style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">$0</div><div dir="ltr" style="font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.04em; color: rgb(139, 144, 163); margin-top: 4px; text-align: left;"><span data-i18n="index.f2s">NinjaTrader account via our link · no deposit required</span></div></div>
+          
+        </div>
+      </div>
+
+      <div data-ladder="" class="hero-visual" dir="ltr" role="img" aria-label="Illustrative order flow sequence: volume profile, footprint, big prints, reversal" style="min-width: 0px; border-top: 1px solid rgba(255, 255, 255, 0.16); padding-top: 6px;">
+        <canvas width="600" height="520"></canvas>
+      </div>
+    </div>
+  </div></section><div aria-hidden="true" dir="ltr" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; font-family: &quot;Geist Mono&quot;, monospace; font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(139, 144, 163); white-space: nowrap;"><div data-ticker="" style="display: inline-flex; animation: 48s linear 0s infinite normal none running tf-ticker; will-change: transform;"><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.0">Volume profile</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.1">Market profile</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.2">Footprint</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.3">Cumulative delta</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.4">VWAP</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.5">Absorption</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.6">Imbalance</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.7">Auction Market Theory</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.8">Delta divergence</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.9">POC</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.10">Value area</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.11">Order flow</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.0">Volume profile</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.1">Market profile</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.2">Footprint</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.3">Cumulative delta</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.4">VWAP</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.5">Absorption</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.6">Imbalance</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.7">Auction Market Theory</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.8">Delta divergence</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.9">POC</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.10">Value area</span></span><span style="display: inline-block; padding: 14px 28px; border-right: 1px solid rgba(255, 255, 255, 0.08);"><span data-i18n="index.ticker.11">Order flow</span></span></div></div><section class="container" style="width: var(--container); margin: 0px auto; padding: var(--space-section) var(--gutter) 0px;">
+  <div data-axis="" style="display: grid; grid-template-columns: 96px minmax(0px, 1fr); gap: 32px;">
+    <div style="font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(139, 144, 163); line-height: 1.8;"><span style="display: block; color: rgb(242, 244, 248); font-size: 13px;">01</span><span dir="ltr" style="display: block; text-align: left;"><span data-i18n="index.s1label">How it works</span></span></div>
+    <div style="min-width: 0px;">
+      <h2 dir="ltr" style="font-size: var(--fs-h2); font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; font-stretch: 112%; text-wrap: balance; max-width: 20ch; text-align: left;"><span data-i18n="index.s1h">Three steps. No card, no catch.</span></h2>
+      <div style="margin-top: 40px;">
+        
+          <div data-row="" style="display: grid; grid-template-columns: 64px minmax(0px, 1fr) minmax(0px, 1.5fr); gap: 20px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent;">
+            <div style="font-family: &quot;Geist Mono&quot;, monospace; font-size: 13px; color: rgb(139, 144, 163); padding-top: 4px;">01</div>
+            <h3 dir="ltr" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; text-align: left;"><span data-i18n="index.steps.0.0">Register and create an account with NinjaTrader</span></h3>
+            <p dir="ltr" style="color: rgb(183, 188, 203); font-size: var(--fs-body); text-wrap: pretty; text-align: left;"><span data-i18n="index.steps.0.1">Create your NinjaTrader account using our partner link. No deposit is required. It costs you nothing extra and it is what funds the free course.</span></p>
+          </div>
+        
+          <div data-row="" style="display: grid; grid-template-columns: 64px minmax(0px, 1fr) minmax(0px, 1.5fr); gap: 20px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent;">
+            <div style="font-family: &quot;Geist Mono&quot;, monospace; font-size: 13px; color: rgb(139, 144, 163); padding-top: 4px;">02</div>
+            <h3 dir="ltr" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; text-align: left;"><span data-i18n="index.steps.1.0">Create an account with Talaria Flow</span></h3>
+            <p dir="ltr" style="color: rgb(183, 188, 203); font-size: var(--fs-body); text-wrap: pretty; text-align: left;"><span data-i18n="index.steps.1.1">Sign up here, then upload two screenshots: the NinjaTrader Welcome dashboard and the Web trading platform in Simulation. Blur anything private.</span></p>
+          </div>
+        
+          <div data-row="" style="display: grid; grid-template-columns: 64px minmax(0px, 1fr) minmax(0px, 1.5fr); gap: 20px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+            <div style="font-family: &quot;Geist Mono&quot;, monospace; font-size: 13px; color: rgb(139, 144, 163); padding-top: 4px;">03</div>
+            <h3 dir="ltr" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; text-align: left;"><span data-i18n="index.steps.2.0">Get approved</span></h3>
+            <p dir="ltr" style="color: rgb(183, 188, 203); font-size: var(--fs-body); text-wrap: pretty; text-align: left;"><span data-i18n="index.steps.2.1">We review by hand. Once approved you receive a confirmation email and course access before 31 December 2026.</span></p>
+          </div>
+        <p style="margin-top: 22px;"><a href="/course/#guide" class="tf-text-link"><span data-i18n="index.guideLink">Full step-by-step guide →</span></a></p>
+        
+      </div>
+    </div>
+  </div></section><section class="container" style="width: var(--container); margin: 0px auto; padding: var(--space-section) var(--gutter) 0px;">
+  <div data-axis="" style="display: grid; grid-template-columns: 96px minmax(0px, 1fr); gap: 32px;">
+    <div style="font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(139, 144, 163); line-height: 1.8;"><span style="display: block; color: rgb(242, 244, 248); font-size: 13px;">02</span><span dir="ltr" style="display: block; text-align: left;"><span data-i18n="index.s2label">The course</span></span></div>
+    <div data-split="" style="display: grid; grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr); gap: clamp(32px, 5vw, 72px); align-items: start;">
+      <div style="min-width: 0px;">
+        <h2 dir="ltr" style="font-size: var(--fs-h2); font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; font-stretch: 112%; text-wrap: balance; text-align: left;"><span data-i18n="index.s2h">Thirty videos on reading order flow data to execute on real price moves.</span></h2>
+        <p dir="ltr" style="margin-top: 22px; font-size: 17px; line-height: 1.6; color: rgb(183, 188, 203); max-width: 44ch; text-wrap: pretty; text-align: left;"><span data-i18n="index.s2p">From the first footprint cell to a full session plan built on structure. Every module comes with written materials and lesson notes, delivered to your inbox. No indicators to buy, no signals to follow — the mechanics, taught properly.</span></p>
+        <a href="/course/" class="btn-primary scp0" style="display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0px 22px; margin-top: 28px; background: rgb(46, 232, 255); color: rgb(4, 20, 26); border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.18s;"><span dir="ltr"><span data-i18n="index.s2cta">See the curriculum</span></span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: none;"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </div>
+      <div style="min-width: 0px; font-size: var(--fs-body);">
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;"><span data-i18n="course.modules.0.0">Auction Market Theory</span></span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;"><span data-i18n="course.modules.2.0">Footprint charts</span></span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;"><span data-i18n="course.modules.4.0">VWAP</span></span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;">Volume &amp; Market Profile</span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;">Absorption &amp; imbalance</span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;">Delta &amp; cumulative delta</span></div>
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid transparent; align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(139, 144, 163); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(242, 244, 248); font-style: normal;">Session planning</span></div>
+        
+        
+          <div data-topic="" style="display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 26px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08); align-items: baseline;"><span style="width: 6px; height: 6px; background: rgb(255, 55, 176); display: inline-block; transform: translateY(-2px);"></span><span dir="ltr" style="text-align: left; color: rgb(183, 188, 203); font-style: normal;"><span data-i18n="index.more">and many more</span></span></div>
+        
+      </div>
+    </div>
+  </div></section><section class="container" style="width: var(--container); margin: 0px auto; padding: var(--space-section) var(--gutter) 0px;">
+  <div data-axis="" style="display: grid; grid-template-columns: 96px minmax(0px, 1fr); gap: 32px;">
+    <div style="font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(139, 144, 163); line-height: 1.8;"><span style="display: block; color: rgb(242, 244, 248); font-size: 13px;">03</span><span dir="ltr" style="display: block; text-align: left;"><span data-i18n="index.s3label">Platform partner</span></span></div>
+    <div data-split="" style="display: grid; grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center;">
+      <div style="min-width: 0px;">
+        <h2 dir="ltr" style="font-size: var(--fs-h2); font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; font-stretch: 112%; text-align: left;"><span data-i18n="index.s3h">Built on NinjaTrader.</span></h2>
+        <p dir="ltr" style="margin-top: 22px; font-size: 17px; line-height: 1.6; color: rgb(183, 188, 203); max-width: 44ch; text-wrap: pretty; text-align: left;"><span data-i18n="index.s3p">Every Talaria Flow tool is written for NinjaTrader and every lesson in the course is taught on it. If you are looking for a futures trading platform, this is the one we are building on.</span></p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; margin-top: 28px;">
+          <a href="https://ninjatraderdomesticvendor.sjv.io/xJnDGk" target="_blank" rel="sponsored noopener" class="btn-outline scp1" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0px 22px; border: 1px solid rgb(46, 232, 255); color: rgb(46, 232, 255); border-radius: 10px; font-size: 15px; font-weight: 600; transition: background 0.18s;"><span dir="ltr"><span data-i18n="index.ctaNT">Open a NinjaTrader account</span></span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: none;"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+          <a href="/ninjatrader/" class="scp2" style="display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: rgb(46, 232, 255); border-bottom: 1px solid rgba(46, 232, 255, 0.4); padding-bottom: 2px;"><span dir="ltr"><span data-i18n="index.s3link">Why NinjaTrader</span></span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: none;"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        </div>
+      </div>
+      <div style="display: grid; place-items: center; padding: 56px 32px; background: rgb(0, 0, 0); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;">
+        <img src="assets/nt-ecosystem.svg" alt="NinjaTrader Ecosystem" data-tip-i18n="tip.partner" data-tip="Independent partner in the NinjaTrader Ecosystem" width="360" height="60" style="max-width:100%;height:auto;display: block; width: min(360px, 100%); height: auto;">
+      </div>
+    </div>
+  </div></section><section style="position: relative; overflow: hidden; margin-top: var(--space-section); border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgb(11, 13, 19);">
+  <div class="container" style="width: var(--container); margin: 0px auto; padding: 40px var(--gutter); display: flex; flex-wrap: wrap; gap: 28px 48px; align-items: center; justify-content: space-between;">
+    <div style="flex: 1 1 380px; min-width: 0px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(255, 138, 208); margin-bottom: 12px;"><span style="width: 6px; height: 6px; background: rgb(255, 55, 176); display: inline-block;"></span><span dir="ltr"><span data-i18n="index.devTag">In development</span></span></div>
+      <h3 dir="ltr" style="font-size: clamp(22px, 2.4vw, 28px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; text-align: left;"><span data-i18n="index.devH">The Talaria Flow tools suite is on its way.</span></h3>
+      <p dir="ltr" style="margin-top: 8px; color: rgb(139, 144, 163); font-size: 15px; max-width: 52ch; text-wrap: pretty; text-align: left;"><span data-i18n="index.devP">Profiles, reference levels and alerts, sharing one engine. Leave your email and you will hear when it ships.</span></p>
+    </div>
+    <form data-waitlist="suite" novalidate style="flex: 0 1 460px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; min-width: 0px;">
+      <label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-family: &quot;Geist Mono&quot;, Cairo, monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(139, 144, 163); text-align: left;"><span dir="ltr"><span data-i18n="index.emailLabel">Email</span></span>
+        <input type="email" placeholder="you@example.com" dir="ltr" class="scp3" style="width: 100%; background: transparent; border-width: 0px 0px 1px; border-style: none none solid; border-color: currentcolor currentcolor rgba(255, 255, 255, 0.16); border-image: none; padding: 10px 0px; color: rgb(242, 244, 248); font-family: Archivo, sans-serif; font-size: 15px; outline: none; box-sizing: border-box;">
+      </label>
+      <button type="submit" dir="ltr" class="btn-primary scp4" style="height: 44px; padding: 0px 20px; background: rgb(46, 232, 255); color: rgb(4, 20, 26); border-radius: 10px; border: 0px; font-family: Archivo, Cairo, sans-serif; font-size: var(--fs-small); font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.18s;"><span data-i18n="index.notify">Notify me</span></button>
+    </form>
+  </div></section></main><footer style="border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 64px; font-family: Archivo, Cairo, sans-serif;">
+  <div class="container" style="width: var(--container); margin: 0px auto; padding: 0px var(--gutter);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 32px; padding: 56px 0px 40px;">
+      <div style="grid-column: span 1; min-width: 0px;">
+        <a href="/" style="display: flex; align-items: center; gap: 12px; font-size: 17px; margin-bottom: 16px;"><img src="assets/logo.svg" alt="Talaria Flow" width="24" height="27" style="max-width:100%;height:auto;display: block;"><span><b style="font-weight: 700;">Talaria</b> <span style="font-weight: 400; color: rgb(139, 144, 163);">Flow</span></span></a>
+        <p dir="ltr" style="margin: 0px 0px 20px; font-size: 14px; line-height: 1.6; color: rgb(139, 144, 163); max-width: 30ch; text-align: left;"><span data-i18n="footer.tagline">Order flow tools and education for NinjaTrader traders. An independent partner in the NinjaTrader Ecosystem.</span></p>
+        <div aria-label="Social channels" style="display: flex; gap: 0px; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; overflow: hidden; width: max-content;">
+          <a href="https://www.youtube.com/@talariatrade" target="_blank" rel="noopener" aria-label="YouTube" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203); border-right: 1px solid rgba(255, 255, 255, 0.08);"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 8s-.2-1.5-.8-2.1c-.8-.8-1.6-.8-2-.9C16.4 4.8 12 4.8 12 4.8s-4.4 0-7.2.2c-.4.1-1.2.1-2 .9C2.2 6.5 2 8 2 8s-.2 1.7-.2 3.5v1.6c0 1.7.2 3.5.2 3.5s.2 1.5.8 2.1c.8.8 1.8.8 2.2.9 1.6.2 7 .2 7 .2s4.4 0 7.2-.2c.4-.1 1.2-.1 2-.9.6-.6.8-2.1.8-2.1s.2-1.7.2-3.5v-1.6C22.2 9.7 22 8 22 8zM10 15V9l5.5 3L10 15z"></path></svg></a>
+          <a href="https://x.com/Talaria_trade" target="_blank" rel="noopener" aria-label="X" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203); border-right: 1px solid rgba(255, 255, 255, 0.08);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"></path></svg></a>
+          <a href="https://www.instagram.com/talariatrade/" target="_blank" rel="noopener" aria-label="Instagram" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203); border-right: 1px solid rgba(255, 255, 255, 0.08);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor"></circle></svg></a>
+          <a href="https://www.tiktok.com/@talariatrade" target="_blank" rel="noopener" aria-label="TikTok" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203); border-right: 1px solid rgba(255, 255, 255, 0.08);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5M14 4c0 2.5 2 4.5 4.5 4.5"></path></svg></a>
+          <a href="https://www.facebook.com/TalariaTrade" target="_blank" rel="noopener" aria-label="Facebook" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203); border-right: 1px solid rgba(255, 255, 255, 0.08);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"></path></svg></a>
+          <a href="https://t.me/Talaria_trade" target="_blank" rel="noopener" aria-label="Telegram" class="scp9" style="width: 40px; height: 40px; display: grid; place-items: center; color: rgb(183, 188, 203);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 4 3z"></path><path d="M9 13l9-8"></path></svg></a>
+        </div>
+      </div>
+      <div>
+        <div dir="ltr" style="font-family: &quot;Geist Mono&quot;, monospace; font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(139, 144, 163); padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px; text-align: left;"><span data-i18n="footer.site">Site</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-small); color: rgb(183, 188, 203);">
+          <a href="/course/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="header.course">Free order flow course</span></a><a href="/ninjatrader/" class="scp7"><span data-i18n="header.nt">NinjaTrader</span></a><a href="/tools/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="header.suite">Tools suite</span></a><a href="/signup/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="header.signup">Create account</span></a><a href="/login/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="header.login">Log in</span></a>
+        </div>
+      </div>
+      <div>
+        <div dir="ltr" style="font-family: &quot;Geist Mono&quot;, monospace; font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(139, 144, 163); padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px; text-align: left;"><span data-i18n="footer.legal">Legal</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-small); color: rgb(183, 188, 203);">
+          <a href="/legal/privacy/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="footer.privacy">Privacy policy</span></a><a href="/legal/terms/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="footer.terms">Terms of use</span></a><a href="/legal/disclaimers/" dir="ltr" class="scp7" style="text-align: left;"><span data-i18n="footer.disclaimers">Disclaimers</span></a><a href="mailto:support@talaria-flow.com" class="scp7">support@talaria-flow.com</a>
+        </div>
+      </div>
+      <div>
+        <div dir="ltr" style="font-family: &quot;Geist Mono&quot;, monospace; font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(139, 144, 163); padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px; text-align: left;"><span data-i18n="footer.partner">Partner</span></div>
+        <a href="https://ninjatraderdomesticvendor.sjv.io/xJnDGk" target="_blank" rel="sponsored noopener" style="display: inline-flex; flex-direction: column; gap: 12px; padding: 16px 18px; background: rgb(0, 0, 0); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;">
+          <img src="assets/nt-ecosystem.svg" alt="NinjaTrader Ecosystem" width="200" height="33" style="max-width:100%;height:auto;display: block; width: 200px; height: auto;">
+        </a>
+      </div>
+    </div>
+    <div dir="ltr" lang="en" style="padding: 28px 0px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12.5px; line-height: 1.55; color: rgb(139, 144, 163); display: flex; flex-direction: column; gap: 10px; text-align: left;">
+      <p style="margin: 0px;"><strong style="color: rgb(183, 188, 203); font-weight: 600;">Risk Disclosure:</strong> Futures and forex trading contains substantial risk and is not for every investor. An investor could potentially lose all or more than the initial investment. Risk capital is money that can be lost without jeopardizing ones’ financial security or lifestyle. Only risk capital should be used for trading and only those with sufficient risk capital should consider trading. Past performance is not necessarily indicative of future results.</p>
+      <p style="margin: 0px;"><strong style="color: rgb(183, 188, 203); font-weight: 600;">Hypothetical Performance Disclosure:</strong> Hypothetical performance results have many inherent limitations, some of which are described below. No representation is being made that any account will or is likely to achieve profits or losses similar to those shown; in fact, there are frequently sharp differences between hypothetical performance results and the actual results subsequently achieved by any particular trading program. One of the limitations of hypothetical performance results is that they are generally prepared with the benefit of hindsight. In addition, hypothetical trading does not involve financial risk, and no hypothetical trading record can completely account for the impact of financial risk of actual trading. for example, the ability to withstand losses or to adhere to a particular trading program in spite of trading losses are material points which can also adversely affect actual trading results. There are numerous other factors related to the markets in general or to the implementation of any specific trading program which cannot be fully accounted for in the preparation of hypothetical performance results and all which can adversely affect trading results.</p>
+      <p style="margin: 0px;"><strong style="color: rgb(183, 188, 203); font-weight: 600;">Live Trade Room Disclosure:</strong> This presentation is for educational purposes only and the opinions expressed are those of the presenter only. All trades presented should be considered hypothetical and should not be expected to be replicated in a live trading account.</p>
+      <p style="margin: 0px;"><strong style="color: rgb(183, 188, 203); font-weight: 600;">Testimonial Disclosure:</strong> Testimonials appearing on this website may not be representative of other clients or customers and is not a guarantee of future performance or success.</p>
+    </div>
+    <div dir="ltr" lang="en" style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 18px 0px 28px; text-align: left; border-top: 1px solid rgba(255, 255, 255, 0.08); font-family: &quot;Geist Mono&quot;, monospace; font-size: 11.5px; line-height: 1.6; color: rgb(124, 130, 150);">
+      <span>© 2026 Talaria-Log Ltd · Registered in England and Wales, company no. 16724003 · 71-75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom</span>
+      <span>Talaria Flow is an independent Ecosystem partner and is not affiliated with, endorsed by, or an agent of NinjaTrader.</span>
+    </div>
+  </div></footer>
+
+<script src="/assets/js/env.js" defer></script>
+<script src="/assets/js/sentry.js" defer></script>
+<script src="/assets/js/vendor/supabase.js" defer></script>
+<script src="/assets/js/supabase-client.js" defer></script>
+<script src="/assets/js/i18n.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
+<script src="/assets/js/nav.js" defer></script>
+</body>
+</html>

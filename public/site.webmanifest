@@ -1,0 +1,23 @@
+{
+  "name": "Talaria Flow",
+  "short_name": "Talaria Flow",
+  "description": "Order flow tools and a free course for NinjaTrader traders.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#07080C",
+  "theme_color": "#07080C",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

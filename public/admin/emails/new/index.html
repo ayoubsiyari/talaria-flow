@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<meta charset="utf-8">
+<script>(function(){try{var a=/\/admin(?:\/|$)/.test(location.pathname),q=/[?&]lang=(en|ar)(?:&|$)/.exec(location.search),l=a?'en':(q?q[1]:(localStorage.getItem('tf-lang')||'en'));if(q&&!a)localStorage.setItem('tf-lang',l);document.documentElement.lang=l;document.documentElement.setAttribute('data-lang',l);if(l==='ar'){var p=document.createElement('link');p.rel='preload';p.as='font';p.type='font/woff2';p.crossOrigin='anonymous';p.href='/fonts/Cairo-wght.woff2';document.head.appendChild(p)}}catch(e){document.documentElement.setAttribute('data-lang','en')}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/Archivo-wdth-wght.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/GeistMono-wght.woff2">
+<title>New template · Talaria Flow</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#07080C">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+<link rel="stylesheet" href="/assets/css/fonts.css">
+</head>
+<body data-admin-active="emails">
+<div data-shell>
+  <aside data-side></aside>
+  <main id="page" data-admin-main data-email-editor>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px">
+      <a href="/admin/emails/" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#8B90A3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>Templates</a>
+      <h1 id="ed-title" style="font-size:24px;font-weight:700;letter-spacing:-0.02em;font-stretch:112%">New template</h1>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:inline-flex;border:1px solid rgba(255,255,255,0.16);border-radius:10px;overflow:hidden">
+          <button type="button" id="ed-lang-en" style="height:34px;padding:0 12px;border:0;background:rgba(255,255,255,0.08);color:#F2F4F8;font-family:Archivo,sans-serif;font-size:13px;font-weight:500;cursor:pointer">EN</button>
+          <button type="button" id="ed-lang-ar" style="height:34px;padding:0 12px;border:0;border-left:1px solid rgba(255,255,255,0.08);background:transparent;color:#8B90A3;font-family:Archivo,sans-serif;font-size:13px;font-weight:500;cursor:pointer">AR</button>
+        </div>
+        <button type="button" id="ed-width" class="scp5" style="height:34px;padding:0 12px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#B7BCCB;font-family:Archivo,sans-serif;font-size:13px;font-weight:600;cursor:pointer">Desktop 600</button>
+      </div>
+    </div>
+    <p id="ed-lede">Build the email once. It renders the same in every inbox.</p>
+    <div data-ed style="display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start;margin-top:0">
+      <div id="ed-form"></div>
+      <div style="min-width:0;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:'Geist Mono',monospace;font-size:11.5px;color:#8B90A3;display:flex;gap:16px;flex-wrap:wrap"><span>From <b style="color:#B7BCCB;font-weight:500">Talaria Flow &lt;support@talaria-flow.com&gt;</b></span><span>Subject <b id="ed-subject" style="color:#F2F4F8;font-weight:500">Subject line</b></span></div>
+        <div style="display:flex;justify-content:center;background:#07080C;padding:16px"><iframe id="ed-frame" title="Email preview" style="width:600px;max-width:100%;height:820px;border:0;background:#07080C;transition:width .2s"></iframe></div>
+      </div>
+    </div>
+    <footer id="ed-foot"></footer>
+  </main>
+</div>
+<script src="/assets/js/vendor/supabase.js" defer></script>
+<script src="/assets/js/env.js" defer></script>
+<script src="/assets/js/sentry.js" defer></script>
+<script src="/assets/js/supabase-client.js" defer></script>
+<script src="/assets/js/i18n.js" defer></script>
+<script src="/assets/js/emails-render.js" defer></script>
+<script src="/assets/js/emails.js" defer></script>
+<script src="/assets/js/admin-emails-ui.js" defer></script>
+<script src="/assets/js/components/AdminShell.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
+<script src="/assets/js/nav.js" defer></script>
+</body>
+</html>

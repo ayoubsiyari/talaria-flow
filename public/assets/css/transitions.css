@@ -1,0 +1,6 @@
+::view-transition-old(root),::view-transition-new(root){ animation:none }
+header{ view-transition-name: site-header }
+footer{ view-transition-name: site-footer }
+[data-side]{ view-transition-name: admin-side }
+[data-account-main]{ min-height:420px }
+html[data-lang="ar"]:not(.i18n-ready) body{ visibility:hidden }

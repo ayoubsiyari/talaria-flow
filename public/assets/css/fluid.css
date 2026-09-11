@@ -1,0 +1,209 @@
+/* Talaria Flow — fluid layout (RESPONSIVE.md) */
+
+.container {
+  width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+
+@media (min-width: 2200px) {
+  :root { --container: min(1760px, 88vw); }
+  html { font-size: 18px; }
+}
+
+/* §4 Full-bleed layers */
+.tf-band,
+section.container {
+  width: 100% !important;
+  max-width: none !important;
+  padding-inline: 0 !important;
+  box-sizing: border-box;
+  position: relative;
+}
+.tf-band > .container,
+section.container > * {
+  width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+section.container::before,
+.tf-band::before {
+  content: "";
+  display: block;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+[data-ticker],
+[data-ticker] + *,
+div[aria-hidden="true"][style*="tf-ticker"],
+div[aria-hidden][style*="Geist Mono"] {
+  width: 100%;
+}
+img[data-bands] {
+  inset-inline-end: -6vw;
+  max-width: none;
+}
+
+/* overflow-x stays on body in the page <style>; do not clip html — it hides growing sections */
+
+@media (min-width: 1600px) {
+  section:has([data-hero]),
+  section:has([data-bands]) {
+    overflow-x: clip !important;
+  }
+  [data-ladder] {
+    margin-inline-end: calc((100vw - var(--container)) / -2 - var(--gutter));
+  }
+}
+
+/* §2 + §5 Fluid type and spacing */
+html { font-size: clamp(15px, 0.35vw + 13.5px, 18px); }
+body { font-size: var(--fs-body); line-height: 1.6; }
+h1 { font-size: var(--fs-h1) !important; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+h2 { font-size: var(--fs-h2) !important; font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; }
+h3 { font-size: var(--font-size-h3) !important; }
+[data-hero] h1 { font-size: var(--fs-h1-hero) !important; font-weight: 800; line-height: 0.94; letter-spacing: -0.035em; font-stretch: 125%; }
+main:has(#login-form) h1,
+main:has(#signup-form) h1 { font-size: 28px !important; letter-spacing: -0.02em; line-height: 1.15; font-stretch: 100%; }
+[data-account] h1,
+[data-acc] h1,
+[data-admin-main] h1 { font-size: 24px !important; letter-spacing: -0.02em; line-height: 1.15; font-stretch: 100%; }
+[data-i18n] { letter-spacing: inherit; }
+html[data-lang="ar"] [dir="rtl"] { letter-spacing: 0; line-height: 1.25; }
+html[data-lang="ar"] .btn-primary [dir="rtl"],
+html[data-lang="ar"] [data-signup] [dir="rtl"],
+html[data-lang="ar"] button [dir="rtl"],
+html[data-lang="ar"] a.btn-primary [dir="rtl"] { line-height: 1 !important; }
+html[data-lang="ar"] h1,
+html[data-lang="ar"] h1[dir="rtl"],
+html[data-lang="ar"] h1 [dir="rtl"] { letter-spacing: 0 !important; line-height: 1.2; }
+html[data-lang="ar"] [data-hero] h1 { line-height: 1.2; }
+@media (max-width: 640px) {
+  h1 { font-size: var(--fs-h1) !important; }
+  [data-hero] h1 { font-size: var(--fs-h1-hero) !important; }
+  main:has(#login-form) h1,
+  main:has(#signup-form) h1 { font-size: 28px !important; }
+  [data-account] h1,
+  [data-acc] h1,
+  [data-admin-main] h1 { font-size: 24px !important; }
+  h2 { font-size: var(--fs-h2) !important; }
+  main section { padding-top: var(--space-block) !important; }
+}
+
+/* §3 Grids reflow */
+[data-axis] { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) !important; }
+[data-cols],
+[data-kpi],
+[data-hero] > div:first-child > div[style*="auto-fit"],
+footer .container > div:first-child {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)) !important;
+}
+footer .container > div[style*="auto-fit"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)) !important;
+}
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll table { min-width: 36rem; }
+
+/* Home.dc.html — hero columns bottom-align; container owns canvas size */
+[data-hero], .hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: end !important;
+}
+.hero-visual {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
+.hero-visual canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  [data-hero], .hero-grid { grid-template-columns: 1fr; }
+  [data-axis] { grid-template-columns: 1fr !important; }
+}
+
+p, h1, h2, h3, li, label, td, th, [data-i18n] {
+  white-space: normal;
+}
+
+/* §6 Header */
+[data-hd] {
+  height: var(--header-height) !important;
+  gap: clamp(1rem, 2vw, 1.75rem) !important;
+}
+[data-nav] { gap: 20px !important; }
+#brand-menu {
+  inset-inline-start: 0 !important;
+  left: auto !important;
+  max-width: calc(100vw - 2 * var(--gutter));
+}
+#lang-menu {
+  inset-inline-end: 0 !important;
+  right: 0 !important;
+  max-width: calc(100vw - 2 * var(--gutter));
+}
+/* §7 Bidi — dir on the text node, never a flex/grid parent */
+[dir="rtl"] {
+  text-align: left;
+}
+
+/* §8 Images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 1000px) {
+  header { overflow: visible; }
+  [data-drawer] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    min-height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
+    overflow: auto;
+    z-index: 60;
+    background: #07080C;
+    box-sizing: border-box;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  [data-drawer] > .container { width: 100%; }
+}
+
+/* §9 Touch */
+@media (max-width: 900px) {
+  button,
+  [data-menu],
+  [data-langbtn],
+  [data-drawer] a,
+  a[class*="scp0"],
+  a[class*="scp1"] {
+    min-height: 44px;
+  }
+  [data-hd] [data-signup],
+  [data-hd] a.btn-primary,
+  .btn-primary,
+  a.btn-primary {
+    min-height: 0;
+  }
+  input, textarea, select { font-size: 16px !important; }
+}
+footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}

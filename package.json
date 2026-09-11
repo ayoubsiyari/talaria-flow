@@ -1,0 +1,36 @@
+{
+  "name": "talaria-flow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Talaria Flow — marketing and member site for the free order flow course (Vercel + Supabase + Resend).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "node scripts/build.mjs && node --env-file-if-exists=.env scripts/dev-server.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node --env-file-if-exists=.env scripts/dev-server.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node scripts/build.mjs && node scripts/csp-hashes.mjs && tsc -p tsconfig.json && node --test \"tests/unit/**/*.test.mjs\" && playwright test",
+    "test:links": "node scripts/check-links.mjs",
+    "seed": "node --env-file=.env scripts/seed.ts",
+    "seed:test-accounts": "node --env-file=.env scripts/create-test-accounts.ts",
+    "purge:proofs": "node --env-file=.env scripts/purge-proofs.ts",
+    "package": "node scripts/package.mjs",
+    "audit": "pnpm audit --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.6.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2",
+    "sucrase": "^3.35.0",
+    "typescript": "^5.6.0"
+  }
+}

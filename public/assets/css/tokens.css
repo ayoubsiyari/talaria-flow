@@ -1,0 +1,110 @@
+/* =========================================================
+   Talaria Flow — Design Tokens
+   Obsidian Design System · Ledger edition (v2)
+   Replaces tokens.css v1. Removed: --grad, glows, sheen cards,
+   pill radius, Bricolage/Manrope/Plex Mono.
+   ========================================================= */
+
+:root {
+  /* Surfaces — structure comes from rules, not boxes */
+  --bg: #07080C;
+  --bg-2: #0B0D13;            /* full-bleed bands (waitlist strip) */
+  --surface: #0E1017;         /* work panels only: upload form, admin detail */
+  --black: #000000;           /* partner logo panel — NT logo is never recoloured */
+  --line: rgba(255, 255, 255, 0.08);        /* row rules */
+  --line-strong: rgba(255, 255, 255, 0.16); /* section starts, table heads, input rules */
+  --sheen: rgba(255, 255, 255, 0.08);       /* active segmented item, hover row .03 */
+
+  /* Text */
+  --text: #F2F4F8;
+  --text-2: #B7BCCB;   /* body, lede */
+  --text-3: #8B90A3;   /* labels, eyebrows, quiet headline line */
+  --text-4: #7C8296;   /* inactive, placeholders, quiet mono — 5.2:1 on --bg, 4.9:1 on --surface */
+
+  /* Brand */
+  --cyan: #2EE8FF;      /* interactive only: buttons, links, focus rules, done steps */
+  --cyan-2: #8FF3FF;    /* hover */
+  --cyan-dim: rgba(46, 232, 255, 0.14);   /* outline-button hover fill */
+  --magenta: #FF37B0;   /* status/highlight only: current step, "in development", rejected */
+  --magenta-2: #FF8AD0; /* magenta text on dark (contrast) */
+  --warn: #FBBF24;      /* under review */
+
+  /* Data viz (footprint ladder only — the one place both hues meet) */
+  --bid-fill: rgba(255, 55, 176, 0.28);
+  --ask-fill: rgba(46, 232, 255, 0.26);
+
+  /* Type */
+  --font-display: "Archivo", "Archivo Fallback", "Helvetica Neue", sans-serif;
+  --font-body: "Archivo", "Archivo Fallback", "Helvetica Neue", sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", "SFMono-Regular", Consolas, monospace;
+
+  --wdth-display: 125%;  /* hero line 1 */
+  --wdth-heading: 112%;  /* h2, page titles */
+  --wdth-body: 100%;
+
+  --fs-h1-hero: clamp(44px, 6vw, 84px);
+  --fs-h1: clamp(32px, 3.6vw, 44px);
+  --fs-h2: clamp(26px, 3vw, 40px);
+  --fs-lede: clamp(1.05rem, 1.2vw, 1.2rem);
+  --fs-body: 15px;
+  --fs-small: .9rem;
+  --fs-mono: .78rem;
+
+  --font-size-h1: var(--fs-h1);
+  --font-size-h1-quiet: var(--fs-h1);
+  --font-size-h2: var(--fs-h2);
+  --font-size-page-title: clamp(32px, 3.6vw, 44px);
+  --font-size-h3: 1.375rem;
+  --font-size-lede: var(--fs-lede);
+  --font-size-body: var(--fs-body);
+  --font-size-body-sm: var(--fs-small);
+  --font-size-caption: 0.8125rem;
+  --font-size-legal: 0.78125rem;
+  --font-size-mono: var(--fs-mono);
+  --font-size-eyebrow: 0.6875rem;
+  --font-size-tag: 0.6875rem;
+  --font-size-input: 1.0625rem;
+
+  --lh-display: 0.94;
+  --lh-heading: 1.02;
+  --lh-body: 1.6;
+  --lh-lede: 1.55;
+  --ls-display: -0.035em;
+  --ls-heading: -0.03em;
+  --ls-eyebrow: 0.14em;
+
+  /* Radii — buttons and inputs are rounded; layout is ruled, not boxed */
+  --r-tag: 6px;
+  --r-thumb: 8px;
+  --r-btn: 10px;
+  --r-input: 10px;
+  --r-panel: 14px;
+
+  /* Layout */
+  --container: min(1440px, 92vw);
+  --gutter: clamp(16px, 4vw, 64px);
+  --axis: 6rem;
+  --axis-gap: 2rem;
+  --space-section: clamp(3rem, 8vw, 7.5rem);
+  --space-block: clamp(1.5rem, 3vw, 3rem);
+  --space-item: 26px;
+  --section-padding: var(--space-section);
+  --hero-padding-top: clamp(48px, 6vw, 88px);
+  --header-height: 68px;
+  --bp-collapse: 900px;
+
+  /* Rows */
+  --row-step: 64px minmax(0,1fr) minmax(0,1.5fr);   /* gap 20, pad 26 0 */
+  --row-module: 56px minmax(0,1fr) auto;            /* gap 16, pad 20 0 */
+  --row-list: 40px 1fr auto;                        /* gap 12, pad 14 0 */
+
+  /* Controls */
+  --btn-h-lg: 52px;  --btn-pad-lg: 24px;
+  --btn-h-md: 48px;  --btn-pad-md: 22px;
+  --btn-h-sm: 36px;  --btn-pad-sm: 16px;
+  --btn-text-on-cyan: #04141A;
+
+  /* Motion */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --transition-fast: 0.18s cubic-bezier(.2, .7, .2, 1);
+}

@@ -1,0 +1,708 @@
+{
+  "header": {
+    "home": "Home",
+    "course": "Free order flow course",
+    "nt": "NinjaTrader",
+    "suite": "Tools suite",
+    "login": "Log in",
+    "signup": "Create account",
+    "signupShort": "Sign up",
+    "lang": "EN",
+    "language": "Language",
+    "logout": "Log out",
+    "dashboard": "Account",
+    "account": "Account",
+    "queue": "Admin",
+    "userDash": "Dashboard",
+    "userProfile": "Profile",
+    "userPassword": "Change password",
+    "menu": "Menu",
+    "skip": "Skip to content"
+  },
+  "crumb": {
+    "access": "Access",
+    "home": "Back to home"
+  },
+  "auth": {
+    "email": "Enter a valid email address",
+    "password": "Wrong email or password",
+    "locked": "Too many attempts. Try again in 15 minutes or reset your password.",
+    "exists": "An account with this email already exists · Log in",
+    "short": "Password must be at least 8 characters",
+    "required": "This field is required",
+    "country": "Select your country",
+    "mismatch": "Passwords do not match",
+    "wrongCurrent": "Wrong current password",
+    "show": "Show password",
+    "hide": "Hide password",
+    "resetSent": "If this email exists, we sent a link",
+    "pwUpdated": "Password updated",
+    "verify": "Verification failed. Reload the page and try again.",
+    "checkEmail": "Account created. Check your inbox and confirm your email.",
+    "resent": "Verification link resent.",
+    "fileRule": "PNG, JPG or WEBP only, up to 5 MB each, 4 files.",
+    "submitted": "Submitted for review.",
+    "uploadFailed": "Something went wrong. Try again.",
+    "waitlistOk": "Thanks — you are on the list.",
+    "waitlistDone": "You're on the list. We'll email {email} when it ships.",
+    "unavailable": "This is temporarily unavailable. Please try again in a few minutes.",
+    "enterEmailFirst": "Enter your email address first.",
+    "recoveryExpired": "This reset link has expired. Request a new one.",
+    "signupDoneTitle": "Check your inbox",
+    "signupDoneBody": "We sent a confirmation link to {email}. Open it to activate your account, then log in.",
+    "signupDoneLogin": "Go to log in →",
+    "langSaveFailed": "Could not save the language to your account."
+  },
+  "tip": {
+    "deposit": "$0 / no deposit — you do not need to fund the account to get the course.",
+    "partner": "Independent partner in the NinjaTrader Ecosystem"
+  },
+  "footer": {
+    "tagline": "Order flow tools and education for NinjaTrader traders. An independent partner in the NinjaTrader Ecosystem.",
+    "site": "Site",
+    "legal": "Legal",
+    "partner": "Partner",
+    "course": "Free order flow course",
+    "suite": "Tools suite",
+    "signup": "Create account",
+    "login": "Log in",
+    "privacy": "Privacy policy",
+    "terms": "Terms of use",
+    "disclaimers": "Disclaimers",
+    "cookies": "Cookie settings"
+  },
+  "index": {
+    "eyebrow": "NinjaTrader Ecosystem partner",
+    "h1a": "Read the order flow.",
+    "h1b": "Trade the structure.",
+    "lede": "Talaria Flow builds order flow tools for NinjaTrader and teaches the concepts behind them. Open your NinjaTrader account through our partner link and the full 30-video course is yours, free, with written materials and lesson notes sent to your inbox.",
+    "ctaCourse": "Get the free course",
+    "ctaNT": "Open a NinjaTrader account",
+    "f1": "30 videos + notes",
+    "f1s": "Written materials and lesson notes to your inbox",
+    "f2s": "NinjaTrader account via our link · no deposit required",
+    "illustrative": "Illustrative",
+    "ticker": {
+      "0": "Volume profile",
+      "1": "Market profile",
+      "2": "Footprint",
+      "3": "Cumulative delta",
+      "4": "VWAP",
+      "5": "Absorption",
+      "6": "Imbalance",
+      "7": "Auction Market Theory",
+      "8": "Delta divergence",
+      "9": "POC",
+      "10": "Value area",
+      "11": "Order flow"
+    },
+    "s1label": "How it works",
+    "s1h": "Three steps. No card, no catch.",
+    "guideLink": "Full step-by-step guide →",
+    "steps": {
+      "0": {
+        "0": "Register and create an account with NinjaTrader",
+        "1": "Create your NinjaTrader account using our partner link. No deposit is required. It costs you nothing extra and it is what funds the free course."
+      },
+      "1": {
+        "0": "Create an account with Talaria Flow",
+        "1": "Sign up here, then upload two screenshots: the NinjaTrader Welcome dashboard and the Web trading platform in Simulation. Blur anything private."
+      },
+      "2": {
+        "0": "Get approved",
+        "1": "We review by hand. Once approved you receive a confirmation email and course access before 31 December 2026."
+      }
+    },
+    "s2label": "The course",
+    "s2h": "Thirty videos on reading order flow data to execute on real price moves.",
+    "s2p": "From the first footprint cell to a full session plan built on structure. Every module comes with written materials and lesson notes, delivered to your inbox. No indicators to buy, no signals to follow — the mechanics, taught properly.",
+    "s2cta": "See the curriculum",
+    "more": "and many more",
+    "s3label": "Platform partner",
+    "s3h": "Built on NinjaTrader.",
+    "s3p": "Every Talaria Flow tool is written for NinjaTrader and every lesson in the course is taught on it. If you are looking for a futures trading platform, this is the one we are building on.",
+    "s3link": "Why NinjaTrader",
+    "devTag": "In development",
+    "devH": "The Talaria Flow tools suite is on its way.",
+    "devP": "Profiles, reference levels and alerts, sharing one engine. Leave your email and you will hear when it ships.",
+    "emailLabel": "Email",
+    "notify": "Notify me"
+  },
+  "course": {
+    "subnav": {
+      "curriculum": "Curriculum",
+      "howto": "How to register"
+    },
+    "axis0": "Free with a NinjaTrader account",
+    "h1a": "Thirty videos.",
+    "h1b": "Zero cost.",
+    "lede": "Open your NinjaTrader account through our partner link, prove it with a screenshot, and the full course is yours: thirty videos plus written materials and lesson notes, sent to your inbox. Approved members receive access before 31 December 2026.",
+    "ctaStart": "Start with NinjaTrader",
+    "ctaSignup": "Already registered? Create your Talaria account",
+    "ctaGuide": "Watch the 2-minute guide",
+    "vidAxis": "Video guide",
+    "vidH": "Watch the whole registration, start to finish.",
+    "vidP": "A short walkthrough: every click from opening your NinjaTrader account to uploading your proof, with the buttons marked as we go.",
+    "vidPlay": "Play the 2-minute guide",
+    "guideMeta": "17 steps · 1:58",
+    "axis1": "Curriculum",
+    "h2": "Seven modules, starting with how markets actually move.",
+    "modules": {
+      "0": {
+        "0": "Auction Market Theory",
+        "1": "Why markets move: balance, imbalance, value and the two-way auction that every profile and footprint is built on."
+      },
+      "1": {
+        "0": "Volume Profile & Market Profile",
+        "1": "POC, value area, single prints, poor highs and lows, developing structure."
+      },
+      "2": {
+        "0": "Footprint charts",
+        "1": "Reading bid × ask cells, stacked imbalances, unfinished business."
+      },
+      "3": {
+        "0": "Delta and cumulative delta",
+        "1": "Divergence, exhaustion, where delta lies and where it doesn't."
+      },
+      "4": {
+        "0": "VWAP and anchored VWAP",
+        "1": "Fair value through the session, deviation bands, anchoring to events."
+      },
+      "5": {
+        "0": "Absorption, imbalance, exhaustion",
+        "1": "Spotting the fights that decide direction and the ones that don't matter."
+      },
+      "6": {
+        "0": "Building a session plan",
+        "1": "Turning structure into a plan you can execute before the open."
+      }
+    },
+    "howTitle": "How it works",
+    "howLink": "Step-by-step guide with screenshots",
+    "howSteps": {
+      "0": "Register a NinjaTrader account using our partner button only, in a normal (not private) browser window. You must be new to NinjaTrader. Screenshot 1: the Welcome dashboard.",
+      "1": "On the dashboard click Start trading, then Access Simulation. The trading platform opens. Screenshot 2: the platform. This must happen within 7 days of registering.",
+      "2": "Create a Talaria Flow account with the same email.",
+      "3": "Upload your proof screenshots from your dashboard.",
+      "4": "We review manually. Once approved, you receive a confirmation email and course access before 31 December 2026."
+    },
+    "proofTitle": "What counts as proof",
+    "proofItems": {
+      "0": "Screenshot 1 (required): the NinjaTrader dashboard showing \"Welcome, your name\"",
+      "1": "Screenshot 2 (required): the NinjaTrader Web trading platform (Simulation) with your account shown at the top",
+      "2": "Optional: the NinjaTrader confirmation email or a platform licence or subscription confirmation"
+    },
+    "proofNote": "Blur card numbers and balances. Your email or username must stay visible. Screenshots must not be edited beyond blurring."
+  },
+  "ninjatrader": {
+    "axis0": "Platform partner",
+    "h1": "Our recommended trading platform",
+    "p1": "NinjaTrader® is our #1 recommended trading software platform, preferred by traders worldwide including our clients.",
+    "p2": "Download NinjaTrader and receive immediate FREE access to:",
+    "perks": {
+      "0": "Real-time futures data",
+      "1": "Advanced charting",
+      "2": "Trade simulator",
+      "3": "Strategy development and backtesting"
+    },
+    "p3": "NinjaTrader's award-winning trading platform is consistently voted an industry leader by the trading community. Featuring 1000s of Apps & Add-Ons for unlimited customization, NinjaTrader is used by over 500,000 traders for advanced market analysis, professional charting and fast order execution.",
+    "p4": "For new traders, start preparing for the live markets with a free trading simulator featuring real-time market data.",
+    "ctaPlatform": "Trading platform",
+    "ctaDownload": "Download NinjaTrader",
+    "ctaSim": "Trading simulator",
+    "ctaFree": "Get started for FREE",
+    "note": "Talaria Flow is an independent partner in the NinjaTrader Ecosystem. Opening an account through our links supports the free course at no extra cost to you. No deposit is required.",
+    "axis1": "Market data",
+    "h2": "Our recommended market data feed",
+    "k1": "Kinetick® delivers reliable, fast and cost-effective market data to help level the playing field for active traders. Take advantage of unfiltered, real time quotes for stocks, futures and forex that exceed the expectations of the world's most demanding traders, like us!",
+    "k2": "Get started with FREE end-of-day historical market data directly through the NinjaTrader platform and learn how you can significantly reduce CME Group Globex exchange fees on real-time market data with Kinetick.",
+    "ctaData": "Market data",
+    "ctaEod": "Get started with free EOD data",
+    "ctaHist": "Historical market data"
+  },
+  "suite": {
+    "axis": "Tools suite",
+    "tag": "In development",
+    "h1": "A suite of order flow tools, sharing one engine.",
+    "lede": "Profiles that understand structure. Reference levels that publish to every chart. Alerts that know what happened last time. Built for NinjaTrader.",
+    "p1": "Profiles",
+    "p2": "Reference levels",
+    "p3": "Alerts & history",
+    "email": "Email",
+    "cta": "Notify me when it ships",
+    "teaserTag": "Coming",
+    "teaser": "A suite of order flow tools for NinjaTrader, built on one engine. Details when it ships."
+  },
+  "signup": {
+    "axis": "Create your Talaria account",
+    "step2": "Talaria account",
+    "step3": "Proof",
+    "h1": "Create your Talaria account",
+    "lede": "Use the same email you registered with NinjaTrader. It makes review faster.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "country": "Country",
+    "countryPh": "Select your country",
+    "emailHelp": "Use the same email you registered with NinjaTrader",
+    "email": "Email",
+    "password": "Password",
+    "password2": "Repeat password",
+    "passwordPh": "At least 8 characters",
+    "agree1": "I agree to the",
+    "terms": "Terms",
+    "agree2": "and",
+    "privacy": "Privacy Policy",
+    "agree3": ", and I understand my uploads are reviewed by a person.",
+    "cta": "Create account",
+    "have": "Already have an account?",
+    "login": "Log in",
+    "noNT": "No NinjaTrader account yet?",
+    "openNT": "Open one through our partner link",
+    "thenReturn": "first, then come back."
+  },
+  "login": {
+    "axis": "Log in",
+    "h1": "Welcome back",
+    "lede": "Log in to check your review status.",
+    "email": "Email",
+    "password": "Password",
+    "passwordPh": "At least 8 characters",
+    "forgot": "Forgot password?",
+    "cta": "Log in",
+    "unvTitle": "Email verification required",
+    "unvBody": "Your email is not verified yet. The dashboard requires a verified email before it opens. Check your inbox or request a new link.",
+    "resend": "Resend verification email",
+    "resetTitle": "Reset password",
+    "resetBody": "Enter your email and we'll send you a password reset link.",
+    "sendReset": "Send reset link",
+    "cancel": "Cancel",
+    "updateTitle": "Set new password",
+    "updateBody": "Enter your new password below.",
+    "newPassword": "New password",
+    "update": "Update password",
+    "newHere": "New here?",
+    "create": "Create an account"
+  },
+  "legal": {
+    "tabs": {
+      "disclaimers": "Disclaimers",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "updated": "Last updated 10 September 2026",
+    "binding": "",
+    "pages": {
+      "disclaimers": {
+        "title": "Disclaimers",
+        "kicker": "Compliance",
+        "sub": "Disclosures",
+        "s1": {
+          "h": "Risk Disclosure",
+          "p": "Futures and forex trading contains substantial risk and is not for every investor. An investor could potentially lose all or more than the initial investment. Risk capital is money that can be lost without jeopardizing ones’ financial security or lifestyle. Only risk capital should be used for trading and only those with sufficient risk capital should consider trading. Past performance is not necessarily indicative of future results."
+        },
+        "s2": {
+          "h": "Hypothetical Performance Disclosure",
+          "p": "Hypothetical performance results have many inherent limitations, some of which are described below. No representation is being made that any account will or is likely to achieve profits or losses similar to those shown; in fact, there are frequently sharp differences between hypothetical performance results and the actual results subsequently achieved by any particular trading program. One of the limitations of hypothetical performance results is that they are generally prepared with the benefit of hindsight. In addition, hypothetical trading does not involve financial risk, and no hypothetical trading record can completely account for the impact of financial risk of actual trading. for example, the ability to withstand losses or to adhere to a particular trading program in spite of trading losses are material points which can also adversely affect actual trading results. There are numerous other factors related to the markets in general or to the implementation of any specific trading program which cannot be fully accounted for in the preparation of hypothetical performance results and all which can adversely affect trading results."
+        },
+        "s3": {
+          "h": "Live Trade Room Disclosure",
+          "p": "This presentation is for educational purposes only and the opinions expressed are those of the presenter only. All trades presented should be considered hypothetical and should not be expected to be replicated in a live trading account."
+        },
+        "s4": {
+          "h": "Testimonial Disclosure",
+          "p": "Testimonials appearing on this website may not be representative of other clients or customers and is not a guarantee of future performance or success."
+        }
+      },
+      "privacy": {
+        "title": "Privacy policy",
+        "kicker": "Legal",
+        "sub": "UK / EU GDPR",
+        "s1": {
+          "h": "Who we are",
+          "p": "Talaria-Log Ltd, registered in England and Wales (company no. 16724003), 71-75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom, is the data controller for www.talaria-flow.com. Contact: support@talaria-flow.com."
+        },
+        "s2": {
+          "h": "What we collect",
+          "p": "",
+          "i1b": "Account data: ",
+          "i1t": "email address and a hashed password.",
+          "i2b": "Verification data: ",
+          "i2t": "screenshots you upload to show you opened a NinjaTrader account, plus any note you add. These may contain personal data such as your name or email; we ask you to blur anything not needed.",
+          "i3b": "Waitlist data: ",
+          "i3t": "email address if you ask to be notified about our indicators.",
+          "i4b": "Technical data: ",
+          "i4t": "server logs (IP address, browser) kept for security. We do not run advertising trackers."
+        },
+        "s3": {
+          "h": "Why we process it",
+          "p": "",
+          "i1b": "",
+          "i1t": "To run your account and review your verification request (performance of a contract).",
+          "i2b": "",
+          "i2t": "To send confirmation, resubmission and course-access emails (performance of a contract).",
+          "i3b": "",
+          "i3t": "To send indicator news if you opted in (consent; withdraw any time).",
+          "i4b": "",
+          "i4t": "To keep the site secure (legitimate interest)."
+        },
+        "s4": {
+          "h": "Retention",
+          "p": "Verification screenshots are deleted within 90 days of a decision. Account data is kept while your account is open and deleted 12 months after closure. Waitlist emails are kept until you unsubscribe."
+        },
+        "s5": {
+          "h": "Sharing",
+          "p": "We use hosting, database and email providers to run the site; they act on our instructions. We do not sell your data. NinjaTrader tracks sign-ups made through our partner link under its own privacy policy; we do not send them your screenshots."
+        },
+        "s6": {
+          "h": "International transfers",
+          "p": "Some providers store data outside the UK/EEA. Where they do, we rely on standard contractual clauses or an adequacy decision."
+        },
+        "s7": {
+          "h": "Your rights",
+          "p": "Under UK GDPR and EU GDPR you can ask for access, correction, deletion, restriction or portability of your data, and object to processing. Email support@talaria-flow.com. You can complain to the UK Information Commissioner's Office or your local EU authority."
+        },
+        "s8": {
+          "h": "Cookies and tracking",
+          "p": "We store a login cookie, your language choice, and a cookie-settings choice so we can remember whether you accepted the notice. There are no analytics, no advertising cookies and no third-party trackers. A short notice appears until you choose Accept or Essential only; you can change that from Cookie settings in the footer."
+        }
+      },
+      "terms": {
+        "title": "Terms of use",
+        "kicker": "Legal",
+        "sub": "Course offer",
+        "s1": {
+          "h": "The offer",
+          "p": "Talaria-Log Ltd (\"we\") offers free access to a 30-video order flow course to people who (a) open a NinjaTrader account through our partner link, (b) create an account on this site, and (c) upload proof that we accept. Review is manual and at our discretion. Approved members receive course access by email before 31 December 2026."
+        },
+        "s2": {
+          "h": "Eligibility",
+          "p": "You must be 18 or older and legally able to open a NinjaTrader account in your country. One course grant per person."
+        },
+        "s3": {
+          "h": "Your uploads",
+          "p": "You confirm screenshots are genuine and unedited beyond blurring private details. Falsified proof leads to removal from the programme."
+        },
+        "s4": {
+          "h": "Educational content",
+          "p": "The course and everything on this site is educational. Nothing here is investment advice or a recommendation to trade. See our disclaimers."
+        },
+        "s5": {
+          "h": "Relationship with NinjaTrader",
+          "p": "We are an independent partner in the NinjaTrader Ecosystem. We may receive a commission when you open an account through our link. We are not NinjaTrader and do not act for it."
+        },
+        "s6": {
+          "h": "Intellectual property",
+          "p": "Course videos and site content belong to Talaria-Log Ltd. Personal use only; no redistribution."
+        },
+        "s7": {
+          "h": "Changes and termination",
+          "p": "We may update these terms or end the offer with notice on this page. Approved members keep the access already promised."
+        },
+        "s8": {
+          "h": "Law",
+          "p": "These terms are governed by the laws of England and Wales."
+        }
+      }
+    }
+  },
+  "account": {
+    "hello": "Welcome back",
+    "memberSince": "Member since",
+    "nav": {
+      "overview": "Overview",
+      "access": "Course access",
+      "course": "Course",
+      "profile": "Profile",
+      "notifications": "Notifications"
+    },
+    "recent": "Recent activity",
+    "save": "Save changes"
+  },
+  "dashboard": {
+    "axis": "Course access",
+    "h1": "Your course access",
+    "tags": {
+      "none": "Not submitted",
+      "review": "Under review",
+      "approved": "Approved",
+      "rejected": "Needs resubmission"
+    },
+    "none": {
+      "title": "Upload your proof to get started",
+      "body": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible."
+    },
+    "review": {
+      "title": "Under review",
+      "body": "We received your screenshots and a person is checking them. Reviews are manual and usually take a few days. You will get an email either way."
+    },
+    "approved": {
+      "title": "Approved — you're in",
+      "body": "Your NinjaTrader registration is confirmed. You will receive access to the full 30-video order flow course, with written materials and lesson notes, before 31 December 2026 at this email address. No further action is needed."
+    },
+    "rejected": {
+      "title": "Needs resubmission",
+      "reasonLead": "Reason from the reviewer: ",
+      "body": "the screenshot doesn't show your account email or username. Please upload one where it is visible, then submit again."
+    },
+    "timeline": {
+      "0": "Account",
+      "1": "Proof uploaded",
+      "2": "Review",
+      "3": "Approved"
+    },
+    "uploadTitle": "Upload proof",
+    "screenshotHelp": "How to take a valid screenshot →",
+    "attachTip": "Attach two screenshots",
+    "uploadAgain": "Upload again",
+    "dropStrong": "Drop screenshots here",
+    "dropRest": "or click to choose",
+    "dropMeta": "PNG, JPG or WEBP · up to 4 files · 5 MB each",
+    "noteLabel": "Note for the reviewer",
+    "optional": "(optional)",
+    "notePh": "Anything that helps us match the NinjaTrader account to this one",
+    "privacyNote": "Uploads are stored privately and seen only by the reviewer.",
+    "privacyLink": "See our privacy policy",
+    "submit": "Submit for review",
+    "resubmit": "Resubmit",
+    "yourSubmission": "Your submission",
+    "submittedLocked": "Submitted · you can't edit while it's under review.",
+    "nextTitle": "What happens next",
+    "nextBody": "Course access lands in your inbox before 31 December 2026. Keep an eye on the email you signed up with.",
+    "viewCurriculum": "View curriculum",
+    "blockedTitle": "Two screenshots are required",
+    "shotReg": "NinjaTrader registration screenshot (the confirmation email or account page)",
+    "shotLogin": "Platform login screenshot (the web dashboard showing \"Welcome, {name}\")",
+    "addShots": "Add screenshots",
+    "dlgCancel": "Cancel",
+    "confirmTitle": "Send for review?",
+    "confirmBody": "We will email {email} when a person has reviewed your submission, usually within a few days. You cannot edit your files while they are under review.",
+    "confirmSend": "Send for review",
+    "confirmNotYet": "Not yet",
+    "sentTitle": "Submission received",
+    "sentBody": "We emailed {email} a confirmation. You will hear from us either way.",
+    "sentBack": "Back to my account",
+    "nameFallback": "your name"
+  },
+  "admin": {
+    "eyebrow": "Owner only",
+    "h1": "Admin",
+    "filters": {
+      "0": "All",
+      "1": "Pending",
+      "2": "Approved",
+      "3": "Rejected"
+    },
+    "export": "Export approved CSV",
+    "kpi": {
+      "0": "Pending",
+      "1": "Approved",
+      "2": "Rejected",
+      "3": "Total signups"
+    },
+    "cols": {
+      "0": "Member",
+      "1": "Submitted",
+      "2": "Status"
+    },
+    "status": {
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "submitted": "Submitted",
+    "memberNote": "Member note",
+    "reason": "Reason (sent to the member on reject)",
+    "reasonPh": "e.g. Email address isn't visible in the screenshot",
+    "approve": "Approve and send confirmation",
+    "reject": "Request resubmission"
+  },
+  "emails": {
+    "confirm": {
+      "subject": "Confirm your email",
+      "h": "Confirm your email",
+      "p": "Thanks for creating a Talaria Flow account. Press the button to confirm {{email}}. The link is valid for 24 hours.",
+      "cta": "Confirm email"
+    },
+    "code": {
+      "subject": "Your sign-in code",
+      "h": "Your sign-in code",
+      "p": "Enter this code to continue. It expires in 10 minutes. If you did not request it, ignore this message."
+    },
+    "received": {
+      "subject": "We received your proof",
+      "h": "We received your proof",
+      "p": "A person will check the screenshots, usually within a few days. You will get an email either way and can follow status from the dashboard.",
+      "cta": "Open dashboard"
+    },
+    "approved": {
+      "subject": "Approved",
+      "h": "Approved. You're in",
+      "p": "Your NinjaTrader registration is confirmed. You will receive the full 30-video Order Flow course with written materials and lesson notes before 31 December 2026 at this email.",
+      "cta": "View curriculum"
+    },
+    "rejected": {
+      "subject": "We need a clearer screenshot",
+      "h": "We need a clearer screenshot",
+      "lead": "Reviewer reason:",
+      "p": "Upload a new screenshot from the dashboard and we will review it again.",
+      "cta": "Upload again"
+    },
+    "courseReady": {
+      "subject": "Your course is ready",
+      "h": "Your course is ready",
+      "p": "The 30 videos, written materials and lesson notes are available now. Access is tied to this email.",
+      "cta": "Start the course"
+    },
+    "reset": {
+      "subject": "Reset your password",
+      "h": "Reset your password",
+      "p": "Press the button to choose a new password. The link is valid for one hour. If you did not request this, ignore the message.",
+      "cta": "Set a new password"
+    },
+    "suiteLaunch": {
+      "subject": "The Talaria Flow tools suite is live",
+      "h": "The tools suite is live",
+      "p": "You asked us to tell you at launch. Order flow tools for NinjaTrader are available now.",
+      "cta": "See the tools suite"
+    },
+    "fallbackLink": "If the button does not work, copy this link:"
+  },
+  "seo": {
+    "home": {
+      "title": "Talaria Flow — Order flow tools and a free course for NinjaTrader",
+      "description": "Read the order flow, trade the structure. Open a NinjaTrader account through our partner link and get the full 30-video order flow course free, with written notes to your inbox."
+    },
+    "course": {
+      "title": "Free order flow course — 30 videos, no cost",
+      "description": "Volume Profile, Footprint, Delta, VWAP, absorption and auction theory in 30 videos. Free with a NinjaTrader account opened through our partner link. Watch the 2-minute registration guide."
+    },
+    "ninjatrader": {
+      "title": "Why we build on NinjaTrader",
+      "description": "Our recommended futures trading platform. Native order flow data, real scripting, free simulation. Open your account through our partner link."
+    },
+    "tools": {
+      "title": "Talaria Flow tools suite — in development",
+      "description": "Order flow indicators for NinjaTrader sharing one engine. Leave your email to hear when it ships."
+    },
+    "signup": {
+      "title": "Create your Talaria Flow account",
+      "description": "Sign up, upload proof of your NinjaTrader account and get the free course."
+    },
+    "login": {
+      "title": "Log in — Talaria Flow",
+      "description": "Check your review status and course access."
+    },
+    "legalPrivacy": {
+      "title": "Privacy policy — Talaria Flow",
+      "description": "How Talaria-Log Ltd handles your data."
+    },
+    "legalTerms": {
+      "title": "Terms of use — Talaria Flow",
+      "description": "Terms of the free course offer."
+    },
+    "legalDisclaimers": {
+      "title": "Disclaimers — Talaria Flow",
+      "description": "Risk, hypothetical performance, trade room and testimonial disclosures."
+    }
+  },
+  "accountApp": {
+    "account": "Account",
+    "hello": "Welcome back",
+    "memberSince": "Member since",
+    "logout": "Log out",
+    "tags": {
+      "none": "Not submitted",
+      "review": "Under review",
+      "approved": "Approved",
+      "rejected": "Needs resubmission"
+    },
+    "accessBody": {
+      "none": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.",
+      "review": "A person is checking your screenshots. You will get an email either way.",
+      "approved": "Your registration is confirmed. Course access lands here before 31 December 2026.",
+      "rejected": "The reviewer asked for a clearer screenshot. Upload again to continue."
+    },
+    "nav": {
+      "0": "Overview",
+      "1": "Course access",
+      "2": "Course",
+      "3": "Profile",
+      "4": "Notifications"
+    },
+    "courseAccess": "Course access",
+    "course": "Course",
+    "courseTitle": "Free order flow course",
+    "recent": "Recent activity",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "name": "Name",
+    "emailLabel": "Email",
+    "emailNote": "This is your login and where course emails go. Contact support to change it.",
+    "language": "Language",
+    "languageNote": "Used for the site and every email we send you.",
+    "save": "Save changes",
+    "password": "Password",
+    "passwordNote": "Use a strong phrase you do not use anywhere else.",
+    "change": "Change",
+    "pwCurrent": "Current password",
+    "pwNew": "New password",
+    "pwRepeat": "Repeat new password",
+    "pwRule": "At least 8 characters. Use a phrase you do not use anywhere else.",
+    "pwSave": "Update password",
+    "cancel": "Cancel",
+    "pwUpdated": "Password updated",
+    "deleteAccount": "Delete account",
+    "deleteNote": "Removes your account and uploaded screenshots. Course access cannot be restored.",
+    "delete": "Delete",
+    "saved": "Saved.",
+    "saveFailed": "Could not save. Try again.",
+    "deleted": "Account deleted.",
+    "deleteTitle": "Delete your account?",
+    "deleteConfirm": "Delete account",
+    "courseBodyLocked": "Opens once your course access is approved and released.",
+    "courseBodyOpen": "Thirty videos with written materials and lesson notes per module.",
+    "courseCtaLocked": "See what is inside",
+    "courseCtaOpen": "Continue",
+    "lockedBody": "The course opens for approved members before 31 December 2026. Module titles are revealed at release. Until then, get NinjaTrader set up.",
+    "videos": "{n} videos · notes PDF",
+    "noActivity": "No activity yet.",
+    "yourFiles": "Your files",
+    "noFiles": "No files on record.",
+    "modState": {
+      "locked": "Locked",
+      "open": "Open",
+      "done": "Done"
+    },
+    "accessCta": {
+      "none": "Upload proof",
+      "review": "View submission",
+      "approved": "View details",
+      "rejected": "Upload again"
+    },
+    "activityKinds": {
+      "proof": "You uploaded {n} screenshot(s)",
+      "decision_approved": "Your proof was approved",
+      "decision_rejected": "The reviewer asked you to upload again",
+      "account": "Account created",
+      "reset": "Password reset requested"
+    },
+    "prefs": {
+      "review": { "title": "Review updates", "body": "Approved, needs resubmission and other decisions about your proof. Always on." },
+      "course": { "title": "Course emails", "body": "Module releases, lesson notes and access announcements." },
+      "newsletter": { "title": "Newsletter", "body": "Occasional order flow notes from the team." },
+      "tools": { "title": "Tools suite news", "body": "Launch and updates for the Talaria Flow indicators." }
+    },
+    "resendEmail": "Resend the confirmation email",
+    "resendOk": "Confirmation email sent.",
+    "resendFail": "Could not send the email. Try again.",
+    "moduleLocked": "Module {n}"
+  },
+  "notfound": {
+    "axis": "Page not found",
+    "h1": "Nothing traded at this price",
+    "p": "The link you opened does not exist or has moved. Go back to the home page or continue to the free course.",
+    "home": "Home",
+    "course": "Free order flow course",
+    "help": "Need help?"
+  }
+}

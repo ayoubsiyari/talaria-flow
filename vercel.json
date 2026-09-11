@@ -1,0 +1,215 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "functions": {
+    "api/proof.ts": { "maxDuration": 60, "memory": 1024 },
+    "api/admin/campaigns.ts": { "maxDuration": 60 },
+    "api/cron/send-campaigns.ts": { "maxDuration": 60 }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com 'sha256-3Xuw2Ope0h/vTkDPGuy8S/PHpUcSlTmzwsW/r5/FM8M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/(account|admin)(/.*)?",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/legal",
+      "destination": "/legal/privacy/",
+      "permanent": true
+    },
+    {
+      "source": "/legal/",
+      "destination": "/legal/privacy/",
+      "permanent": true
+    },
+    {
+      "source": "/how-to",
+      "destination": "/course/#guide",
+      "permanent": true
+    },
+    {
+      "source": "/how-to/",
+      "destination": "/course/#guide",
+      "permanent": true
+    },
+    {
+      "source": "/how-to.html",
+      "destination": "/course/#guide",
+      "permanent": true
+    },
+    {
+      "source": "/course/how-to-register",
+      "destination": "/course/#guide",
+      "permanent": true
+    },
+    {
+      "source": "/course/how-to-register/",
+      "destination": "/course/#guide",
+      "permanent": true
+    },
+    {
+      "source": "/course.html",
+      "destination": "/course/",
+      "permanent": true
+    },
+    {
+      "source": "/suite",
+      "destination": "/tools/",
+      "permanent": true
+    },
+    {
+      "source": "/suite/",
+      "destination": "/tools/",
+      "permanent": true
+    },
+    {
+      "source": "/suite.html",
+      "destination": "/tools/",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/account/access/",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard/",
+      "destination": "/account/access/",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/account/access/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/content/",
+      "destination": "/admin/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/settings/",
+      "destination": "/admin/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/emails/templates",
+      "destination": "/admin/emails/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/emails/templates/",
+      "destination": "/admin/emails/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/emails/templates/new/",
+      "destination": "/admin/emails/new/",
+      "permanent": true
+    },
+    {
+      "source": "/admin/emails/history/",
+      "destination": "/admin/campaigns/history/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/account/course/:lesson*",
+      "destination": "/account/course/"
+    },
+    {
+      "source": "/admin/emails/:id/",
+      "destination": "/admin/emails/edit/"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/purge-proofs",
+      "schedule": "20 3 * * *"
+    },
+    {
+      "path": "/api/cron/send-campaigns",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}
