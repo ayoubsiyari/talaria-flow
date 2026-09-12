@@ -737,7 +737,12 @@
     var lang = S.pv === 'ar' ? 'ar' : 'en';
     if (window.TF && window.TF.renderEmail) {
       try {
-        var out = await window.TF.renderEmail(t.file || t.id, lang, { first_name: (first && first.firstName) || 'there', email: (first && first.email) || '' });
+        var out = await window.TF.renderEmail(t.file || t.id, lang, {
+          first_name: (first && first.firstName) || 'there',
+          email: (first && first.email) || '',
+          hero_image_url: (location.origin || '') + '/assets/nt-platform.png',
+          hero_image_alt: 'Talaria Flow suite on a NinjaTrader chart',
+        });
         S.previewSubject = out.subject || '';
         return out;
       } catch (e) {}

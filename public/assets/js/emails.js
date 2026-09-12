@@ -97,7 +97,15 @@
     var spec = JSON.parse(JSON.stringify(row.spec || row));
     if (row.spec_ar && !spec.ar) spec.ar = row.spec_ar;
     lang = lang === 'ar' ? 'ar' : 'en';
-    var payload = data || {};
+    var origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
+    var payload = Object.assign({
+      first_name: 'there',
+      email: '',
+      hero_image_url: origin + '/assets/nt-platform.png',
+      hero_image_alt: 'Talaria Flow suite on a NinjaTrader chart',
+      dashboard_url: origin + '/account/access/',
+      course_url: origin + '/account/course/',
+    }, data || {});
     if (lang === 'ar' && !hasArabic(spec)) {
       return { html: missingArHtml(), subject: 'No Arabic version yet · Add translation', data: payload, spec: spec, missingAr: true };
     }

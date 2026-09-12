@@ -231,6 +231,8 @@ export async function runSend(sb: SupabaseClient, send: EmailSendRow, recipients
         dashboard_url: `${env.siteUrl}/account/access/`,
         course_url: `${env.siteUrl}/account/course/`,
         reason: send.note || '',
+        hero_image_url: `${env.siteUrl}/assets/nt-platform.png`,
+        hero_image_alt: 'Talaria Flow suite on a NinjaTrader chart',
         ...emailLinks({ memberId: r.memberId, email: r.email, templateId: send.template_id }),
       },
     });
