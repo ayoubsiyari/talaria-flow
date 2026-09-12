@@ -358,7 +358,7 @@
   }
 
   function campaignTemplates() {
-    return templates().filter(function (t) { return t.kind === 'campaign'; });
+    return templates();
   }
   // Per-template stats come from email_events only; "—" / "never" when there are none.
   function statsFor(file) {
@@ -366,26 +366,52 @@
     if (!s || !s.sent) return { sent: 0, open: '—', last: 'never' };
     return { sent: s.sent, open: Math.round((s.opened / s.sent) * 100) + '%', last: fmtDate(s.last) };
   }
+  function hasArabicSpec(spec, row) {
+    return !!(spec && spec.ar && (spec.ar.title || spec.ar.subject || (spec.ar.blocks && spec.ar.blocks.length)))
+      || !!(row && row.spec_ar && (row.spec_ar.title || row.spec_ar.subject || (row.spec_ar.blocks && row.spec_ar.blocks.length)));
+  }
   function templates() {
     var live = (window.TF.getEmailTemplates && window.TF.getEmailTemplates()) || [];
-    return TPL_META.map(function (t) {
+    var seen = {};
+    var out = TPL_META.map(function (t) {
       var ev = statsFor(t.file);
       var row = live.filter(function (x) { return x.id === t.file || x.id === t.id || (x.id && x.id.indexOf(t.id) === 0); })[0];
       var spec = row && (row.spec || row);
-      var hasAr = !!(spec && spec.ar && (spec.ar.title || spec.ar.subject || (spec.ar.blocks && spec.ar.blocks.length))) || !!(row && row.spec_ar && (row.spec_ar.title || row.spec_ar.subject));
+      seen[t.file] = true;
+      seen[t.id] = true;
+      if (row && row.id) seen[row.id] = true;
       return {
         id: t.id,
         file: t.file,
         name: (row && row.name) || t.name,
         kind: (row && row.kind) || t.kind,
         trigger: (row && row.trigger) || t.trigger,
-        subject: t.subject,
+        subject: (spec && spec.subject) || t.subject,
         sent: ev.sent,
         open: ev.open,
         last: ev.last,
-        hasAr: hasAr,
+        hasAr: hasArabicSpec(spec, row),
       };
     });
+    live.forEach(function (row) {
+      if (!row || !row.id || seen[row.id]) return;
+      var spec = row.spec || row;
+      var ev = statsFor(row.id);
+      seen[row.id] = true;
+      out.push({
+        id: row.id,
+        file: row.id,
+        name: row.name || row.id,
+        kind: row.kind || 'campaign',
+        trigger: row.trigger || 'Manual send',
+        subject: (spec && spec.subject) || row.name || '',
+        sent: ev.sent,
+        open: ev.open,
+        last: ev.last,
+        hasAr: hasArabicSpec(spec, row),
+      });
+    });
+    return out;
   }
   function tplById(id) {
     return templates().filter(function (t) { return t.id === id || t.file === id; })[0] || templates()[0];
@@ -401,7 +427,7 @@
     return list;
   }
   function tplNameOf(templateId) {
-    var t = TPL_META.filter(function (x) { return x.file === templateId || x.id === templateId; })[0];
+    var t = templates().filter(function (x) { return x.file === templateId || x.id === templateId; })[0];
     return t ? t.name : (templateId || '—');
   }
 
@@ -1087,7 +1113,7 @@
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px">' + t.sent + '</td>' +
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(t.open) + '</td>' +
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap">' + esc(t.last) + '</td>' +
-          '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right">' + (t.kind === 'campaign' ? '<button type="button" data-act="use-tpl" data-tpl="' + t.id + '" style="height:30px;padding:0 10px;border:1px solid #2EE8FF;border-radius:8px;background:transparent;color:#2EE8FF;font-size:12.5px;font-weight:600;cursor:pointer">Use</button> ' : '') + '<a href="/admin/emails/' + esc(t.file || t.id) + '/" style="display:inline-flex;align-items:center;height:30px;padding:0 10px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;font-size:12.5px;font-weight:600;margin-left:6px">Edit</a></td></tr>';
+          '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right"><button type="button" data-act="use-tpl" data-tpl="' + esc(t.file || t.id) + '" style="height:30px;padding:0 10px;border:1px solid #2EE8FF;border-radius:8px;background:transparent;color:#2EE8FF;font-size:12.5px;font-weight:600;cursor:pointer">Use</button> <a href="/admin/emails/' + esc(t.file || t.id) + '/" style="display:inline-flex;align-items:center;height:30px;padding:0 10px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;font-size:12.5px;font-weight:600;margin-left:6px">Edit</a></td></tr>';
       }).join('') + '</tbody></table></div></section>';
   }
 
@@ -1198,12 +1224,13 @@
   function mountTplSelects(root) {
     if (!window.TF.mountSelect || !root) return;
     var tpls = campaignTemplates();
-    if (!tpls.some(function (t) { return t.id === S.tpl; })) S.tpl = (tpls[0] && tpls[0].id) || '06';
+    var current = tpls.filter(function (t) { return t.id === S.tpl || t.file === S.tpl; })[0] || tpls[0];
+    if (current) S.tpl = current.file || current.id;
     var hosts = root.querySelectorAll('[data-tf-select="tpl"]');
     for (var i = 0; i < hosts.length; i++) {
       window.TF.mountSelect(hosts[i], {
         value: S.tpl,
-        options: tpls.map(function (x) { return { value: x.id, label: x.name }; }),
+        options: tpls.map(function (x) { return { value: x.file || x.id, label: x.name }; }),
         ariaLabel: 'Template',
         onChange: function (v) { S.tpl = v; S.subject = ''; paint(); }
       });
@@ -1391,7 +1418,7 @@
       if (!dlgRecips.length) { toast('That audience is empty.'); return; }
       var dlgLater = S.when === 'later';
       var dlgTpl = tplById(S.tpl);
-      if (dlgTpl.kind !== 'campaign') { toast('That template sends automatically.'); return; }
+      if (!dlgTpl || !dlgTpl.file) { toast('Pick a template first.'); return; }
       var dlgBody = {
         action: 'create',
         templateId: dlgTpl.file,
@@ -1505,8 +1532,8 @@
     if (act === 'pv') { S.pv = el.getAttribute('data-pv'); paint(); return; }
     if (act === 'use-tpl') {
       var use = tplById(el.getAttribute('data-tpl'));
-      if (!use || use.kind !== 'campaign') { toast('That template sends automatically.'); return; }
-      S.tpl = use.id; S.subject = ''; go('/admin/campaigns/?tpl=' + encodeURIComponent(S.tpl)); return;
+      if (!use) { toast('Unknown template.'); return; }
+      S.tpl = use.id; S.subject = ''; go('/admin/campaigns/?tpl=' + encodeURIComponent(use.file || use.id)); return;
     }
     if (act === 'email-waitlist') { S.audience = 'waitlist'; S.tpl = '09'; S.subject = ''; go('/admin/campaigns/?audience=waitlist&tpl=09'); return; }
     if (act === 'export-wait') {
@@ -1564,7 +1591,7 @@
     if (act === 'submit-send') {
       if (S.busy) return;
       var t = tplById(S.tpl);
-      if (t.kind !== 'campaign') { toast('That template sends automatically.'); return; }
+      if (!t || !t.file) { toast('Pick a template first.'); return; }
       var later = S.when === 'later';
       var body = {
         action: 'create',
@@ -1639,7 +1666,7 @@
       try {
         await Promise.race([
           window.TF.readyEmails,
-          new Promise(function (resolve) { setTimeout(resolve, 1500); }),
+          new Promise(function (resolve) { setTimeout(resolve, 8000); }),
         ]);
       } catch (e) {}
     }

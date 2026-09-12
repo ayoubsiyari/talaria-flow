@@ -126,7 +126,7 @@ export const campaignLang = z.enum(['all', 'en', 'ar']);
 export const campaignTemplateId = z
   .string()
   .trim()
-  .regex(/^(0?6|0?8|0?9)(-[a-z-]+)?$|^(course-ready|newsletter|tools-suite-launch)$/i);
+  .regex(/^[a-z0-9][a-z0-9-]{0,79}$/i);
 
 const campaignFilter = {
   audience: campaignAudience,

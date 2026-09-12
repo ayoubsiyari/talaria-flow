@@ -10,7 +10,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { env } from './env.ts';
 import { HttpError } from './http.ts';
-import { sendTemplate, resolveTemplateId, templateName, emailLinks } from './send-template.ts';
+import { sendTemplate, resolveTemplateId, resolveSendSpec, templateName, emailLinks } from './send-template.ts';
 import { unsubscribeKindFor } from './unsubscribe.ts';
 
 export const CAMPAIGN_TEMPLATES = ['06-course-ready', '08-newsletter', '09-tools-suite-launch'] as const;
@@ -229,6 +229,8 @@ export async function runSend(sb: SupabaseClient, send: EmailSendRow, recipients
         account_email: r.email,
         email: r.email,
         dashboard_url: `${env.siteUrl}/account/access/`,
+        course_url: `${env.siteUrl}/account/course/`,
+        reason: send.note || '',
         ...emailLinks({ memberId: r.memberId, email: r.email, templateId: send.template_id }),
       },
     });
@@ -244,6 +246,8 @@ export async function runSend(sb: SupabaseClient, send: EmailSendRow, recipients
 
 export async function createCampaign(sb: SupabaseClient, input: CreateCampaignInput, createdBy: string, now: Date = new Date()): Promise<EmailSendRow> {
   const templateId = resolveTemplateId(input.templateId);
+  const spec = await resolveSendSpec(templateId);
+  if (!spec) throw new HttpError(400, 'invalid_input', 'Unknown email template.');
   const q: AudienceQuery = { templateId, audience: input.audience, lang: input.lang, skipRecent: Boolean(input.skipRecent), memberIds: input.memberIds || null };
   const recipients = await resolveRecipients(sb, q, now);
   const scheduledAt = input.scheduledFor ? new Date(input.scheduledFor) : null;
@@ -255,7 +259,7 @@ export async function createCampaign(sb: SupabaseClient, input: CreateCampaignIn
     id: crypto.randomUUID(),
     state: future ? 'scheduled' : 'sending',
     template_id: templateId,
-    template_name: templateName(templateId),
+    template_name: (typeof spec.name === 'string' && spec.name) || templateName(templateId),
     audience: audienceLabel(q),
     audience_key: input.audience,
     recipient_count: recipients.length,

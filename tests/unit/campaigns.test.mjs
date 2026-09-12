@@ -124,7 +124,9 @@ test('admin schemas: decision needs a reason when rejecting; campaigns union; te
   const create = adminCampaignSchema.parse({ action: 'create', templateId: '06', audience: 'approved' });
   assert.equal(create.lang, 'all');
   assert.equal(create.skipRecent, false);
-  assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '04-approved', audience: 'approved' }).success, false);
+  assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '04-approved', audience: 'approved' }).success, true);
+  assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: 'custom-launch', audience: 'all' }).success, true);
+  assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '../secret', audience: 'approved' }).success, false);
   assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '08-newsletter', audience: 'everyone' }).success, false);
   assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '08-newsletter', audience: 'all', scheduledFor: 'tomorrow' }).success, false);
   assert.equal(adminCampaignSchema.safeParse({ action: 'create', templateId: '08-newsletter', audience: 'all', scheduledFor: '2026-12-01T09:00:00Z', memberIds: [U(1)] }).success, true);
