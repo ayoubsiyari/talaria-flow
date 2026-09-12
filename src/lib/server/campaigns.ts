@@ -248,6 +248,7 @@ export async function createCampaign(sb: SupabaseClient, input: CreateCampaignIn
   const templateId = resolveTemplateId(input.templateId);
   const spec = await resolveSendSpec(templateId);
   if (!spec) throw new HttpError(400, 'invalid_input', 'Unknown email template.');
+  if (spec.kind === 'auto') throw new HttpError(400, 'invalid_input', 'That template sends automatically.');
   const q: AudienceQuery = { templateId, audience: input.audience, lang: input.lang, skipRecent: Boolean(input.skipRecent), memberIds: input.memberIds || null };
   const recipients = await resolveRecipients(sb, q, now);
   const scheduledAt = input.scheduledFor ? new Date(input.scheduledFor) : null;

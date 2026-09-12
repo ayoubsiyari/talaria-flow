@@ -358,7 +358,7 @@
   }
 
   function campaignTemplates() {
-    return templates();
+    return templates().filter(function (t) { return t.kind !== 'auto'; });
   }
   // Per-template stats come from email_events only; "—" / "never" when there are none.
   function statsFor(file) {
@@ -1113,7 +1113,7 @@
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px">' + t.sent + '</td>' +
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(t.open) + '</td>' +
           '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap">' + esc(t.last) + '</td>' +
-          '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right"><button type="button" data-act="use-tpl" data-tpl="' + esc(t.file || t.id) + '" style="height:30px;padding:0 10px;border:1px solid #2EE8FF;border-radius:8px;background:transparent;color:#2EE8FF;font-size:12.5px;font-weight:600;cursor:pointer">Use</button> <a href="/admin/emails/' + esc(t.file || t.id) + '/" style="display:inline-flex;align-items:center;height:30px;padding:0 10px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;font-size:12.5px;font-weight:600;margin-left:6px">Edit</a></td></tr>';
+          '<td style="padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right">' + (t.kind === 'auto' ? '' : '<button type="button" data-act="use-tpl" data-tpl="' + esc(t.file || t.id) + '" style="height:30px;padding:0 10px;border:1px solid #2EE8FF;border-radius:8px;background:transparent;color:#2EE8FF;font-size:12.5px;font-weight:600;cursor:pointer">Use</button> ') + '<a href="/admin/emails/' + esc(t.file || t.id) + '/" style="display:inline-flex;align-items:center;height:30px;padding:0 10px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;font-size:12.5px;font-weight:600;margin-left:6px">Edit</a></td></tr>';
       }).join('') + '</tbody></table></div></section>';
   }
 
@@ -1419,6 +1419,7 @@
       var dlgLater = S.when === 'later';
       var dlgTpl = tplById(S.tpl);
       if (!dlgTpl || !dlgTpl.file) { toast('Pick a template first.'); return; }
+      if (dlgTpl.kind === 'auto') { toast('That template sends automatically.'); return; }
       var dlgBody = {
         action: 'create',
         templateId: dlgTpl.file,
@@ -1532,7 +1533,7 @@
     if (act === 'pv') { S.pv = el.getAttribute('data-pv'); paint(); return; }
     if (act === 'use-tpl') {
       var use = tplById(el.getAttribute('data-tpl'));
-      if (!use) { toast('Unknown template.'); return; }
+      if (!use || use.kind === 'auto') { toast('That template sends automatically.'); return; }
       S.tpl = use.id; S.subject = ''; go('/admin/campaigns/?tpl=' + encodeURIComponent(use.file || use.id)); return;
     }
     if (act === 'email-waitlist') { S.audience = 'waitlist'; S.tpl = '09'; S.subject = ''; go('/admin/campaigns/?audience=waitlist&tpl=09'); return; }
@@ -1592,6 +1593,7 @@
       if (S.busy) return;
       var t = tplById(S.tpl);
       if (!t || !t.file) { toast('Pick a template first.'); return; }
+      if (t.kind === 'auto') { toast('That template sends automatically.'); return; }
       var later = S.when === 'later';
       var body = {
         action: 'create',
