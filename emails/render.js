@@ -42,7 +42,7 @@ function render(t,opts){
     t=Object.assign({},t,{lang:'en'});
   }
   const base=opts.baseUrl!=null?opts.baseUrl:'https://www.talaria-flow.com/';
-  const logo=opts.logoUrl||(base+'assets/email-logo-2x.png?v=2');
+  const logo=opts.logoUrl||(base+'assets/email-logo-2x.png?v=3');
   const ar=t.lang==='ar';
   face=ar?"'Cairo','Segoe UI',Tahoma,sans-serif":F;
   const accent=t.accent||C.cyan;
