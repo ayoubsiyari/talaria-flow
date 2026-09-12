@@ -42,7 +42,13 @@ test('every template renders to a complete HTML document in EN and AR', () => {
     const html = fill(TFEmail.render(row.spec, {}));
     assert.ok(html.startsWith('<!doctype html>'), `${row.id}/${row.lang} doctype`);
     assert.ok(html.includes(`<html lang="${row.lang}" dir="${row.lang === 'ar' ? 'rtl' : 'ltr'}">`), `${row.id}/${row.lang} lang/dir`);
-    assert.ok(html.includes(isMerge(row.spec.title) ? SAMPLE.title : row.spec.title), `${row.id}/${row.lang} title`);
+    const title = isMerge(row.spec.title) ? SAMPLE.title : row.spec.title;
+    if (row.lang === 'ar' && /[A-Za-z]/.test(title)) {
+      assert.ok(html.includes('unicode-bidi:isolate'), `${row.id}/ar isolates Latin in mixed copy`);
+      assert.ok(ARABIC.test(html), `${row.id}/ar title still has Arabic`);
+    } else {
+      assert.ok(html.includes(title), `${row.id}/${row.lang} title`);
+    }
     assert.ok(html.includes('assets/email-logo-2x.png'), `${row.id}/${row.lang} PNG logo`);
     assert.ok(html.includes('support@talaria-flow.com') && html.includes('not affiliated with'), `${row.id}/${row.lang} footer`);
     assert.ok(!/<<[a-z_]+>>/.test(html), `${row.id}/${row.lang} unknown merge field: ${(html.match(/<<[a-z_]+>>/) || [])[0]}`);
@@ -68,6 +74,7 @@ test('renderer: opts.lang=ar applies the ar overrides, inherits hrefs and isolat
   assert.ok(html.includes('https://www.talaria-flow.com/account/access/'), 'button href inherited from the English block');
   assert.ok(html.includes("'Cairo'"), 'Arabic font stack');
   assert.ok(html.includes('<td dir="ltr" style="unicode-bidi:isolate;padding:24px 4px 0'), 'footer stays LTR');
+  assert.ok(html.includes('dir="ltr"'), 'layout tables stay LTR so Gmail matches the preview');
   const en = TFEmail.render(spec, { lang: 'en' });
   assert.ok(en.includes('<html lang="en" dir="ltr">') && en.includes(spec.title));
   assert.equal(TFEmail.bidi('NinjaTrader'), '<span dir="ltr" style="unicode-bidi:isolate">NinjaTrader</span>');
