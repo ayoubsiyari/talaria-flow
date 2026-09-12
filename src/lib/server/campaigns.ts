@@ -28,6 +28,8 @@ export interface ProfileRow {
   first_name?: string | null;
   name?: string | null;
   notify?: unknown;
+  is_admin?: boolean | null;
+  role?: string | null;
 }
 export interface SubmissionRow { user_id: string; status: string; created_at?: string | null }
 export interface WaitlistRow { email: string; lang?: string | null }
@@ -78,14 +80,19 @@ export function firstNameOf(p: { first_name?: string | null; name?: string | nul
 }
 
 /**
- * Pure recipient selection. `recentEmails` are addresses with an email_events row inside the last 24h.
- * With `memberIds` the list is exactly those profiles (prefs do not apply); `audience` is informational.
+ * Pure recipient selection. `recentEmails` are addresses that already received this template in the last 24h.
+ * EN/AR force the email language; they do not filter the audience. `all` uses each member's profile language.
+ * With `memberIds` the list is exactly those profiles (prefs and admin skip do not apply); `audience` is informational.
  */
 export function pickRecipients(
   data: { profiles: ProfileRow[]; submissions: SubmissionRow[]; waitlist: WaitlistRow[]; recentEmails?: Set<string> },
   q: AudienceQuery,
 ): Recipient[] {
-  const wantLang = (l: string | null | undefined) => q.lang === 'all' || (l === 'ar' ? 'ar' : 'en') === q.lang;
+  const mailLang = (memberLang: string | null | undefined): 'en' | 'ar' => {
+    if (q.lang === 'ar') return 'ar';
+    if (q.lang === 'en') return 'en';
+    return memberLang === 'ar' ? 'ar' : 'en';
+  };
   const recent = q.skipRecent ? data.recentEmails || new Set<string>() : new Set<string>();
   const seen = new Set<string>();
   const out: Recipient[] = [];
@@ -97,7 +104,7 @@ export function pickRecipients(
   };
 
   if (q.audience === 'waitlist' && !(q.memberIds && q.memberIds.length)) {
-    for (const w of data.waitlist) if (w.email && wantLang(w.lang)) push({ email: w.email, memberId: null, lang: w.lang === 'ar' ? 'ar' : 'en', firstName: '' });
+    for (const w of data.waitlist) if (w.email) push({ email: w.email, memberId: null, lang: mailLang(w.lang), firstName: '' });
     return out;
   }
 
@@ -108,12 +115,12 @@ export function pickRecipients(
     if (wanted.size) {
       if (!wanted.has(p.id)) continue;
     } else {
+      if (p.is_admin || p.role === 'admin') continue;
       const st = status.get(p.id) || 'none';
       if (q.audience !== 'all' && st !== q.audience) continue;
-      if (!wantLang(p.lang)) continue;
       if (!prefAllows(p.notify, q.templateId)) continue;
     }
-    push({ email: p.email, memberId: p.id, lang: p.lang === 'ar' ? 'ar' : 'en', firstName: firstNameOf(p) });
+    push({ email: p.email, memberId: p.id, lang: mailLang(p.lang), firstName: firstNameOf(p) });
   }
   return out;
 }
@@ -125,21 +132,22 @@ export function audienceLabel(q: { audience: Audience; lang: CampaignLang; membe
   return q.lang === 'all' ? base : `${base} · ${q.lang.toUpperCase()}`;
 }
 
-async function loadRecent(sb: SupabaseClient, now: Date): Promise<Set<string>> {
+async function loadRecent(sb: SupabaseClient, now: Date, templateId: string): Promise<Set<string>> {
   const since = new Date(now.getTime() - RECENT_WINDOW_MS).toISOString();
-  const { data, error } = await sb.from('email_events').select('recipient').gte('created_at', since).limit(5000);
+  const wanted = resolveTemplateId(templateId);
+  const { data, error } = await sb.from('email_events').select('recipient').eq('template_id', wanted).gte('created_at', since).limit(5000);
   if (error) throw new Error(error.message);
   return new Set((data || []).map((r) => String(r.recipient || '').toLowerCase()).filter(Boolean));
 }
 
 export async function resolveRecipients(sb: SupabaseClient, q: AudienceQuery, now: Date = new Date()): Promise<Recipient[]> {
-  const recentEmails = q.skipRecent ? await loadRecent(sb, now) : undefined;
+  const recentEmails = q.skipRecent ? await loadRecent(sb, now, q.templateId) : undefined;
   if (q.audience === 'waitlist' && !(q.memberIds && q.memberIds.length)) {
     const { data, error } = await sb.from('waitlist').select('email, lang');
     if (error) throw new Error(error.message);
     return pickRecipients({ profiles: [], submissions: [], waitlist: (data || []) as WaitlistRow[], recentEmails }, q);
   }
-  let profilesQuery = sb.from('profiles').select('id, email, lang, first_name, name, notify');
+  let profilesQuery = sb.from('profiles').select('id, email, lang, first_name, name, notify, is_admin, role');
   if (q.memberIds && q.memberIds.length) profilesQuery = profilesQuery.in('id', q.memberIds);
   const { data: profiles, error: pErr } = await profilesQuery;
   if (pErr) throw new Error(pErr.message);

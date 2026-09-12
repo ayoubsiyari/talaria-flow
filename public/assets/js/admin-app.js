@@ -25,7 +25,7 @@
     subject: '',
     audience: 'approved',
     langF: 'all',
-    skipRecent: true,
+    skipRecent: false,
     when: 'now',
     date: '',
     time: '09:00',
@@ -398,7 +398,6 @@
     else if (key === 'selected') list = members.filter(function (m) { return S.selected.has(String(m.id)); });
     else if (key === 'all') list = members.slice();
     else list = members.filter(function (m) { return m.status === key; });
-    if (langF && langF !== 'all') list = list.filter(function (m) { return m.lang === langF; });
     return list;
   }
   function tplNameOf(templateId) {
@@ -1010,7 +1009,7 @@
         '<div data-tf-select="tpl"></div></label>' +
         '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Subject' +
         '<input data-act="subject" value="' + esc(subject) + '" style="height:38px;padding:0 10px;background:#07080C;border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:14px;outline:none"></label>' +
-        '<div style="display:flex;gap:14px;font-size:13px;color:#8B90A3"><span>Language: member\'s preference (EN/AR)</span><a href="/admin/emails/' + esc(t.file || t.id) + '/" style="color:#2EE8FF;font-weight:600;margin-left:auto">Edit template</a></div></div>' +
+        '<div style="display:flex;gap:14px;font-size:13px;color:#8B90A3"><span>All = each member\'s language. EN or AR sends that language to everyone.</span><a href="/admin/emails/' + esc(t.file || t.id) + '/" style="color:#2EE8FF;font-weight:600;margin-left:auto">Edit template</a></div></div>' +
         '<div style="padding:18px;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-radius:12px;display:flex;flex-direction:column;gap:14px">' +
         '<div style="display:flex;align-items:center;gap:8px"><span class="tf-dot" style="background:#FBBF24"></span><span style="font-family:\'Geist Mono\',monospace;font-size:11px;font-weight:600;color:#F2F4F8">2</span><span style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8B90A3">Who</span></div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
@@ -1021,7 +1020,7 @@
         [['all', 'All'], ['en', 'EN'], ['ar', 'AR']].map(function (l) {
           return '<button type="button" data-act="langf" data-langf="' + l[0] + '" style="height:28px;padding:0 10px;border:1px solid;border-radius:8px;' + chip(S.langF === l[0]) + ';font-size:12.5px;cursor:pointer">' + l[1] + '</button>';
         }).join('') +
-        '<label style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-act="skip" ' + (S.skipRecent ? 'checked' : '') + ' style="accent-color:#2EE8FF;margin:0">Skip anyone emailed in the last 24h</label></div>' +
+        '<label style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-act="skip" ' + (S.skipRecent ? 'checked' : '') + ' style="accent-color:#2EE8FF;margin:0">Skip anyone who got this campaign in the last 24h</label></div>' +
         '<div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08)"><span style="font-size:13px;color:#8B90A3">Recipients</span><span data-recip-count aria-live="polite" style="font-size:22px;font-weight:700;letter-spacing:-0.02em">' + esc(countLabel) + '</span></div>' +
         '<div data-count-error role="alert" style="font-size:12.5px;color:#FF8AD0;' + (S.countError ? '' : 'display:none') + '">' + esc(S.countError) + '</div></div>' +
         '<div style="padding:18px;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-radius:12px;display:flex;flex-direction:column;gap:14px">' +
@@ -1212,7 +1211,8 @@
   }
 
   function countPayload() {
-    return { action: 'count', audience: S.audience, lang: S.langF, skipRecent: !!S.skipRecent };
+    var t = tplById(S.tpl);
+    return { action: 'count', templateId: t.file || t.id, audience: S.audience, lang: S.langF, skipRecent: !!S.skipRecent };
   }
   function paintCount() {
     var label = S.count == null ? '…' : String(S.count);
@@ -1467,7 +1467,12 @@
     if (act === 'tpl') { S.tpl = el.value; S.subject = ''; paint(); return; }
     if (act === 'subject') { S.subject = el.value; return; }
     if (act === 'audience') { S.audience = el.getAttribute('data-audience'); paint(); return; }
-    if (act === 'langf') { S.langF = el.getAttribute('data-langf'); paint(); return; }
+    if (act === 'langf') {
+      S.langF = el.getAttribute('data-langf');
+      if (S.langF === 'ar' || S.langF === 'en') S.pv = S.langF;
+      paint();
+      return;
+    }
     if (act === 'skip') { S.skipRecent = el.checked; paint(); return; }
     if (act === 'when') { S.when = el.getAttribute('data-when'); closePickers(); paint(); return; }
     if (act === 'cal-toggle') { S.calOpen = !S.calOpen; S.clkOpen = false; paint(); return; }

@@ -7,7 +7,7 @@ import { adminCampaignSchema, adminDecisionSchema, adminTestEmailSchema, waitlis
 
 const U = (n) => `00000000-0000-4000-8000-00000000000${n}`;
 const profiles = [
-  { id: U(1), email: 'Admin@x.test', lang: 'en', first_name: 'Ada', name: 'Ada Admin', notify: { course: true, newsletter: true, tools: false } },
+  { id: U(1), email: 'Admin@x.test', lang: 'en', first_name: 'Ada', name: 'Ada Admin', is_admin: true, notify: { course: true, newsletter: true, tools: false } },
   { id: U(2), email: 'pending@x.test', lang: 'en', first_name: null, name: 'Pia Pending', notify: { course: true, newsletter: false, tools: true } },
   { id: U(3), email: 'approved@x.test', lang: 'ar', first_name: 'Amir', notify: { course: false, newsletter: true, tools: true } },
   { id: U(4), email: 'rejected@x.test', lang: 'en', first_name: 'Rita', notify: null },
@@ -40,17 +40,23 @@ test('campaign resolver: latest submission decides status; audience/lang/prefs f
   // approved: only U(3) — but course pref is off
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({}))), []);
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '08-newsletter' }))), ['approved@x.test']);
-  // none = members without a submission (admin + new), newsletter prefs apply
-  assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '08', audience: 'none' }))), ['admin@x.test', 'new@x.test']);
+  // none = members without a submission (admins are skipped on audience sends), newsletter prefs apply
+  assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '08', audience: 'none' }))), ['new@x.test']);
   // all + tools: admin has tools:false, rejected has notify null (opted in), new has {} (opted in)
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '09', audience: 'all' }))), ['approved@x.test', 'new@x.test', 'pending@x.test', 'rejected@x.test']);
-  // lang filter
-  assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '09', audience: 'all', lang: 'ar' }))), ['approved@x.test']);
+  // EN/AR force the email language for everyone; they do not shrink the audience
+  const arMail = pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '09', audience: 'all', lang: 'ar' }));
+  assert.deepEqual(emails(arMail), ['approved@x.test', 'new@x.test', 'pending@x.test', 'rejected@x.test']);
+  assert.ok(arMail.every((r) => r.lang === 'ar'));
+  const enMail = pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '09', audience: 'all', lang: 'en' }));
+  assert.ok(enMail.every((r) => r.lang === 'en'));
   // rejected + course
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ audience: 'rejected' }))), ['rejected@x.test']);
-  // waitlist ignores prefs, honours lang
+  // waitlist ignores prefs; lang all keeps each row's language, AR forces Arabic
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ audience: 'waitlist' }))), ['approved@x.test', 'w1@x.test', 'w2@x.test']);
-  assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist }, q({ audience: 'waitlist', lang: 'ar' }))), ['w2@x.test']);
+  const waitAr = pickRecipients({ profiles, submissions, waitlist }, q({ audience: 'waitlist', lang: 'ar' }));
+  assert.deepEqual(emails(waitAr), ['approved@x.test', 'w1@x.test', 'w2@x.test']);
+  assert.ok(waitAr.every((r) => r.lang === 'ar'));
   // skipRecent drops addresses mailed in the last 24h
   const recentEmails = new Set(['w1@x.test']);
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist, recentEmails }, q({ audience: 'waitlist', skipRecent: true }))), ['approved@x.test', 'w2@x.test']);

@@ -12,7 +12,8 @@
  *   { action: "run-due" }                                                      -> { ok, processed, ids }
  *
  * templateId: 06-course-ready | 08-newsletter | 09-tools-suite-launch (short ids 06/08/09 accepted).
- * audience: approved | submitted | rejected | none (no submission) | all | waitlist. lang: all | en | ar.
+ * audience: approved | submitted | rejected | none (no submission) | all | waitlist.
+ * lang: all = each recipient's profile language; en / ar = send that language to the whole audience.
  */
 import { adminCampaignSchema } from '../../src/lib/validation.ts';
 import { handle, json, readJson, methodNotAllowed, HttpError } from '../../src/lib/server/http.ts';
