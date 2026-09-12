@@ -218,7 +218,7 @@ export async function runSend(sb: SupabaseClient, send: EmailSendRow, recipients
     const res = await sendTemplate({
       templateId: send.template_id,
       to: r.email,
-      lang: r.lang,
+      lang: send.lang === 'ar' ? 'ar' : send.lang === 'en' ? 'en' : r.lang,
       memberId: r.memberId,
       sendId: send.id,
       subject: send.subject || undefined,

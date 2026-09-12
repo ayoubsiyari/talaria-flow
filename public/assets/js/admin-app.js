@@ -357,6 +357,24 @@
     return '/admin/members/' + (qs ? '?' + qs : '');
   }
 
+  function defaultSubjectOf(t, lang) {
+    var row = window.TF.getEmailTemplate && window.TF.getEmailTemplate(t.file || t.id);
+    var spec = (row && row.spec) || {};
+    var ar = (spec && spec.ar) || (row && row.spec_ar);
+    if (lang === 'ar' && ar && ar.subject) return ar.subject;
+    return (spec && spec.subject) || t.subject || '';
+  }
+  function campaignSendLang() {
+    if (S.pv === 'ar') return 'ar';
+    if (S.langF === 'en' || S.langF === 'ar') return S.langF;
+    return 'all';
+  }
+  function subjectForSend(t) {
+    var typed = String(S.subject || '').trim();
+    if (!typed) return '';
+    if (typed === defaultSubjectOf(t, 'en') || typed === defaultSubjectOf(t, 'ar')) return '';
+    return typed;
+  }
   function campaignTemplates() {
     return templates().filter(function (t) { return t.kind !== 'auto'; });
   }
@@ -1023,7 +1041,8 @@
 
     if (tab === 'compose') {
       var t = tplById(S.tpl);
-      var subject = S.subject || t.subject;
+      var sendLang = campaignSendLang();
+      var subject = S.subject || defaultSubjectOf(t, sendLang === 'ar' || S.pv === 'ar' ? 'ar' : 'en');
       var countLabel = S.count == null ? '…' : String(S.count);
       var audDefs = [['approved', 'Approved members', c.approved], ['submitted', 'Pending review', c.pending], ['rejected', 'Needs resubmission', c.rejected], ['none', 'No proof yet', c.none], ['all', 'All members', c.total], ['waitlist', 'Waitlist', c.waitlist]];
       var later = S.when === 'later';
@@ -1035,7 +1054,7 @@
         '<div data-tf-select="tpl"></div></label>' +
         '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Subject' +
         '<input data-act="subject" value="' + esc(subject) + '" style="height:38px;padding:0 10px;background:#07080C;border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:14px;outline:none"></label>' +
-        '<div style="display:flex;gap:14px;font-size:13px;color:#8B90A3"><span>All = each member\'s language. EN or AR sends that language to everyone.</span><a href="/admin/emails/' + esc(t.file || t.id) + '/" style="color:#2EE8FF;font-weight:600;margin-left:auto">Edit template</a></div></div>' +
+        '<div style="display:flex;gap:14px;font-size:13px;color:#8B90A3"><span>AR in the preview sends Arabic to everyone. All = each member\'s language.</span><a href="/admin/emails/' + esc(t.file || t.id) + '/" style="color:#2EE8FF;font-weight:600;margin-left:auto">Edit template</a></div></div>' +
         '<div style="padding:18px;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-radius:12px;display:flex;flex-direction:column;gap:14px">' +
         '<div style="display:flex;align-items:center;gap:8px"><span class="tf-dot" style="background:#FBBF24"></span><span style="font-family:\'Geist Mono\',monospace;font-size:11px;font-weight:600;color:#F2F4F8">2</span><span style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8B90A3">Who</span></div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
@@ -1239,7 +1258,7 @@
 
   function countPayload() {
     var t = tplById(S.tpl);
-    return { action: 'count', templateId: t.file || t.id, audience: S.audience, lang: S.langF, skipRecent: !!S.skipRecent };
+    return { action: 'count', templateId: t.file || t.id, audience: S.audience, lang: campaignSendLang(), skipRecent: !!S.skipRecent };
   }
   function paintCount() {
     var label = S.count == null ? '…' : String(S.count);
@@ -1424,11 +1443,12 @@
         action: 'create',
         templateId: dlgTpl.file,
         audience: 'all',
-        lang: 'all',
+        lang: campaignSendLang(),
         skipRecent: false,
         memberIds: dlgRecips.map(function (m) { return m.id; }),
       };
-      if (S.subject) dlgBody.subject = S.subject;
+      var dlgSubject = subjectForSend(dlgTpl);
+      if (dlgSubject) dlgBody.subject = dlgSubject;
       if (String(S.note || '').trim()) dlgBody.note = S.note.trim();
       if (dlgLater) {
         var dlgIso = scheduledIso();
@@ -1497,7 +1517,8 @@
     if (act === 'audience') { S.audience = el.getAttribute('data-audience'); paint(); return; }
     if (act === 'langf') {
       S.langF = el.getAttribute('data-langf');
-      if (S.langF === 'ar' || S.langF === 'en') S.pv = S.langF;
+      if (S.langF === 'all') S.pv = 'en';
+      else if (S.langF === 'ar' || S.langF === 'en') S.pv = S.langF;
       paint();
       return;
     }
@@ -1530,7 +1551,12 @@
     }
     if (act === 'cal-done') { S.calOpen = false; paint(); return; }
     if (act === 'clk-pick') { S.time = el.getAttribute('data-time') || S.time; S.clkOpen = false; paint(); return; }
-    if (act === 'pv') { S.pv = el.getAttribute('data-pv'); paint(); return; }
+    if (act === 'pv') {
+      S.pv = el.getAttribute('data-pv');
+      if (S.pv === 'ar' || S.pv === 'en') S.langF = S.pv;
+      paint();
+      return;
+    }
     if (act === 'use-tpl') {
       var use = tplById(el.getAttribute('data-tpl'));
       if (!use || use.kind === 'auto') { toast('That template sends automatically.'); return; }
@@ -1599,10 +1625,11 @@
         action: 'create',
         templateId: t.file,
         audience: S.audience,
-        lang: S.langF,
+        lang: campaignSendLang(),
         skipRecent: !!S.skipRecent,
       };
-      if (S.subject) body.subject = S.subject;
+      var customSubject = subjectForSend(t);
+      if (customSubject) body.subject = customSubject;
       if (later) {
         var iso = scheduledIso();
         if (!iso) { toast('Pick a date and time first.'); return; }
@@ -1610,7 +1637,13 @@
         body.scheduledFor = iso;
       } else {
         if (S.count === 0) { toast('That audience is empty.'); return; }
-        var okSend = await dialog({ title: 'Send to ' + (S.count == null ? 'this audience' : S.count) + ' now?', body: 'Sends in batches of 100. This cannot be undone once it starts.', ok: 'Send now' });
+        var sendLang = campaignSendLang();
+        var langLine = sendLang === 'ar'
+          ? 'Everyone receives the Arabic email — the same version as the preview.'
+          : sendLang === 'en'
+            ? 'Everyone receives the English email.'
+            : 'Each member receives their own language (EN or AR). Click AR in the preview to send Arabic to everyone.';
+        var okSend = await dialog({ title: 'Send to ' + (S.count == null ? 'this audience' : S.count) + ' now?', body: langLine + ' This cannot be undone once it starts.', ok: 'Send now' });
         if (!okSend) return;
       }
       S.busy = true;
