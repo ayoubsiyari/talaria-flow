@@ -47,15 +47,30 @@ const HEADERS = (CONFIG.headers || []).map((h) => ({ ...h, re: toRegex(h.source)
 function fill(dest, match) {
   return dest.replace(/:([a-zA-Z0-9_]+)\*?/g, (_, k) => (match.groups && match.groups[k]) || '');
 }
-function headersFor(pathname) {
+function requestOrigin(req) {
+  if (!req || !req.headers) return '';
+  const proto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || 'http';
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  if (!host) return '';
+  return `${proto}://${host}`.replace(/\/+$/, '');
+}
+
+function headersFor(pathname, req) {
   const out = {};
   for (const h of HEADERS) if (h.re.test(pathname)) for (const kv of h.headers) out[kv.key] = kv.value;
-  // HTTP preview (raw VPS IP) must not set HSTS — browsers would then force HTTPS and hit a cert mismatch.
-  if (/^http:\/\//i.test(process.env.SITE_URL || '')) delete out['Strict-Transport-Security'];
+  const origin = requestOrigin(req) || (process.env.SITE_URL || '').replace(/\/+$/, '');
+  let host = '';
+  try { host = origin ? new URL(origin).hostname : ''; } catch { host = ''; }
+  // IP / HTTP preview must not set HSTS — browsers would force HTTPS and hit a cert mismatch.
+  if (/^http:\/\//i.test(origin) || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) delete out['Strict-Transport-Security'];
   // vercel.json allows *.supabase.co; a local/self-hosted SUPABASE_URL (the test mock) must be reachable too.
-  const sb = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-  if (out['Content-Security-Policy'] && sb && !/\.supabase\.co$/.test(new URL(sb).hostname)) {
-    out['Content-Security-Policy'] = out['Content-Security-Policy'].replace(/connect-src ([^;]*)/, (m, list) => `connect-src ${list} ${sb} ${sb.replace(/^http/, 'ws')}`);
+  const sb = (origin || process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  if (out['Content-Security-Policy'] && sb && !/\.supabase\.co$/i.test(host)) {
+    const http = origin.replace(/^https:/i, 'http:');
+    const https = origin.replace(/^http:/i, 'https:');
+    out['Content-Security-Policy'] = out['Content-Security-Policy'].replace(/connect-src ([^;]*)/, () => (
+      `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${http} ${https} ${http.replace(/^http/i, 'ws')} ${https.replace(/^https/i, 'wss')}`
+    ));
   }
   // Production pins hashed assets for a year. Locally JS/CSS must not be cached; images in emails must be.
   if (/^\/(assets|fonts)\//.test(pathname)) {
@@ -108,7 +123,7 @@ async function runApi(req, res, pathname) {
     const cookies = response.headers.getSetCookie();
     if (cookies.length) h['set-cookie'] = cookies;
   }
-  res.writeHead(response.status, { ...h, ...headersFor(pathname) });
+  res.writeHead(response.status, { ...h, ...headersFor(pathname, req) });
   res.end(Buffer.from(await response.arrayBuffer()));
   return true;
 }
@@ -117,7 +132,7 @@ export function listen(port = PORT) {
   const srv = createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://${req.headers.host || `127.0.0.1:${port}`}`);
     let pathname = url.pathname;
-    const base = headersFor(pathname);
+    const base = headersFor(pathname, req);
     try {
       if (pathname.startsWith('/api/')) {
         if (await runApi(req, res, pathname)) return;
@@ -141,8 +156,10 @@ export function listen(port = PORT) {
       }
       // Public env rendered live from process.env/.env (build.mjs writes the same file for Vercel).
       if (pathname === '/assets/js/env.js') {
+        const origin = requestOrigin(req);
+        const extras = origin ? { SITE_URL: origin, SUPABASE_URL: origin } : {};
         res.writeHead(200, { 'content-type': MIME['.js'], 'cache-control': 'no-store', ...base });
-        return res.end(publicEnvScript(join(ROOT, '.env')));
+        return res.end(publicEnvScript(join(ROOT, '.env'), extras));
       }
       // cleanUrls + trailingSlash: /login -> /login/, /login.html -> /login/
       if (pathname === '/404.html') return send(res, 200, join(PUB, '404.html'), base, req);
