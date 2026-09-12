@@ -1596,6 +1596,7 @@
     if (s.state === 'scheduled') return 'Scheduled for ' + s.when + ' · ' + s.count + ' recipient' + (s.count === 1 ? '' : 's') + '.';
     if (s.state === 'failed') return 'Send failed' + (s.error ? ': ' + s.error : '.') + ' ' + s.sent + '/' + s.count + ' delivered.';
     if (s.state === 'sending') return 'Sending to ' + s.count + ' recipient' + (s.count === 1 ? '' : 's') + '…';
+    if (!s.count || Number(s.sent) === 0) return 'Nobody was emailed. They may have this category turned off, or the list was empty.';
     return 'Sent ' + s.sent + '/' + s.count + ' · ' + s.template + '.';
   }
 

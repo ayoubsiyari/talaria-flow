@@ -54,9 +54,9 @@ test('campaign resolver: latest submission decides status; audience/lang/prefs f
   // skipRecent drops addresses mailed in the last 24h
   const recentEmails = new Set(['w1@x.test']);
   assert.deepEqual(emails(pickRecipients({ profiles, submissions, waitlist, recentEmails }, q({ audience: 'waitlist', skipRecent: true }))), ['approved@x.test', 'w2@x.test']);
-  // memberIds pins the list (prefs still apply; audience informational)
+  // memberIds pins the list and ignores notification prefs (admin chose these people)
   const picked = pickRecipients({ profiles, submissions, waitlist }, q({ templateId: '08', audience: 'approved', memberIds: [U(1), U(2), U(4)] }));
-  assert.deepEqual(emails(picked), ['admin@x.test', 'rejected@x.test']);
+  assert.deepEqual(emails(picked), ['admin@x.test', 'pending@x.test', 'rejected@x.test']);
   assert.equal(picked[0].firstName, 'Ada');
   assert.equal(firstNameOf(profiles[1]), 'Pia');
   assert.equal(audienceLabel({ audience: 'approved', lang: 'en' }), 'Approved members · EN');

@@ -9,6 +9,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { env } from './env.ts';
+import { HttpError } from './http.ts';
 import { sendTemplate, resolveTemplateId, templateName, emailLinks } from './send-template.ts';
 import { unsubscribeKindFor } from './unsubscribe.ts';
 
@@ -78,7 +79,7 @@ export function firstNameOf(p: { first_name?: string | null; name?: string | nul
 
 /**
  * Pure recipient selection. `recentEmails` are addresses with an email_events row inside the last 24h.
- * With `memberIds` the list is exactly those profiles (prefs still apply); `audience` is informational.
+ * With `memberIds` the list is exactly those profiles (prefs do not apply); `audience` is informational.
  */
 export function pickRecipients(
   data: { profiles: ProfileRow[]; submissions: SubmissionRow[]; waitlist: WaitlistRow[]; recentEmails?: Set<string> },
@@ -110,8 +111,8 @@ export function pickRecipients(
       const st = status.get(p.id) || 'none';
       if (q.audience !== 'all' && st !== q.audience) continue;
       if (!wantLang(p.lang)) continue;
+      if (!prefAllows(p.notify, q.templateId)) continue;
     }
-    if (!prefAllows(p.notify, q.templateId)) continue;
     push({ email: p.email, memberId: p.id, lang: p.lang === 'ar' ? 'ar' : 'en', firstName: firstNameOf(p) });
   }
   return out;
@@ -239,6 +240,9 @@ export async function createCampaign(sb: SupabaseClient, input: CreateCampaignIn
   const recipients = await resolveRecipients(sb, q, now);
   const scheduledAt = input.scheduledFor ? new Date(input.scheduledFor) : null;
   const future = Boolean(scheduledAt && scheduledAt.getTime() > now.getTime());
+  if (!future && recipients.length === 0) {
+    throw new HttpError(400, 'empty_audience', 'Nobody to send to. They may have turned this email off, or the selection is empty.');
+  }
   const row = {
     id: crypto.randomUUID(),
     state: future ? 'scheduled' : 'sending',
