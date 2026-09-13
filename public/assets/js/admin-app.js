@@ -545,6 +545,7 @@
     });
   }
 
+  var loading = null;
   function shortProofName(path) {
     var base = String(path || '').split('/').pop() || 'file';
     var i = base.lastIndexOf('.');
