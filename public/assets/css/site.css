@@ -110,17 +110,44 @@ html body [data-nav] a[data-key]:is(:hover,:focus-visible,:active,[aria-current=
   .nav-ind, .nav-ind.is-ready{ transition:none }
 }
 
-/* Ledger rows — design px, never rem-collapsed */
-[data-row]{
+/* Ledger rows — symmetric padding; rule is always border-top */
+.step-row, [data-row]{
   display:grid;
   grid-template-columns:64px minmax(0,1fr) minmax(0,1.5fr);
   gap:20px;
   padding:26px 0 !important;
   border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:0 !important;
   box-sizing:border-box;
 }
-[data-row]:last-child{ border-bottom:1px solid rgba(255,255,255,.08); }
-[data-mod],[data-sec],[data-topic]{ padding:26px 0 !important; box-sizing:border-box; }
+.step-row:last-of-type, [data-row]:last-of-type{ border-bottom:1px solid rgba(255,255,255,.08) !important; }
+.module-row, [data-mod]{
+  padding:20px 0 !important;
+  box-sizing:border-box;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:0 !important;
+}
+.module-row:last-of-type, [data-mod]:last-of-type{ border-bottom:1px solid rgba(255,255,255,.08) !important; }
+.list-row, [data-topic]{
+  padding:14px 0 !important;
+  box-sizing:border-box;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:0 !important;
+}
+.list-row:last-of-type, [data-topic]:last-of-type{ border-bottom:1px solid rgba(255,255,255,.08) !important; }
+.legal-row, [data-sec]{
+  padding:24px 0 !important;
+  box-sizing:border-box;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:0 !important;
+}
+.step-row p, [data-row] p, .module-row p, [data-mod] p, .list-row p, [data-topic] p, .legal-row p, [data-sec] > div > p{
+  margin-bottom:0 !important;
+}
+.step-row h3, [data-row] h3, .module-row h3, [data-mod] h3{ margin-top:0; margin-bottom:0; }
+.step-row > :first-child, [data-row] > :first-child,
+.module-row > :first-child, [data-mod] > :first-child,
+.legal-row > :first-child, [data-sec] > :first-child{ padding-top:0 !important; }
 h2 + div:has([data-row]),
 h2 + div:has([data-mod]),
 h2 + div:has([data-sec]){ margin-top:40px !important; }
