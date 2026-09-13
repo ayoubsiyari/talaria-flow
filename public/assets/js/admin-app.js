@@ -206,20 +206,29 @@
       raw: row,
     };
   }
+  var adminStats = null;
   function countsOf() {
-    var list = members;
+    var s = adminStats || {};
     return {
-      pending: list.filter(function (m) { return m.status === 'submitted'; }).length,
-      approved: list.filter(function (m) { return m.status === 'approved'; }).length,
-      rejected: list.filter(function (m) { return m.status === 'rejected'; }).length,
-      none: list.filter(function (m) { return m.status === 'none'; }).length,
-      total: list.length,
-      waitlist: waitlist.length,
-      scheduled: sends.filter(function (s) { return s.state === 'scheduled'; }).length,
+      pending: Number(s.pending) || 0,
+      approved: Number(s.approved) || 0,
+      rejected: Number(s.resubmission != null ? s.resubmission : s.rejected) || 0,
+      none: Number(s.no_proof != null ? s.no_proof : s.none) || 0,
+      total: Number(s.total) || 0,
+      waitlist: Number(s.waitlist) || 0,
+      scheduled: Number(s.scheduled) || 0,
       emails: templates().length,
     };
   }
+  async function loadStats() {
+    var res = await window.TF.api('/api/admin/stats');
+    if (!res.ok) throw new Error((res.body && res.body.message) || 'Could not load admin stats.');
+    adminStats = res.body || {};
+  }
   window.TF.getAdminSummary = async function () {
+    if (!adminStats) {
+      try { await loadStats(); } catch (e) { /* paint still uses last known counts */ }
+    }
     if (!loaded) await loadLive();
     return countsOf();
   };
@@ -473,7 +482,7 @@
         email: p.email,
         firstName: first || '',
         lastName: p.last_name || '',
-        status: !sub ? 'none' : sub.status,
+        status: (sub && (sub.status === 'submitted' || sub.status === 'approved' || sub.status === 'rejected')) ? sub.status : 'none',
         submitted: sub ? fmtDate(sub.created_at) : '—',
         submittedAt: sub ? sub.created_at : '',
         decidedAt: sub ? (sub.decided_at || '') : '',
@@ -547,6 +556,7 @@
       if (!auth) return;
       var sb = window.TF.getClient();
       if (!sb) { fail('members', 'Not connected to the backend.'); return; }
+      try { await loadStats(); } catch (eS) { fail('stats', 'Could not load admin stats: ' + eS.message); }
       try { await loadEmailEvents(sb); } catch (e0) { tplStats = {}; lastEmailByRecipient = {}; fail('stats', 'Could not load email stats: ' + e0.message); }
       try { await loadMembers(sb); } catch (e1) { members = []; fail('members', 'Could not load members: ' + e1.message); }
       try { await loadWaitlist(sb); } catch (e2) { waitlist = []; fail('waitlist', 'Could not load the waitlist: ' + e2.message); }
@@ -723,7 +733,6 @@
       if (status === 'rejected') S.reason = '';
       S.selected = new Set();
       writeSelected(S.selected);
-      await paint();
       await loadLive();
     }
     await paint();
@@ -1512,7 +1521,6 @@
       writeSelected(S.selected);
       S.focus = members[0] ? members[0].id : '';
       toast('Member deleted.');
-      await paint();
       await loadLive();
       paint();
       return;

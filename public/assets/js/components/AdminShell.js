@@ -46,7 +46,7 @@
       if (window.TF.getAdminSummary) {
         var sum = await window.TF.getAdminSummary();
         if (sum) {
-          counts.pending = sum.pending || 0;
+          counts.pending = sum.pending;
           counts.waitlist = sum.waitlist || 0;
           counts.scheduled = sum.scheduled || 0;
           counts.emails = sum.emails || 0;
