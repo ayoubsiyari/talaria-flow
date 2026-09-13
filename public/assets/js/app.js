@@ -718,7 +718,7 @@
             '<figcaption>' + name + '</figcaption>' +
             '<button type="button" data-upload-remove="' + f.id + '" aria-label="Remove">×</button></figure>';
         }).join('') + (files.length < 4
-          ? '<div data-upload-add role="button"><span data-upload-add-slot><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg></span><span>+ Add</span></div>'
+          ? '<div data-upload-add role="button"><span data-upload-add-slot><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg></span><span>+ Add</span></div>'
           : '');
       }
       if (!submit) return;
