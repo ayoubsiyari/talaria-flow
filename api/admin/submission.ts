@@ -31,8 +31,9 @@ export default handle(async (req: Request) => {
   if (input.action === 'restore') {
     const { data: member } = await sb.from('profiles').select('id, email').eq('id', input.id).maybeSingle();
     if (!member) throw new HttpError(404, 'not_found', 'Member not found.');
-    const { error } = await sb.from('profiles').update({ blocked: false, resubmit_note: null }).eq('id', member.id);
+    const { data: ok, error } = await sb.rpc('admin_set_blocked', { p_id: member.id, p_blocked: false });
     if (error) throw new Error(error.message);
+    if (ok === false) throw new Error('Could not restore this member.');
     await sb.from('activity_log').insert({
       kind: 'decision',
       actor_id: admin.id,
@@ -64,7 +65,7 @@ export default handle(async (req: Request) => {
       .update({ status: 'approved', reviewer_note: null, decided_at: now, reviewed_at: now, reviewed_by: admin.id })
       .eq('id', submission.id);
     if (upErr) throw new Error(upErr.message);
-    await sb.from('profiles').update({ blocked: false, resubmit_note: null }).eq('id', member.id);
+    await sb.rpc('admin_set_blocked', { p_id: member.id, p_blocked: false });
   }
 
   const approve = input.action === 'approve';
@@ -108,10 +109,7 @@ export default handle(async (req: Request) => {
 
   if (input.action === 'reject') {
     if (submission) await wipeProof(sb, submission.id);
-    const { error } = await sb.from('profiles').update({
-      blocked: true,
-      resubmit_note: null,
-    }).eq('id', member.id);
+    const { error } = await sb.rpc('admin_set_blocked', { p_id: member.id, p_blocked: true });
     if (error) throw new Error(error.message);
     return json({ ok: true, id: submission ? submission.id : member.id, status: 'blocked', email: { ok: email.ok, skipped: Boolean(email.skipped) } });
   }

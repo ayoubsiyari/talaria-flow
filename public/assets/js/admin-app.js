@@ -737,48 +737,52 @@
     var out = { done: 0, failed: 0, emailSent: 0, emailSkipped: 0, noProof: 0, errors: [] };
     for (var i = 0; i < ids.length; i++) {
       var m = members.filter(function (x) { return String(x.id) === String(ids[i]); })[0];
-      if (!m) continue;
+      var memberId = m ? m.id : ids[i];
+      if (!memberId) continue;
       var action = status === 'approved' ? 'approve' : status === 'blocked' ? 'reject' : status === 'restore' ? 'restore' : 'resubmit';
-      if (action === 'approve' && !m.submissionId) { out.noProof += 1; continue; }
-      if (action === 'resubmit' && !m.submissionId && m.status !== 'rejected') { out.noProof += 1; continue; }
-      var body = { action: action, id: action === 'restore' ? m.id : (m.submissionId || m.id) };
+      if (action !== 'restore' && !m) continue;
+      if (action === 'approve' && (!m || !m.submissionId)) { out.noProof += 1; continue; }
+      if (action === 'resubmit' && m && !m.submissionId && m.status !== 'rejected') { out.noProof += 1; continue; }
+      var body = { action: action, id: action === 'restore' ? memberId : ((m && m.submissionId) || memberId) };
       if (action === 'resubmit' || action === 'reject') body.reason = String(reason || '').trim().slice(0, 600);
       var res;
       try { res = await window.TF.api('/api/admin/submission', { body: body }); }
       catch (e) { res = { ok: false, body: { message: (e && e.message) || 'Network error' } }; }
       if (!res.ok) {
         out.failed += 1;
-        out.errors.push(m.email + ': ' + apiMessage(res, 'Request failed'));
+        out.errors.push((m && m.email ? m.email : memberId) + ': ' + apiMessage(res, res.status === 401 ? 'Session expired — refresh the page and try again.' : 'Request failed'));
         continue;
       }
       out.done += 1;
       var r = res.body || {};
-      m.status = r.status || status;
-      m.decidedAt = new Date().toISOString();
-      if (action === 'resubmit' || action === 'reject' || action === 'restore') {
-        m.submissionId = null;
-        m.thumbs = [];
-        m.files = 0;
-        m.proofTiles = [];
-        m.submitted = '—';
-        m.submittedAt = '';
-      }
-      if (action === 'resubmit') {
-        m.status = 'rejected';
-        m.reason = body.reason || '';
-      }
-      if (action === 'reject') {
-        m.status = 'blocked';
-        m.reason = body.reason || '';
-      }
-      if (action === 'restore') {
-        m.status = 'none';
-        m.reason = '';
-      }
-      if (r.email && r.email.ok && !r.email.skipped) {
-        out.emailSent += 1;
-        m.lastEmail = action === 'approve' ? 'Approved' : action === 'reject' ? 'Application rejected' : 'Needs resubmission';
-      } else if (action !== 'restore') out.emailSkipped += 1;
+      if (m) {
+        m.status = r.status || (action === 'restore' ? 'none' : status);
+        m.decidedAt = new Date().toISOString();
+        if (action === 'resubmit' || action === 'reject' || action === 'restore') {
+          m.submissionId = null;
+          m.thumbs = [];
+          m.files = 0;
+          m.proofTiles = [];
+          m.submitted = '—';
+          m.submittedAt = '';
+        }
+        if (action === 'resubmit') {
+          m.status = 'rejected';
+          m.reason = body.reason || '';
+        }
+        if (action === 'reject') {
+          m.status = 'blocked';
+          m.reason = body.reason || '';
+        }
+        if (action === 'restore') {
+          m.status = 'none';
+          m.reason = '';
+        }
+        if (r.email && r.email.ok && !r.email.skipped) {
+          out.emailSent += 1;
+          m.lastEmail = action === 'approve' ? 'Approved' : action === 'reject' ? 'Application rejected' : 'Needs resubmission';
+        } else if (action !== 'restore') out.emailSkipped += 1;
+      } else if (r.email && r.email.ok && !r.email.skipped) out.emailSent += 1;
     }
     return out;
   }
@@ -795,10 +799,11 @@
     }
     if (res.noProof) parts.push(res.noProof + ' skipped: no proof uploaded yet.');
     if (res.failed) parts.push(res.failed + ' failed: ' + res.errors[0]);
-    toast(parts.join(' — '));
+    if (!parts.length) toast(res.failed ? (res.errors[0] || 'Request failed.') : 'Nothing changed.');
+    else toast(parts.join(' — '));
   }
   async function decide(ids, status, reason) {
-    if (S.busy) return;
+    if (S.busy) { toast('Please wait…'); return; }
     S.busy = true;
     var res;
     try { res = await setMemberStatus(ids, status, reason); }
@@ -1118,14 +1123,14 @@
             '<button type="button" data-act="block" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,55,176,0.55);border-radius:10px;background:transparent;color:#FF37B0;font-size:13.5px;font-weight:600;cursor:pointer">Reject</button></div>';
         } else if (focus.status === 'blocked') {
           html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
-            '<button type="button" data-act="restore" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
+            '<button type="button" data-act="restore" data-id="' + esc(focus.id) + '" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
         } else {
           html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Approved' + (focus.decidedAt ? ' on ' + esc(fmtDay(focus.decidedAt)) : '') + '. Nothing to decide.</p>';
         }
       } else if (focus.status === 'blocked') {
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
           (focus.reason ? '<p style="margin-top:8px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '') +
-          '<button type="button" data-act="restore" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
+          '<button type="button" data-act="restore" data-id="' + esc(focus.id) + '" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
       } else if (focus.status === 'rejected') {
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Asked to resubmit' + (focus.reason ? ': ' + esc(focus.reason) : '') + '.</p>' +
           '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
@@ -1549,8 +1554,7 @@
     }
     if (act === 'row-restore' || act === 'restore') {
       S.focus = el.getAttribute('data-id') || S.focus;
-      var rest = await dialog({ title: 'Restore access?', body: 'This member will be able to upload proof again. No email is sent.', ok: 'Restore access' });
-      if (!rest) return;
+      if (!S.focus) { toast('Select a member first.'); return; }
       await decide([S.focus], 'restore');
       return;
     }

@@ -97,7 +97,7 @@
     var res = await send(token);
     if (res.status === 401 && opts.auth !== false) {
       var next = await accessToken(true);
-      if (next && next !== token) res = await send(next);
+      if (next) res = await send(next);
     }
     var out = null;
     try { out = await res.json(); } catch (e) { out = null; }
