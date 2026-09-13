@@ -628,7 +628,8 @@
       var dir = dashDir();
       var shell = proofShell();
       var thumbs = files.slice(0, 2).map(function (f) {
-        var url = URL.createObjectURL(f);
+        var blob = f.file || f;
+        var url = f.preview || URL.createObjectURL(blob);
         return '<img src="' + url + '" alt="" data-revoke="' + url + '" style="width:100%;height:88px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#07080C">';
       }).join('');
       shell.panel.innerHTML =
@@ -689,7 +690,6 @@
     var drop = document.getElementById('upload-dropzone');
     var note = document.getElementById('upload-note');
     var submit = document.getElementById('submit-proof');
-    var fileBox = document.getElementById('upload-files');
     if (drop && drop.getAttribute('data-bound')) return;
     if (drop) drop.setAttribute('data-bound', '1');
     var files = [];
@@ -697,13 +697,27 @@
       if (window.TF.refreshAccount) window.TF.refreshAccount();
       else showDashState('review');
     }
+    function revokeFile(f) {
+      if (f && f.preview) { try { URL.revokeObjectURL(f.preview); } catch (e) {} }
+    }
     function syncSend() {
       var on = files.length >= 2;
-      if (fileBox) {
-        fileBox.style.display = files.length ? 'flex' : 'none';
-        fileBox.innerHTML = files.map(function (f) {
-          return '<span style="display:inline-flex;align-items:center;height:32px;padding:0 10px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#07080C;font-family:Geist Mono,monospace;font-size:11px;color:#B7BCCB">' + String(f.name || 'screenshot').replace(/[<>]/g, '') + '</span>';
-        }).join('');
+      var empty = drop && drop.querySelector('[data-upload-empty]');
+      var grid = drop && drop.querySelector('[data-upload-grid]');
+      var count = drop && drop.querySelector('[data-upload-count]');
+      if (count) count.textContent = files.length + ' / 4';
+      if (empty) empty.style.display = files.length ? 'none' : '';
+      if (grid) {
+        grid.style.display = files.length ? 'grid' : 'none';
+        grid.innerHTML = files.map(function (f) {
+          var name = String(f.name || 'screenshot').replace(/[<>]/g, '');
+          return '<figure data-upload-id="' + f.id + '" style="margin:0;position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#0E1017">' +
+            '<img src="' + f.preview + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover">' +
+            '<figcaption style="display:block;padding:6px 8px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</figcaption>' +
+            '<button type="button" data-upload-remove="' + f.id + '" aria-label="Remove" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:6px;border:0;background:rgba(7,8,12,.8);color:#F2F4F8;cursor:pointer;line-height:1">×</button></figure>';
+        }).join('') + (files.length < 4
+          ? '<button type="button" data-upload-add style="display:grid;place-items:center;aspect-ratio:4/3;border:1px dashed rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#8B90A3;font:500 13px Archivo,Cairo,sans-serif;cursor:pointer">+ Add</button>'
+          : '');
       }
       if (!submit) return;
       submit.disabled = !on;
@@ -727,11 +741,18 @@
     var MAX_BYTES = 5 * 1024 * 1024;
     var OK_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
     function acceptFiles(list) {
-      var picked = Array.from(list || []).slice(0, 4);
+      var picked = Array.from(list || []);
       var bad = picked.filter(function (f) { return !OK_TYPES[f.type] || f.size > MAX_BYTES; });
       if (bad.length) toast(authMsg('fileRule'));
-      files = picked.filter(function (f) { return OK_TYPES[f.type] && f.size <= MAX_BYTES; });
+      picked.filter(function (f) { return OK_TYPES[f.type] && f.size <= MAX_BYTES; }).forEach(function (file) {
+        if (files.length >= 4) return;
+        files.push({ id: randomId(), name: file.name, file: file, type: file.type, preview: URL.createObjectURL(file) });
+      });
       syncSend();
+    }
+    function randomId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
     }
     if (drop) {
       var input = document.createElement('input');
@@ -740,15 +761,28 @@
       input.multiple = true;
       input.hidden = true;
       drop.appendChild(input);
-      drop.addEventListener('click', function () { input.click(); });
+      drop.addEventListener('click', function (e) {
+        if (e.target.closest('[data-upload-remove]')) return;
+        if (files.length && !e.target.closest('[data-upload-add]')) return;
+        if (files.length >= 4) return;
+        input.click();
+      });
+      drop.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-upload-remove]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var id = btn.getAttribute('data-upload-remove');
+        var gone = files.filter(function (f) { return f.id === id; })[0];
+        files = files.filter(function (f) { return f.id !== id; });
+        revokeFile(gone);
+        syncSend();
+      });
       drop.addEventListener('dragover', function (e) { e.preventDefault(); });
       drop.addEventListener('drop', function (e) { e.preventDefault(); acceptFiles(e.dataTransfer.files); });
-      input.addEventListener('change', function () { acceptFiles(input.files); });
+      input.addEventListener('change', function () { acceptFiles(input.files); input.value = ''; });
     }
-    function randomId() {
-      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
-    }
+    window.addEventListener('pagehide', function () { files.forEach(revokeFile); });
     if (submit && submit.parentNode && submit.parentNode.getAttribute('data-submit-wrap') !== '') {
       var wrap = document.createElement('span');
       wrap.setAttribute('data-submit-wrap', '');
@@ -771,8 +805,9 @@
       try {
         var uploaded = [];
         for (var i = 0; i < files.length; i++) {
-          var path = auth.user.id + '/incoming/' + randomId() + '.' + OK_TYPES[files[i].type];
-          var up = await sb.storage.from('proofs').upload(path, files[i], { upsert: false, contentType: files[i].type });
+          var blob = files[i].file || files[i];
+          var path = auth.user.id + '/incoming/' + randomId() + '.' + OK_TYPES[blob.type];
+          var up = await sb.storage.from('proofs').upload(path, blob, { upsert: false, contentType: blob.type });
           if (up.error) throw new Error(up.error.message);
           uploaded.push({ path: path, name: files[i].name });
         }
@@ -783,6 +818,7 @@
           toast(apiErrorMsg(res));
           return;
         }
+        files.forEach(revokeFile);
         files = [];
         syncSend();
         await showSentDialog(auth.user.email || '');
