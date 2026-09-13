@@ -14,7 +14,10 @@ function latinRun(s){
 function mix(s){
   s=String(s==null?'':s);
   if(/<[a-z]/i.test(s)) return s;
-  return s.replace(/[A-Za-z0-9][A-Za-z0-9+./\-]*/g,function(run){return bidi(run);});
+  return s.replace(/\{\{[a-zA-Z0-9_]+\}\}|[A-Za-z0-9][A-Za-z0-9+./\-]*/g,function(run){
+    if(run.charAt(0)==='{') return run;
+    return bidi(run);
+  });
 }
 function inheritHrefs(enBlocks, arBlocks){
   return (arBlocks||[]).map(function(b,i){
@@ -48,13 +51,13 @@ function render(t,opts){
     ? '<td dir="rtl" style="vertical-align:middle;text-align:left">'+eyebrow+'</td><td dir="ltr" align="right" style="vertical-align:middle">'+brand+'</td>'
     : '<td dir="ltr" style="vertical-align:middle">'+brand+'</td><td align="right" style="vertical-align:middle">'+eyebrow+'</td>';
   const blocks={
-    p:b=>'<p dir="'+dir+'" style="margin:0 0 16px;font-size:16px;line-height:1.6;color:'+C.text2+';text-align:'+align+'">'+tx(b.text)+'</p>',
+    p:b=>'<p dir="'+dir+'" style="margin:0 0 16px;font-size:16px;line-height:1.6;color:'+C.text2+';text-align:'+align+';clear:both">'+tx(b.text)+'</p>',
     h2:b=>'<h2 dir="'+dir+'" style="margin:8px 0 12px;font-size:20px;line-height:1.3;color:'+C.text+';font-family:'+face+';text-align:'+align+'">'+tx(b.text)+'</h2>',
     callout:b=>'<table role="presentation" width="100%" dir="ltr" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td dir="'+dir+'" style="background:'+C.bg+';border:1px solid '+C.line+';border-'+(ar?'right':'left')+':3px solid '+(b.color||C.cyan)+';border-radius:10px;padding:14px 16px;text-align:'+align+'">'+(b.label?'<div style="font-family:'+M+';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:'+C.text3+';margin-bottom:6px">'+tx(b.label)+'</div>':'')+'<div style="font-size:15px;line-height:1.55;color:'+C.text+'">'+tx(b.text)+'</div></td></tr></table>',
     code:b=>'<table role="presentation" dir="ltr" cellpadding="0" cellspacing="0" style="margin:0 0 8px;'+(ar?'margin-left:auto':'')+'"><tr><td dir="ltr" style="background:'+C.bg+';border:1px solid '+C.line+';border-radius:10px;padding:16px 24px;font-family:'+M+';font-size:32px;letter-spacing:.24em;color:'+C.text+'">'+b.value+'</td></tr></table>'+(b.note?'<p dir="'+dir+'" style="margin:0 0 20px;font-size:13px;color:'+C.text3+';text-align:'+align+'">'+tx(b.note)+'</p>':'<div style="height:12px"></div>'),
     kv:b=>'<table role="presentation" width="100%" dir="ltr" cellpadding="0" cellspacing="0" style="margin:0 0 20px;border-top:1px solid '+C.line+'">'+(b.rows||[]).map(function(r){
       var label='<td dir="'+dir+'" style="padding:10px 0;border-bottom:1px solid '+C.line+';font-family:'+M+';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:'+C.text3+';width:38%;text-align:'+(ar?'right':'left')+'">'+tx(r[0])+'</td>';
-      var value='<td dir="ltr" style="padding:10px 0;border-bottom:1px solid '+C.line+';font-size:15px;color:'+C.text+';text-align:'+(ar?'left':'left')+'">'+mix(r[1])+'</td>';
+      var value='<td dir="ltr" style="padding:10px 0;border-bottom:1px solid '+C.line+';font-size:15px;color:'+C.text+';text-align:'+(ar?'left':'left')+'">'+(ar?mix(r[1]):r[1])+'</td>';
       return '<tr>'+(ar?value+label:label+value)+'</tr>';
     }).join('')+'</table>',
     steps:b=>'<table role="presentation" width="100%" dir="ltr" cellpadding="0" cellspacing="0" style="margin:0 0 20px;border-top:1px solid '+C.line+'">'+(b.items||[]).map(function(item,i){
@@ -71,7 +74,7 @@ function render(t,opts){
     divider:()=>'<div style="border-top:1px solid '+C.line+';margin:8px 0 24px"></div>',
     spacer:b=>'<div style="height:'+(b.height||16)+'px;line-height:0;font-size:0">&nbsp;</div>',
     image:b=>'<img src="'+b.src+'" width="544" alt="'+esc(b.alt)+'" style="display:block;width:100%;max-width:544px;height:auto;border-radius:10px;margin:0 0 20px">',
-    status:b=>'<table role="presentation" dir="ltr" cellpadding="0" cellspacing="0" align="'+(ar?'right':'left')+'" style="margin:0 0 16px"><tr><td dir="ltr" style="unicode-bidi:isolate;border:1px solid '+b.color+';border-radius:6px;padding:5px 10px;font-family:'+M+';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:'+b.color+'"><span style="display:inline-block;width:6px;height:6px;background:'+b.color+';margin-right:8px;vertical-align:middle"></span>'+tx(b.text)+'</td></tr></table>'
+    status:b=>'<table role="presentation" width="100%" dir="ltr" cellpadding="0" cellspacing="0" style="margin:0 0 16px"><tr><td align="'+(ar?'right':'left')+'" style="padding:0"><table role="presentation" dir="ltr" cellpadding="0" cellspacing="0" align="'+(ar?'right':'left')+'"><tr><td dir="ltr" style="unicode-bidi:isolate;border:1px solid '+b.color+';border-radius:6px;padding:5px 10px;font-family:'+M+';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:'+b.color+'"><span style="display:inline-block;width:6px;height:6px;background:'+b.color+';margin-right:8px;vertical-align:middle"></span>'+tx(b.text)+'</td></tr></table></td></tr></table>'
   };
   const body=(t.blocks||[]).map(b=>blocks[b.type]?blocks[b.type](b):'').join('');
   return '<!doctype html><html lang="'+(t.lang||'en')+'" dir="'+dir+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="dark"><title>'+esc(t.subject)+'</title></head>'

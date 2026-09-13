@@ -81,6 +81,22 @@ test('renderer: opts.lang=ar applies the ar overrides, inherits hrefs and isolat
   assert.ok(TFEmail.blocks.includes('spacer'));
 });
 
+test('merge fields stay intact through bidi mix so fill can replace them', () => {
+  const spec = specs.find((s) => s.file === '03-submission-received');
+  const raw = TFEmail.render(spec, { lang: 'en' });
+  assert.ok(raw.includes('{{submitted_at}}'), 'submitted_at placeholder not split by bidi');
+  assert.ok(raw.includes('{{file_count}}'), 'file_count placeholder not split by bidi');
+  assert.ok(raw.includes('{{email}}'), 'email placeholder not split by bidi');
+  assert.ok(raw.includes('style="padding:0">') && raw.includes('Under review'), 'status badge sits on its own full-width row');
+  const html = fill(raw);
+  assert.ok(html.includes('2026-09-09'));
+  assert.ok(html.includes('member@example.com'));
+  assert.ok(!html.includes('{{submitted_at}}'));
+  const ar = fill(TFEmail.render(spec, { lang: 'ar' }));
+  assert.ok(ar.includes('2026-09-09') && ar.includes('قيد المراجعة'));
+});
+
+
 test('public/assets/js/emails-render.js is the generated copy of emails/render.js', () => {
   const a = readFileSync(new URL('../../emails/render.js', import.meta.url), 'utf8');
   const b = readFileSync(new URL('../../public/assets/js/emails-render.js', import.meta.url), 'utf8');
