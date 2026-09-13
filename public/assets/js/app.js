@@ -713,12 +713,12 @@
         grid.style.display = files.length ? 'flex' : 'none';
         grid.innerHTML = files.map(function (f) {
           var name = String(f.name || 'screenshot').replace(/[<>]/g, '');
-          return '<figure data-upload-id="' + f.id + '" style="margin:0;width:150px;flex:none;position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#0E1017">' +
-            '<img src="' + f.preview + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover">' +
-            '<figcaption style="display:block;padding:6px 8px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</figcaption>' +
-            '<button type="button" data-upload-remove="' + f.id + '" aria-label="Remove" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:6px;border:0;background:rgba(7,8,12,.8);color:#F2F4F8;cursor:pointer;line-height:1">×</button></figure>';
+          return '<figure data-upload-id="' + f.id + '">' +
+            '<img src="' + f.preview + '" alt="">' +
+            '<figcaption>' + name + '</figcaption>' +
+            '<button type="button" data-upload-remove="' + f.id + '" aria-label="Remove">×</button></figure>';
         }).join('') + (files.length < 4
-          ? '<button type="button" data-upload-add aria-label="Add screenshot"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg></button>'
+          ? '<div data-upload-add role="button"><span data-upload-add-slot><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg></span><span>+ Add</span></div>'
           : '');
       }
       if (!submit) return;
