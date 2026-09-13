@@ -208,7 +208,18 @@
   }
   var adminStats = null;
   function countsOf() {
-    var s = adminStats || {};
+    var fromRows = {
+      pending: members.filter(function (m) { return m.status === 'submitted'; }).length,
+      approved: members.filter(function (m) { return m.status === 'approved'; }).length,
+      rejected: members.filter(function (m) { return m.status === 'rejected'; }).length,
+      none: members.filter(function (m) { return m.status === 'none'; }).length,
+      total: members.length,
+      waitlist: waitlist.length,
+      scheduled: sends.filter(function (s) { return s.state === 'scheduled'; }).length,
+      emails: templates().length,
+    };
+    var s = adminStats;
+    if (!s || Number(s.pending) < fromRows.pending) return fromRows;
     return {
       pending: Number(s.pending) || 0,
       approved: Number(s.approved) || 0,
@@ -222,8 +233,7 @@
   }
   async function loadStats() {
     var res = await window.TF.api('/api/admin/stats');
-    if (!res.ok) throw new Error((res.body && res.body.message) || 'Could not load admin stats.');
-    adminStats = res.body || {};
+    if (res.ok && res.body && res.body.pending != null) adminStats = res.body;
   }
   window.TF.getAdminSummary = async function () {
     if (!adminStats) {

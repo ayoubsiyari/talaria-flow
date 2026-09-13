@@ -38,3 +38,20 @@ export function isSecureRequest(req: Request): boolean {
   const proto = req.headers.get('x-forwarded-proto') || new URL(req.url).protocol.replace(':', '');
   return proto === 'https';
 }
+
+/** Access token from the HttpOnly session cookie, if present. */
+export function readSessionCookie(req: Request): string | null {
+  const raw = req.headers.get('cookie') || '';
+  for (const part of raw.split(';')) {
+    const i = part.indexOf('=');
+    if (i < 0) continue;
+    if (part.slice(0, i).trim() !== SESSION_COOKIE) continue;
+    try {
+      const value = decodeURIComponent(part.slice(i + 1).trim());
+      return value || null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}

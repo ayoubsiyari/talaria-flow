@@ -5,6 +5,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { env } from './env.ts';
 import { HttpError, bearer } from './http.ts';
+import { readSessionCookie } from './session-cookie.ts';
 
 let admin: SupabaseClient | null = null;
 
@@ -45,7 +46,7 @@ export async function callerFromToken(token: string | null): Promise<Caller | nu
 }
 
 export async function requireUser(req: Request): Promise<Caller> {
-  const caller = await callerFromToken(bearer(req));
+  const caller = await callerFromToken(bearer(req) || readSessionCookie(req));
   if (!caller) throw new HttpError(401, 'unauthorized');
   if (!caller.emailVerified) throw new HttpError(403, 'email_not_confirmed');
   return caller;

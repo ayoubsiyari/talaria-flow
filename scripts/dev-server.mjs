@@ -115,7 +115,13 @@ async function runApi(req, res, pathname) {
   for await (const c of req) chunks.push(c);
   const raw = Buffer.concat(chunks);
   const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
-  const request = new Request(url, { method: req.method, headers: req.headers, body: ['GET', 'HEAD'].includes(req.method) ? undefined : raw });
+  const hdrs = new Headers();
+  for (const [k, vals] of Object.entries(req.headers)) {
+    if (k === 'connection' || k === 'keep-alive' || k === 'transfer-encoding') continue;
+    const v = Array.isArray(vals) ? vals.join(', ') : vals;
+    if (v) try { hdrs.set(k, v); } catch { /* hop-by-hop / forbidden */ }
+  }
+  const request = new Request(url, { method: req.method, headers: hdrs, body: ['GET', 'HEAD'].includes(req.method) ? undefined : raw });
   const response = await handler(request);
   const h = Object.fromEntries(response.headers.entries());
   // Headers.entries() folds multiple Set-Cookie values; keep them separate for Node.
