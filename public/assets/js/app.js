@@ -98,7 +98,17 @@
     btn.disabled = !!on;
     btn.classList.toggle('is-pending', !!on);
     btn.classList.toggle('is-loading', !!on);
-    var spin = btn.querySelector('.tf-spin');
+    if (on) btn.setAttribute('aria-busy', 'true');
+    else btn.removeAttribute('aria-busy');
+    var st = btn.style;
+    st.position = 'relative';
+    st.display = 'inline-flex';
+    st.alignItems = 'center';
+    st.justifyContent = 'center';
+    st.gap = '10px';
+    st.whiteSpace = 'nowrap';
+    st.lineHeight = '1';
+    var spin = btn.querySelector(':scope > .tf-spin');
     if (on && !spin) {
       spin = document.createElement('span');
       spin.className = 'tf-spin';

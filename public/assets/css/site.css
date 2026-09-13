@@ -71,9 +71,10 @@ select.tf-select,select.tf-input{
   display:none;align-items:center;gap:8px;font-size:13px;color:#2EE8FF
 }
 .tf-form-ok.is-on{display:flex}
-.tf-spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:tf-spin .6s linear infinite}
+.tf-spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:tf-spin .8s linear infinite;flex:none}
 @keyframes tf-spin{to{transform:rotate(360deg)}}
-button[disabled] .tf-spin+*,button.is-pending{opacity:.7;pointer-events:none}
+button.is-pending,button.is-loading{pointer-events:none}
+button.is-loading > svg, button.is-pending > svg{display:none}
 .tf-tip{
   position:fixed;z-index:80;max-width:240px;padding:6px 10px;background:#0E1017;border:1px solid rgba(255,255,255,.16);
   border-radius:8px;color:#F2F4F8;font-family:Archivo,Cairo,sans-serif;font-size:12.5px;line-height:1.35;
@@ -401,15 +402,9 @@ html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral) * {
   outline-offset: 2px;
 }
 
-.btn-primary.is-loading::before, .btn-outline.is-loading::before, .btn-neutral.is-loading::before,
-.btn-primary.is-pending .tf-spin, button.is-pending .tf-spin {
+.btn-primary.is-pending .tf-spin, button.is-pending .tf-spin,
+.btn-primary.is-loading .tf-spin, button.is-loading .tf-spin {
   flex: none;
-}
-.btn-primary.is-loading::before, .btn-outline.is-loading::before, .btn-neutral.is-loading::before {
-  content: "";
-  width: 16px; height: 16px;
-  border: 2px solid currentColor; border-right-color: transparent;
-  border-radius: 50%; animation: tf-spin .6s linear infinite;
 }
 
 [data-hd] [data-signup],
