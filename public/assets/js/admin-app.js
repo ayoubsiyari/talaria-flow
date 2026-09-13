@@ -88,8 +88,19 @@
   function closeRowMenu() {
     if (rowMenuEl) { rowMenuEl.remove(); rowMenuEl = null; }
   }
-  function menuItem(act, id, label, color) {
-    return '<button type="button" role="menuitem" data-act="' + act + '" data-id="' + esc(id) + '" style="display:block;width:100%;height:36px;padding:0 12px;border:0;background:transparent;color:' + (color || '#F2F4F8') + ';font:500 13.5px Archivo,sans-serif;text-align:left;cursor:pointer">' + esc(label) + '</button>';
+  function menuIcon(kind) {
+    var icons = {
+      open: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle></svg>',
+      approve: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg>',
+      resubmit: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"></path></svg>',
+      reject: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>',
+      restore: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0"></path></svg>',
+      email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>',
+    };
+    return icons[kind] || '';
+  }
+  function menuItem(act, id, label, kind, color) {
+    return '<button type="button" role="menuitem" data-act="' + act + '" data-id="' + esc(id) + '" style="color:' + (color || '#F2F4F8') + '">' + menuIcon(kind) + '<span>' + esc(label) + '</span></button>';
   }
   function openRowMenu(btn) {
     var id = elId(btn);
@@ -100,18 +111,18 @@
     menu.setAttribute('data-admin-row-menu', '');
     menu.setAttribute('role', 'menu');
     var html = '';
-    html += menuItem('open', m.id, 'View details');
-    if (m.submissionId && m.status === 'submitted') html += menuItem('row-approve', m.id, 'Approve', '#2EE8FF');
+    html += menuItem('open', m.id, 'View details', 'open');
+    if (m.submissionId && m.status === 'submitted') html += menuItem('row-approve', m.id, 'Approve', 'approve', '#2EE8FF');
     if (m.status === 'submitted' || m.status === 'rejected') {
-      html += menuItem('row-reject', m.id, 'Request resubmission', '#FF8AD0');
-      html += menuItem('row-block', m.id, 'Reject', '#FF37B0');
+      html += menuItem('row-reject', m.id, 'Request resubmission', 'resubmit', '#FF8AD0');
+      html += menuItem('row-block', m.id, 'Reject', 'reject', '#FF37B0');
     }
-    if (m.status === 'blocked') html += menuItem('row-restore', m.id, 'Restore access', '#2EE8FF');
-    html += menuItem('row-email', m.id, 'Send email');
+    if (m.status === 'blocked') html += menuItem('row-restore', m.id, 'Restore access', 'restore', '#2EE8FF');
+    html += menuItem('row-email', m.id, 'Send email', 'email');
     menu.innerHTML = html;
     document.body.appendChild(menu);
     var r = btn.getBoundingClientRect();
-    var mw = 220;
+    var mw = 200;
     var left = Math.min(Math.max(8, r.right - mw), window.innerWidth - mw - 8);
     var top = r.bottom + 6;
     menu.style.left = left + 'px';
@@ -1126,7 +1137,7 @@
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.country || '—') + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap;cursor:pointer">' + esc(m.lastEmail) + '</td>' +
           '<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right;position:sticky;right:0;background:' + (on ? '#0C1216' : '#0E1017') + ';z-index:1">' +
-          '<button type="button" data-act="row-menu" data-id="' + esc(m.id) + '" aria-haspopup="menu" aria-label="Actions for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
+          '<button type="button" data-act="row-menu" data-id="' + esc(m.id) + '" aria-haspopup="menu" aria-label="Actions for ' + esc(m.email) + '" style="width:26px;height:26px;border:1px solid rgba(255,255,255,0.16);border-radius:7px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
           '</td></tr>';
       }).join('') : emptyRow(members.length ? (S.q ? 'No members match this search.' : 'No members in this list.') : 'No members yet.', cols.length + 2)) +
       '</tbody></table><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;font-family:\'Geist Mono\',monospace;font-size:11px;color:#8B90A3"><span>' + list.length + ' of ' + c.total + ' members</span><span>Sorted by ' + (cols.filter(function (x) { return x[0] === S.sort; })[0] || cols[2])[1].toLowerCase() + (S.dir > 0 ? ' ascending' : ' descending') + '</span></div></div></section>';
