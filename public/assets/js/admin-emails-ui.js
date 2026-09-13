@@ -335,7 +335,9 @@
           preheader: current && current.preheader || 'Preview',
           title: current && current.title || 'Title',
         };
-        html = html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function (_, k) {
+        html = html.replace(/\{\{([\s\S]*?)\}\}/g, function (_, inner) {
+          var k = String(inner).replace(/<[^>]*>/g, '').replace(/\s+/g, '');
+          if (!/^[a-zA-Z0-9_]+$/.test(k)) return '';
           return data[k] == null ? '' : esc(data[k]);
         });
         frame.srcdoc = html;

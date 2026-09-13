@@ -87,7 +87,7 @@ test('merge fields stay intact through bidi mix so fill can replace them', () =>
   assert.ok(raw.includes('{{submitted_at}}'), 'submitted_at placeholder not split by bidi');
   assert.ok(raw.includes('{{file_count}}'), 'file_count placeholder not split by bidi');
   assert.ok(raw.includes('{{email}}'), 'email placeholder not split by bidi');
-  assert.ok(raw.includes('style="padding:0">') && raw.includes('Under review'), 'status badge sits on its own full-width row');
+  assert.ok(raw.includes('style="width:100%;margin:0 0 16px;clear:both"') && raw.includes('Under review'), 'status badge sits on its own full-width row');
   const html = fill(raw);
   assert.ok(html.includes('2026-09-09'));
   assert.ok(html.includes('member@example.com'));

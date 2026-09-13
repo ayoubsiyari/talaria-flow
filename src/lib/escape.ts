@@ -10,5 +10,9 @@ export function escapeHtml(value: unknown): string {
 
 /** Replace {{key}} placeholders with escaped values; unknown keys become empty strings. */
 export function fillTemplate(html: string, data: Record<string, unknown> = {}): string {
-  return html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, k: string) => escapeHtml(data[k]));
+  return String(html ?? '').replace(/\{\{([\s\S]*?)\}\}/g, (_, inner: string) => {
+    const key = String(inner).replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, '').replace(/\s+/g, '');
+    if (!/^[a-zA-Z0-9_]+$/.test(key)) return '';
+    return escapeHtml(data[key]);
+  });
 }

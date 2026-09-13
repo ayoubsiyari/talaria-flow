@@ -932,7 +932,10 @@
       try {
         var out = await window.TF.renderEmail(t.file || t.id, lang, {
           first_name: (first && first.firstName) || 'there',
-          email: (first && first.email) || '',
+          email: (first && first.email) || 'member@example.com',
+          submitted_at: (first && first.submitted) || '9 Sep 2026, 10:00',
+          file_count: (first && first.files) || 2,
+          reason: (first && first.reason) || 'Example reason',
           hero_image_url: (location.origin || '') + '/assets/nt-platform.png',
           hero_image_alt: 'Talaria Flow suite on a NinjaTrader chart',
         });

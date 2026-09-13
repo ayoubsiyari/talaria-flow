@@ -123,10 +123,21 @@ export function localiseSpec(spec: TemplateSpec, lang: string): TemplateSpec {
   return { ...en, lang: 'en' };
 }
 
+function fillDeep(value: unknown, vars: Record<string, unknown>): unknown {
+  if (typeof value === 'string') return fillTemplate(value, vars);
+  if (Array.isArray(value)) return value.map((v) => fillDeep(v, vars));
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = fillDeep(v, vars);
+    return out;
+  }
+  return value;
+}
+
 /** Render a spec to { html, subject } with merge fields filled (escaped). */
 export function renderEmail(spec: TemplateSpec, lang: string, vars: Record<string, unknown>, subjectOverride?: string, extra?: { logoUrl?: string }): { html: string; subject: string } {
   const l = lang === 'ar' ? 'ar' : 'en';
-  const localised = localiseSpec(spec, l);
+  const localised = fillDeep(localiseSpec(spec, l), vars) as TemplateSpec;
   const html = fill(loadRenderer().render(localised, { lang: l, baseUrl: env.siteUrl + '/', logoUrl: extra?.logoUrl }), vars);
   const subject = fill(String(subjectOverride || localised.subject || spec.subject || ''), vars);
   return { html, subject };
@@ -210,6 +221,8 @@ export interface SendTemplateOptions {
   subject?: string | null;
   /** Render this spec instead of the one in templates.json (admin "send test" of an unsaved template) */
   spec?: TemplateSpec | null;
+  /** Resend even if this template×member×submission already went out (proof "resend" button). */
+  force?: boolean;
 }
 
 export type SendResult = { ok: boolean; id?: string; skipped?: boolean; error?: string };
@@ -263,19 +276,16 @@ export async function sendTemplate(opts: SendTemplateOptions): Promise<SendResul
     if (insErr) {
       if (insErr.code === '23505' || /duplicate|unique/i.test(insErr.message || '')) {
         const existing = await findExistingEvent(sb, { templateId, to: opts.to, memberId: opts.memberId, submissionId: opts.submissionId, sendId: opts.sendId });
-        if (!existing || existing.status === 'sent') return { ok: true, skipped: true };
-        if (existing.status === 'failed') {
+        if (!existing) return { ok: true, skipped: true };
+        if (opts.force || existing.status === 'failed' || (existing.status === 'queued' && !existing.provider_id)) {
           const { data: claimed } = await sb
             .from('email_events')
             .update({ status: 'queued', event: 'queued', provider_id: null })
             .eq('id', existing.id)
-            .eq('status', 'failed')
             .select('id')
             .maybeSingle();
           if (!claimed) return { ok: true, skipped: true };
           eventId = claimed.id;
-        } else if (existing.status === 'queued' && !existing.provider_id) {
-          eventId = existing.id;
         } else {
           return { ok: true, skipped: true };
         }

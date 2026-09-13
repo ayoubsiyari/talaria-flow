@@ -41,7 +41,7 @@ export default handle(async (req: Request) => {
   const { data: latest } = await sb.from('submissions').select('id, status').eq('user_id', caller.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
   if ('resend' in input) {
     if (!latest || latest.status !== 'submitted') throw new HttpError(409, 'not_pending', 'There is no proof under review to email about.');
-    const email = await sendProofReceived(sb, { caller, submissionId: latest.id });
+  const email = await sendProofReceived(sb, { caller, submissionId: latest.id, force: true });
     return json({ ok: true, submission_id: latest.id, resent: true, email: { ok: email.ok, skipped: Boolean(email.skipped) } });
   }
 
@@ -124,7 +124,7 @@ export default handle(async (req: Request) => {
 
 async function sendProofReceived(
   sb: ReturnType<typeof adminClient>,
-  opts: { caller: { id: string; email: string }; submissionId: string; fileCount?: number },
+  opts: { caller: { id: string; email: string }; submissionId: string; fileCount?: number; force?: boolean },
 ) {
   const { data: member } = await sb.from('profiles').select('email, lang, first_name, name').eq('id', opts.caller.id).maybeSingle();
   const { data: sub } = opts.fileCount == null
@@ -139,6 +139,7 @@ async function sendProofReceived(
     lang,
     memberId: opts.caller.id,
     submissionId: opts.submissionId,
+    force: Boolean(opts.force),
     vars: {
       first_name: firstNameOf(member || { email: to }),
       file_count: sub?.file_count ?? opts.fileCount ?? 0,

@@ -69,6 +69,7 @@ test('escapeHtml / fillTemplate neutralise markup in merge fields', () => {
   assert.equal(escapeHtml('<img src=x onerror=alert(1)>'), '&lt;img src=x onerror=alert(1)&gt;');
   assert.equal(fillTemplate('<p>{{ reason }}</p>', { reason: '"><script>1</script>' }), '<p>&quot;&gt;&lt;script&gt;1&lt;/script&gt;</p>');
   assert.equal(fillTemplate('{{missing}}', {}), '');
+  assert.equal(fillTemplate('{{<span>submitted</span>_at}}', { submitted_at: '13 Sep 2026' }), '13 Sep 2026');
 });
 
 test('rate limit: 5 allowed, 6th blocked, keyed by ip+email', async () => {

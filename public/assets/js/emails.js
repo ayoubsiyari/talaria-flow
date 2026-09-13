@@ -7,7 +7,9 @@
   }
   // Merge fields (reviewer note, first name, ...) are user text: always escaped. Unknown fields render empty.
   function fill(html, data) {
-    return html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function (_, k) {
+    return html.replace(/\{\{([\s\S]*?)\}\}/g, function (_, inner) {
+      var k = String(inner).replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, '').replace(/\s+/g, '');
+      if (!/^[a-zA-Z0-9_]+$/.test(k)) return '';
       return escapeHtml(data && data[k] != null ? data[k] : '');
     });
   }
