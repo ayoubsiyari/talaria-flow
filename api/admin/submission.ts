@@ -1,7 +1,9 @@
 /**
  * POST /api/admin/submission  (Authorization: Bearer <admin access token>)
  *   { action: "approve", id }                 -> status approved, "04-approved" email
- *   { action: "reject",  id, reason }         -> status rejected, reviewer_note = reason, "05-needs-resubmission" email
+ *   { action: "reject",  id, reason }         -> "05-needs-resubmission" email, then proof files
+ *                                              and the submission row are removed so the member
+ *                                              can upload again from a clean slate.
  *
  * The decision is written with the service role (browser policies no longer allow admins to update
  * submissions), logged to activity_log and mailed to the member in their language. A failed email
@@ -30,15 +32,16 @@ export default handle(async (req: Request) => {
   if (!member || !member.email) throw new HttpError(404, 'not_found', 'Member not found.');
 
   const approve = input.action === 'approve';
-  const status = approve ? 'approved' : 'rejected';
   const reason = approve ? null : String(input.reason || '').trim();
   const now = new Date().toISOString();
 
-  const { error: upErr } = await sb
-    .from('submissions')
-    .update({ status, reviewer_note: reason, decided_at: now, reviewed_at: now, reviewed_by: admin.id })
-    .eq('id', submission.id);
-  if (upErr) throw new Error(upErr.message);
+  if (approve) {
+    const { error: upErr } = await sb
+      .from('submissions')
+      .update({ status: 'approved', reviewer_note: null, decided_at: now, reviewed_at: now, reviewed_by: admin.id })
+      .eq('id', submission.id);
+    if (upErr) throw new Error(upErr.message);
+  }
 
   await sb.from('activity_log').insert({
     kind: 'decision',
@@ -67,5 +70,13 @@ export default handle(async (req: Request) => {
     },
   });
 
-  return json({ ok: true, id: submission.id, status, email: { ok: email.ok, skipped: Boolean(email.skipped) } });
+  if (!approve) {
+    const { data: files } = await sb.from('submission_files').select('file_path').eq('submission_id', submission.id);
+    const paths = (files || []).map((f) => String(f.file_path || '')).filter(Boolean);
+    if (paths.length) await sb.storage.from('proofs').remove(paths);
+    const { error: delErr } = await sb.from('submissions').delete().eq('id', submission.id);
+    if (delErr) throw new Error(delErr.message);
+  }
+
+  return json({ ok: true, id: submission.id, status: approve ? 'approved' : 'none', email: { ok: email.ok, skipped: Boolean(email.skipped) } });
 });

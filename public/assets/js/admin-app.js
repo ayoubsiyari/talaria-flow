@@ -740,10 +740,20 @@
       var r = res.body || {};
       m.status = r.status || status;
       m.decidedAt = new Date().toISOString();
+      if (status === 'rejected' || m.status === 'none') {
+        m.status = 'none';
+        m.submissionId = null;
+        m.thumbs = [];
+        m.files = 0;
+        m.proofTiles = [];
+        m.reason = '';
+        m.submitted = '—';
+        m.submittedAt = '';
+      }
       if (m.status === 'rejected') m.reason = body.reason || '';
       if (r.email && r.email.ok && !r.email.skipped) {
         out.emailSent += 1;
-        m.lastEmail = m.status === 'approved' ? 'Approved' : 'Needs resubmission';
+        m.lastEmail = status === 'approved' ? 'Approved' : 'Needs resubmission';
       } else out.emailSkipped += 1;
     }
     return out;
