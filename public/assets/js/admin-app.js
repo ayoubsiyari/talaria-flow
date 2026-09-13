@@ -672,12 +672,15 @@
     });
   }
   // Proofs live in a private bucket: the admin's own JWT (RLS select) mints a 10-minute signed URL.
-  async function lightbox(path) {
+  async function lightbox(path, url) {
     var opener = document.activeElement;
     var label = String(path || '').split('/').pop();
     var wrap = document.createElement('div');
-    wrap.setAttribute('data-admin-dialog', '');
-    wrap.innerHTML = '<div data-admin-dialog-panel role="dialog" aria-modal="true" aria-label="Proof preview" style="max-width:960px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px"><span style="font-family:Geist Mono,monospace;font-size:12px;color:#8B90A3;word-break:break-all">' + esc(label) + '</span><button type="button" data-lightbox-close aria-label="Close proof preview" style="width:32px;height:32px;flex:none;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#F2F4F8;cursor:pointer;font-size:18px;line-height:1">×</button></div><div data-lightbox-body style="min-height:240px;background:#07080C;border:1px solid rgba(255,255,255,.08);border-radius:10px;display:grid;place-items:center;color:#7C8296;font-family:Geist Mono,monospace;overflow:hidden">Loading…</div></div>';
+    wrap.setAttribute('data-admin-lightbox', '');
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.setAttribute('aria-label', 'Proof preview');
+    wrap.innerHTML = '<div data-admin-lightbox-bar><span style="font-family:Geist Mono,monospace;font-size:12px;color:#8B90A3;word-break:break-all;min-width:0">' + esc(label) + '</span><button type="button" data-lightbox-close aria-label="Close proof preview" style="width:32px;height:32px;flex:none;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#F2F4F8;cursor:pointer;font-size:18px;line-height:1">×</button></div><div data-lightbox-body style="color:#7C8296;font-family:Geist Mono,monospace">Loading…</div>';
     document.body.appendChild(wrap);
     var untrap = trapFocus(wrap);
     function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } }
@@ -689,19 +692,22 @@
     }
     document.addEventListener('keydown', onKey, true);
     wrap.addEventListener('click', function (e) {
-      if (e.target === wrap || e.target.closest('[data-lightbox-close]')) close();
+      if (e.target === wrap || e.target === wrap.querySelector('[data-lightbox-body]') || e.target.closest('[data-lightbox-close]')) close();
     });
     var closeBtn = wrap.querySelector('[data-lightbox-close]');
     if (closeBtn) closeBtn.focus();
     var body = wrap.querySelector('[data-lightbox-body]');
     try {
-      var sb = window.TF.getClient();
-      var res = await sb.storage.from('proofs').createSignedUrl(path, 600);
-      if (res.error || !res.data || !res.data.signedUrl) throw new Error('no url');
+      var src = String(url || '');
+      if (!src) {
+        var sb = window.TF.getClient();
+        var res = await sb.storage.from('proofs').createSignedUrl(path, 600);
+        if (res.error || !res.data || !res.data.signedUrl) throw new Error('no url');
+        src = res.data.signedUrl;
+      }
       var img = document.createElement('img');
       img.alt = 'Proof screenshot ' + label;
-      img.style.cssText = 'display:block;max-width:100%;max-height:80vh;object-fit:contain';
-      img.src = res.data.signedUrl;
+      img.src = src;
       body.textContent = '';
       body.appendChild(img);
     } catch (e) {
@@ -1058,9 +1064,9 @@
                     '<span style="display:flex;flex-direction:column;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 19 6-6 3 3 4-4 5 5"/><circle cx="8.5" cy="9.5" r="1.2"/></svg>Unavailable</span></div>' +
                     '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span></div>';
                 }
-                return '<a href="' + esc(src) + '" target="_blank" rel="noopener" data-act="lightbox" data-src="' + esc(t.path) + '" aria-label="Open proof ' + esc(name) + '" style="display:block;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C">' +
-                  '<img src="' + esc(src) + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover">' +
-                  '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span></a>';
+                return '<button type="button" data-act="lightbox" data-src="' + esc(t.path) + '" data-url="' + esc(src) + '" aria-label="Open proof ' + esc(name) + ' full size" style="display:block;width:100%;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C;padding:0;cursor:zoom-in;text-align:left">' +
+                  '<img src="' + esc(src) + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover;pointer-events:none">' +
+                  '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span></button>';
               }).join('') + '</div>'
             : '<p style="margin-top:8px;font-size:13px;color:#8B90A3">Files are not available for preview.</p>') +
           '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Member note</div>' +
@@ -1551,7 +1557,7 @@
       return;
     }
     if (act === 'reason') { S.reason = el.value; return; }
-    if (act === 'lightbox') { lightbox(el.getAttribute('data-src')); return; }
+    if (act === 'lightbox') { lightbox(el.getAttribute('data-src'), el.getAttribute('data-url')); return; }
     if (act === 'email-hist') { go('/admin/campaigns/history/'); return; }
     if (act === 'reset-pw') {
       var rm = members.filter(function (x) { return String(x.id) === String(S.focus); })[0];
