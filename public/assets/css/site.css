@@ -149,9 +149,14 @@ html body [data-nav] a[data-key]:is(:hover,:focus-visible,:active,[aria-current=
 .step-row > :first-child, [data-row] > :first-child,
 .module-row > :first-child, [data-mod] > :first-child,
 .legal-row > :first-child, [data-sec] > :first-child{ padding-top:0 !important; }
+.step-row + .step-row, [data-row] + [data-row],
+.module-row + .module-row, [data-mod] + [data-mod],
+.list-row + .list-row, [data-topic] + [data-topic],
+.legal-row + .legal-row, [data-sec] + [data-sec]{ margin-top:10px; }
 h2 + div:has([data-row]),
 h2 + div:has([data-mod]),
-h2 + div:has([data-sec]){ margin-top:40px !important; }
+h2 + div:has([data-sec]),
+h2 + div:has([data-topic]){ margin-top:52px !important; }
 [data-hero-pad]{ padding-top:clamp(48px, 6vw, 88px) !important; }
 [data-nav]{ gap:20px !important; }
 
