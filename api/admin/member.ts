@@ -1,5 +1,5 @@
 /**
- * POST /api/admin/member { action: "delete" | "reset-password", id }  (Authorization: Bearer <admin token>)
+ * POST /api/admin/member { action: "delete" | "reset-password" | "delete-waitlist", id? email? }  (Authorization: Bearer <admin token>)
  *   delete         -> removes proof files + auth user (profile/submissions cascade)
  *   reset-password -> Supabase Auth sends the recovery email to the member
  * Non-admins get 404. Admin accounts cannot be deleted here.
@@ -11,15 +11,24 @@ import { env } from '../../src/lib/server/env.ts';
 import { rateLimit } from '../../src/lib/server/ratelimit.ts';
 
 const schema = z.object({
-  action: z.enum(['delete', 'reset-password']),
-  id: z.string().uuid(),
-});
+  action: z.enum(['delete', 'reset-password', 'delete-waitlist']),
+  id: z.string().uuid().optional(),
+  email: z.string().email().optional(),
+}).refine((v) => (v.action === 'delete-waitlist' ? Boolean(v.email) : Boolean(v.id)), { message: 'id or email is required' });
 
 export default handle(async (req: Request) => {
   if (req.method !== 'POST') return methodNotAllowed(['POST']);
   const admin = await requireAdmin(req);
   const input = await readJson(req, schema);
   const sb = adminClient();
+
+  if (input.action === 'delete-waitlist') {
+    const email = String(input.email || '').trim().toLowerCase();
+    const { error } = await sb.from('waitlist').delete().eq('email', email);
+    if (error) throw new Error(error.message);
+    await sb.from('activity_log').insert({ kind: 'deleted', actor_id: admin.id, text: `Waitlist ${email} removed`, color: '#B7BCCB', filter: 'member' });
+    return json({ ok: true });
+  }
 
   const { data: target } = await sb.from('profiles').select('id, email, is_admin, role').eq('id', input.id).maybeSingle();
   if (!target) throw new HttpError(404, 'not_found', 'Member not found.');

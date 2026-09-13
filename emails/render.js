@@ -1,5 +1,5 @@
 (function(g){
-const C={bg:'#07080C',card:'#0E1017',line:'rgba(255,255,255,0.08)',text:'#F2F4F8',text2:'#B7BCCB',text3:'#8B90A3',text4:'#7C8296',cyan:'#2EE8FF',magenta:'#FF37B0',amber:'#FBBF24'};
+const C={bg:'#07080C',card:'#0E1017',line:'rgba(255,255,255,0.08)',text:'#F2F4F8',text2:'#B7BCCB',text3:'#8B90A3',text4:'#8B90A3',cyan:'#2EE8FF',magenta:'#FF37B0',amber:'#FBBF24'};
 const F="Archivo,'Helvetica Neue',Arial,sans-serif", M="'Geist Mono',Menlo,Consolas,monospace";
 let face=F;
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');

@@ -991,9 +991,16 @@
 
   function consentCopy(lang) {
     var ar = lang === 'ar';
-    return ar
-      ? { body: 'نستخدم ملفات تعريف الارتباط الضرورية لتشغيل الموقع وتذكّر لغتك. لا نستخدم إعلانات ولا تتبّعاً', accept: 'موافق', reject: 'الضروري فقط', more: 'اعرف المزيد', label: 'إشعار ملفات تعريف الارتباط' }
-      : { body: 'We use cookies that are needed to run the site and remember your language. No advertising, no tracking.', accept: 'Accept', reject: 'Essential only', more: 'Learn more', label: 'Cookie notice' };
+    var L = window.TF.lookup;
+    function pick(key, fallback) { var v = L && L(key, lang); return v || fallback; }
+    return {
+      body: pick('cookies.body', ar
+        ? 'نستخدم ملفات تعريف الارتباط الضرورية لتشغيل الموقع وتذكّر لغتك. لا إعلانات ولا تتبّع. حسناً يغلق هذا الإشعار.'
+        : 'We only use cookies needed to run the site and remember your language. There is no advertising or tracking. OK dismisses this notice.'),
+      accept: pick('cookies.ok', ar ? 'حسناً' : 'OK'),
+      more: pick('cookies.more', ar ? 'اعرف المزيد' : 'Learn more'),
+      label: pick('cookies.label', ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice'),
+    };
   }
 
   function padForConsent(on) {
@@ -1017,16 +1024,16 @@
     var bar = document.createElement('div');
     bar.id = 'tf-consent';
     bar.setAttribute('role', 'dialog');
-    bar.setAttribute('aria-live', 'polite');
-    bar.setAttribute('aria-label', t.label);
-    bar.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;z-index:200;display:flex;flex-wrap:wrap;align-items:center;gap:16px;max-width:1180px;margin:0 auto;padding:14px 18px;background:#0E1017;border:1px solid rgba(255,255,255,0.12);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45);transform:translateY(12px);opacity:0;transition:transform .2s ease,opacity .2s ease';
+    bar.setAttribute('aria-modal', 'true');
+    bar.setAttribute('aria-labelledby', 'tf-consent-label');
+    bar.tabIndex = -1;
+    bar.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;z-index:180;display:flex;flex-wrap:wrap;align-items:center;gap:16px;max-width:1180px;margin:0 auto;padding:14px 18px;background:#0E1017;border:1px solid rgba(255,255,255,0.12);border-radius:12px;transform:translateY(12px);opacity:0;transition:transform .2s ease,opacity .2s ease';
     bar.innerHTML =
-      '<p dir="' + (ar ? 'rtl' : 'ltr') + '" style="margin:0;flex:1 1 320px;font-size:14px;line-height:1.55;color:#B7BCCB;text-align:left">' +
+      '<p id="tf-consent-label" dir="' + (ar ? 'rtl' : 'ltr') + '" style="margin:0;flex:1 1 320px;font-size:14px;line-height:1.55;color:#B7BCCB;text-align:left">' +
         t.body + ' <a href="/legal/privacy/" style="color:#2EE8FF;border-bottom:1px solid rgba(46,232,255,.4)">' + t.more + '</a>' +
       '</p>' +
       '<div style="display:flex;gap:10px;flex:none">' +
-        '<button type="button" data-consent="essential" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#F2F4F8;font:600 14px Archivo,sans-serif;cursor:pointer;white-space:nowrap;line-height:1">' + t.reject + '</button>' +
-        '<button type="button" data-consent="all" class="btn-outline" style="height:40px;padding:0 18px;border-radius:10px;border:1px solid #2EE8FF;background:transparent;color:#2EE8FF;font:600 14px Archivo,sans-serif;cursor:pointer;white-space:nowrap;line-height:1">' + t.accept + '</button>' +
+        '<button type="button" data-consent="essential" style="min-height:44px;height:44px;padding:0 18px;border-radius:10px;border:1px solid #2EE8FF;background:transparent;color:#2EE8FF;font:600 14px ' + (ar ? 'Cairo' : 'Archivo') + ',sans-serif;cursor:pointer;white-space:nowrap;line-height:1">' + t.accept + '</button>' +
       '</div>';
     document.body.appendChild(bar);
     padForConsent(true);
@@ -1036,12 +1043,25 @@
         bar.style.opacity = '1';
       });
     });
+    function trap(e) {
+      if (e.key === 'Escape') { e.preventDefault(); bar.querySelector('[data-consent]').click(); return; }
+      if (e.key !== 'Tab') return;
+      var list = bar.querySelectorAll('a, button');
+      if (!list.length) return;
+      var first = list[0];
+      var last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    bar.addEventListener('keydown', trap);
     bar.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-consent]');
       if (!btn) return;
       writeConsent(btn.getAttribute('data-consent'));
       removeConsentBar();
     });
+    var firstBtn = bar.querySelector('[data-consent]');
+    if (firstBtn) firstBtn.focus();
   }
 
   function injectCookieSettings() {

@@ -11,15 +11,16 @@
  *   { action: "cancel", id }                                                   -> { ok, send } | 409 not_cancellable
  *   { action: "run-due" }                                                      -> { ok, processed, ids }
  *
- * templateId: any saved email template (built-in 01–09 or a custom id from Email templates).
+ * templateId: any saved email template (built-in 01–10 or a custom id from Email templates).
  * audience: approved | submitted | rejected | none (no submission) | all | waitlist.
  * lang: all = each recipient's profile language; en / ar = send that language to the whole audience.
  */
 import { adminCampaignSchema } from '../../src/lib/validation.ts';
-import { handle, json, readJson, methodNotAllowed, HttpError } from '../../src/lib/server/http.ts';
+import { handle, json, readJson, methodNotAllowed, HttpError, clientIp } from '../../src/lib/server/http.ts';
 import { adminClient, requireAdmin } from '../../src/lib/server/supabase.ts';
 import { resolveTemplateId } from '../../src/lib/server/send-template.ts';
 import { createCampaign, processDueSends, resolveRecipients } from '../../src/lib/server/campaigns.ts';
+import { rateLimit } from '../../src/lib/server/ratelimit.ts';
 
 export default handle(async (req: Request) => {
   if (req.method !== 'GET' && req.method !== 'POST') return methodNotAllowed(['GET', 'POST']);
@@ -47,6 +48,7 @@ export default handle(async (req: Request) => {
   }
 
   if (input.action === 'create') {
+    await rateLimit('campaign', clientIp(req), admin.id, 20);
     const templateId = resolveTemplateId(input.templateId);
     // A schedule is either clearly in the future or omitted; a stale timestamp must not silently send now.
     if (input.scheduledFor && new Date(input.scheduledFor).getTime() < Date.now() - 60_000) {

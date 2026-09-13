@@ -57,7 +57,7 @@ function fill(html: string, data: Record<string, unknown>): string {
   return fillTemplate(html, data);
 }
 
-type Renderer = { render: (spec: unknown, opts?: { lang?: string; baseUrl?: string }) => string };
+type Renderer = { render: (spec: unknown, opts?: { lang?: string; baseUrl?: string; logoUrl?: string }) => string };
 let renderer: Renderer | null = null;
 
 function loadRenderer(): Renderer {
@@ -142,7 +142,8 @@ export function emailLinks(opts: { memberId?: string | null; email: string; temp
   const kind = unsubscribeKindFor(resolveTemplateId(opts.templateId));
   let unsubscribe_url: string | null = null;
   if (kind) {
-    const key = env.supabaseServiceRoleKey;
+    const key = env.unsubscribeSecret;
+    const fallback = env.supabaseServiceRoleKey;
     unsubscribe_url = opts.memberId
       ? unsubscribeUrl(env.siteUrl, { kind, memberId: opts.memberId }, key)
       : unsubscribeUrl(env.siteUrl, { kind: 'waitlist', email: opts.email }, key);

@@ -51,6 +51,13 @@ export default handle(async (req: Request) => {
   if (latest && latest.status === 'submitted') throw new HttpError(409, 'already_pending', 'Your proof is already under review.');
   if (latest && latest.status === 'approved') throw new HttpError(409, 'already_approved', 'Your proof is already approved.');
 
+  const incoming = await storage.list(`${caller.id}/incoming`);
+  const extras = (incoming.data || []).filter((o) => !input.files.some((f) => f.path.endsWith('/' + o.name)));
+  if ((incoming.data || []).length > 12) {
+    const drop = extras.slice(0, Math.max(0, (incoming.data || []).length - 8)).map((o) => `${caller.id}/incoming/${o.name}`);
+    if (drop.length) await storage.remove(drop);
+  }
+
   // Validate and re-encode before anything is written to the database.
   const encoded: Array<{ bytes: Buffer; originalName: string }> = [];
   for (const f of input.files.slice(0, PROOF_MAX_FILES)) {

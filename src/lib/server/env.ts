@@ -13,6 +13,10 @@ export const env = {
   },
   get supabaseAnonKey() { return need('SUPABASE_ANON_KEY'); },
   get supabaseServiceRoleKey() { return need('SUPABASE_SERVICE_ROLE_KEY'); },
+  /** HMAC for unsubscribe links. Falls back to the service role so existing mail still verifies. */
+  get unsubscribeSecret() {
+    return process.env.UNSUBSCRIBE_SECRET || this.supabaseServiceRoleKey;
+  },
   get turnstileSecret() { return process.env.TURNSTILE_SECRET_KEY || ''; },
   get resendApiKey() { return process.env.RESEND_API_KEY || ''; },
   get resendFrom() { return process.env.RESEND_FROM || process.env.SMTP_FROM_EMAIL || 'Talaria Flow <support@talaria-flow.com>'; },

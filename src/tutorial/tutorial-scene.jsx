@@ -348,7 +348,7 @@ function Piece({ lang }) {
             }
           }, ar ? 'كيف تحصل على الدورة مجاناً' : 'How to get the course for free'),
           React.createElement('div', { dir, style: { marginTop: 30, fontSize: 29, lineHeight: 1.45, color: C.text2 } },
-            ar ? 'أربع عشرة خطوة من فتح حساب NinjaTrader إلى رفع الإثبات. لا يلزم أي إيداع' : 'Fourteen steps, from opening your NinjaTrader account to uploading your proof. No deposit required.')
+            ar ? 'سبع عشرة خطوة من فتح حساب NinjaTrader إلى رفع الإثبات. لا يلزم أي إيداع' : 'Seventeen steps, from opening your NinjaTrader account to uploading your proof. No deposit required.')
         )
       )
     ),

@@ -627,7 +627,7 @@
     return new Promise(function (resolve) {
       var dir = dashDir();
       var shell = proofShell();
-      var thumbs = files.slice(0, 2).map(function (f) {
+      var thumbs = files.map(function (f) {
         var blob = f.file || f;
         var url = f.preview || URL.createObjectURL(blob);
         return '<img src="' + url + '" alt="" data-revoke="' + url + '" style="width:100%;height:88px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#07080C">';

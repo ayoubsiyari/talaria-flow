@@ -89,6 +89,7 @@ test('unsubscribe: signature verifies, rejects tampering, wrong key and bad para
   const u = new URL(url);
   assert.equal(u.pathname, '/api/unsubscribe');
   assert.deepEqual(parseUnsubscribe(u.searchParams, key), member);
+  assert.deepEqual(parseUnsubscribe(u.searchParams, ['other-key', key]), member, 'accepts the matching key in a list');
   u.searchParams.set('k', 'tools');
   assert.equal(parseUnsubscribe(u.searchParams, key), null);
 

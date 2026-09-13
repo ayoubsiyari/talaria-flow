@@ -26,6 +26,8 @@
       deleteAccount: 'Delete account', deleteNote: 'Removes your account and uploaded screenshots. Course access cannot be restored.', delete: 'Delete',
       saved: 'Saved.', saveFailed: 'Could not save. Try again.', deleted: 'Account deleted.',
       deleteTitle: 'Delete your account?', deleteConfirm: 'Delete account',
+      deletePassword: 'Enter your password to confirm',
+      country: 'Country',
       tags: { none: 'Not submitted', review: 'Under review', approved: 'Approved', rejected: 'Needs resubmission', blocked: 'Rejected' },
       accessBody: {
         none: 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.',
@@ -40,8 +42,8 @@
       blockedNotice: 'Your application was rejected. Contact admin support — you cannot submit again until an admin restores your access.',
       blockedCta: 'Email admin support',
       courseBodyLocked: 'Opens once your course access is approved and released.',
-      courseBodyOpen: 'Thirty videos with written materials and lesson notes per module.',
-      courseCtaLocked: 'See what is inside', courseCtaOpen: 'Continue',
+      courseBodyOpen: 'The seven-module list is unlocked. Full video playback is not in the dashboard yet — use the public curriculum for the outline.',
+      courseCtaLocked: 'See what is inside', courseCtaOpen: 'View curriculum',
       lockedBody: 'The course opens for approved members before 31 December 2026. Module titles are revealed at release. Until then, get NinjaTrader set up.',
       modState: { locked: 'Locked', open: 'Open', done: 'Done' },
       videos: function (n) { return n + ' videos · notes PDF'; },
@@ -54,8 +56,8 @@
         ['newsletter', 'Newsletter', 'Occasional order flow notes from the team.'],
         ['tools', 'Tools suite news', 'Launch and updates for the Talaria Flow indicators.'],
       ],
-      resendEmail: 'Resend the confirmation email',
-      resendOk: 'Confirmation email sent.',
+      resendEmail: 'Resend the “proof received” email',
+      resendOk: 'Proof-received email sent.',
       resendFail: 'Could not send the email. Try again.',
       moduleLocked: 'Module {n}',
     },
@@ -88,7 +90,7 @@
   };
 
   function esc(s) {
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function lang() {
     return (window.TF.currentLang && window.TF.currentLang()) || localStorage.getItem('tf-lang') || 'en';
@@ -138,6 +140,8 @@
       deleted: str('deleted', base.deleted),
       deleteTitle: str('deleteTitle', base.deleteTitle),
       deleteConfirm: str('deleteConfirm', base.deleteConfirm),
+      deletePassword: str('deletePassword', base.deletePassword),
+      country: str('country', base.country),
       tags: {
         none: str('tags.none', base.tags.none),
         review: str('tags.review', base.tags.review),
@@ -404,7 +408,7 @@
       '<div id="upload-dropzone" role="button" tabindex="0" aria-label="Upload screenshots" class="scp0" style="position:relative;border:1px solid rgba(255,255,255,0.16);padding:28px 24px;text-align:center;background:#07080C;cursor:pointer;border-radius:10px">' +
       '<div data-upload-empty style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg>' +
-      '<div dir="ltr" style="font-size:var(--fs-body);text-align:center"><strong style="font-weight:600"><span data-i18n="dashboard.dropStrong">Drop screenshots here</span></strong> <span style="color:#B7BCCB"><span data-i18n="dashboard.dropRest">or click to choose</span></span></div></div>' +
+      '<div dir="' + tdir() + '" style="font-size:var(--fs-body);text-align:center"><strong style="font-weight:600"><span data-i18n="dashboard.dropStrong">Drop screenshots here</span></strong> <span style="color:#B7BCCB"><span data-i18n="dashboard.dropRest">or click to choose</span></span></div></div>' +
       '<div data-upload-grid></div>' +
       '<p style="margin-top:6px;font-family:\'Geist Mono\',monospace;font-size:11.5px;letter-spacing:.04em;color:#8B90A3"><span data-i18n="dashboard.dropMeta">PNG, JPG or WEBP · up to 4 files · 5 MB each</span></p>' +
       '<span data-upload-count style="position:absolute;top:10px;right:12px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3">0 / 4</span></div>' +
@@ -421,7 +425,7 @@
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:28px">' +
       '<h1 style="font-size:clamp(32px,3.6vw,44px);font-weight:700;letter-spacing:-0.03em;line-height:1.02;font-stretch:112%"><span data-i18n="dashboard.h1">Your course access</span></h1>' +
       '<span data-status style="display:inline-flex;align-items:center;gap:8px;font-family:\'Geist Mono\',monospace;font-size:var(--fs-mono);letter-spacing:.1em;text-transform:uppercase;color:' + tag + ';border:1px solid ' + (state === 'none' ? 'rgba(255,255,255,0.16)' : tag) + ';padding:6px 10px;border-radius:6px;white-space:nowrap"><span style="width:6px;height:6px;background:' + tag + ';display:inline-block"></span><span data-i18n="dashboard.tags.' + state + '">' + t().tags[state] + '</span></span></div>' +
-      '<div style="border-top:2px solid ' + (state === 'none' ? '#B7BCCB' : state === 'rejected' ? '#FF37B0' : tag) + ';padding:24px 0 0">' +
+      '<div style="border-top:2px solid ' + tag + ';padding:24px 0 0">' +
       '<h2 style="font-size:clamp(24px,2.4vw,30px);font-weight:600;letter-spacing:-0.025em;line-height:1.15"><span data-i18n="' + titleKey + '">' + titleFallback + '</span></h2>' +
       '<p style="margin-top:10px;font-size:var(--fs-body);color:#B7BCCB;max-width:64ch;text-wrap:pretty">' + extra + (bodyKey ? '<span data-i18n="' + bodyKey + '">' + bodyFallback + '</span>' : bodyFallback) + '</p>' +
       timeline(state === 'none' ? 2 : state === 'review' ? 3 : state === 'approved' ? 4 : 3) + '</div>';
@@ -498,7 +502,7 @@
         '<div' + hidden + ' style="font-family:\'Geist Mono\',\'Cairo\',monospace;font-size:11px;color:#8B90A3;margin-top:2px;filter:' + blur + ';user-select:none">' + dirSpan(copy.videos(mod[1])) + '</div></div>' +
         '<span style="display:inline-flex;align-items:center;gap:8px;font-family:\'Geist Mono\',\'Cairo\',monospace;font-size:11px;color:' + color + '">' + dirSpan(copy.modState[st]) +
         (st === 'locked' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>' : '') + '</span>';
-      html += '<div style="display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid rgba(255,255,255,0.08)' + (open ? '' : ';opacity:.7') + '">' + inner + '</div>';
+      html += (open && st !== 'locked' ? '<a href="/course/" style="display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid rgba(255,255,255,0.08);color:inherit">' : '<div style="display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid rgba(255,255,255,0.08)' + (open ? '' : ';opacity:.7') + '">') + inner + (open && st !== 'locked' ? '</a>' : '</div>');
     });
     html += '<div style="border-top:1px solid rgba(255,255,255,0.08)"></div></div>';
     return html;
@@ -515,6 +519,8 @@
       '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3">' + dirSpan(copy.emailLabel) +
       '<input value="' + esc(S.email) + '" dir="ltr" readonly style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.16);padding:10px 0;color:#8B90A3;font-family:Archivo,sans-serif;font-size:16px;outline:none">' +
       '<span dir="' + tdir() + '" style="font-family:Archivo,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:#7C8296;text-align:left">' + copy.emailNote + '</span></label>' +
+      '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3">' + dirSpan(copy.country || 'Country') +
+      '<input value="' + esc(S.country || '—') + '" dir="ltr" readonly style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.16);padding:10px 0;color:#8B90A3;font-family:Archivo,sans-serif;font-size:16px;outline:none"></label>' +
       '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3">' + dirSpan(copy.language) +
       '<div style="display:inline-flex;border:1px solid rgba(255,255,255,0.16);border-radius:10px;overflow:hidden;width:max-content">' +
       '<button type="button" data-set-lang="en" style="height:36px;padding:0 14px;border:0;background:' + (ar ? 'transparent' : 'rgba(255,255,255,0.08)') + ';color:' + (ar ? '#8B90A3' : '#F2F4F8') + ';font-family:Archivo,sans-serif;font-size:13.5px;font-weight:600;cursor:pointer">English</button>' +
@@ -602,10 +608,10 @@
     var del = root.querySelector('[data-account-delete]');
     if (del) del.addEventListener('click', async function () {
       var copy = t();
-      var ok = await confirmDialog({ title: copy.deleteTitle, body: copy.deleteNote, ok: copy.deleteConfirm, cancel: copy.cancel, danger: true, opener: del });
-      if (!ok) return;
+      var pw = await confirmDialog({ title: copy.deleteTitle, body: copy.deleteNote, ok: copy.deleteConfirm, cancel: copy.cancel, danger: true, opener: del, password: copy.deletePassword || 'Enter your password to confirm' });
+      if (!pw) return;
       try {
-        var res = await window.TF.api('/api/account/delete', { method: 'DELETE' });
+        var res = await window.TF.api('/api/account/delete', { method: 'POST', body: { password: pw } });
         if (!res.ok) { toast(window.TF.authCopy('uploadFailed')); return; }
         await window.TF.signOut();
       } catch (err) { toast(window.TF.authCopy('uploadFailed')); return; }
@@ -683,13 +689,14 @@
       wrap.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="' + titleId + '" aria-describedby="' + bodyId + '" dir="' + (ar ? 'rtl' : 'ltr') + '" style="width:min(440px,100%);padding:24px;background:#0E1017;border:1px solid rgba(255,255,255,0.12);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);font-family:Archivo,Cairo,sans-serif;color:#F2F4F8">' +
         '<h2 id="' + titleId + '" style="font-size:19px;font-weight:700;letter-spacing:-0.01em;margin:0 0 8px">' + opts.title + '</h2>' +
         '<p id="' + bodyId + '" style="margin:0 0 20px;font-size:14px;line-height:1.55;color:#B7BCCB">' + opts.body + '</p>' +
+        (opts.password ? '<label style="display:block;margin:0 0 16px;font-size:12px;color:#8B90A3">' + opts.password + '<input type="password" data-dlg-pw autocomplete="current-password" style="display:block;width:100%;margin-top:6px;height:40px;box-sizing:border-box;background:#07080C;border:1px solid rgba(255,255,255,.16);border-radius:10px;color:#F2F4F8;padding:0 12px"></label>' : '') +
         '<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">' +
         '<button type="button" data-dlg-cancel style="height:40px;padding:0 16px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font:600 14px Archivo,Cairo,sans-serif;cursor:pointer">' + opts.cancel + '</button>' +
         '<button type="button" data-dlg-ok style="height:40px;padding:0 16px;border:0;border-radius:10px;background:' + (opts.danger ? '#FF8AD0' : '#2EE8FF') + ';color:#04141A;font:600 14px Archivo,Cairo,sans-serif;cursor:pointer">' + opts.ok + '</button>' +
         '</div></div>';
       document.body.appendChild(wrap);
       var panel = wrap.firstChild;
-      var focusables = function () { return Array.prototype.slice.call(panel.querySelectorAll('button')); };
+      var focusables = function () { return Array.prototype.slice.call(panel.querySelectorAll('button, input')); };
       function close(result) {
         document.removeEventListener('keydown', onKey, true);
         wrap.remove();
@@ -709,7 +716,10 @@
       document.addEventListener('keydown', onKey, true);
       wrap.addEventListener('mousedown', function (e) { if (e.target === wrap) close(false); });
       panel.querySelector('[data-dlg-cancel]').addEventListener('click', function () { close(false); });
-      panel.querySelector('[data-dlg-ok]').addEventListener('click', function () { close(true); });
+      panel.querySelector('[data-dlg-ok]').addEventListener('click', function () {
+        var pw = wrap.querySelector('[data-dlg-pw]');
+        close(opts.password ? (pw && pw.value ? pw.value : false) : true);
+      });
       panel.querySelector('[data-dlg-cancel]').focus();
     });
   }

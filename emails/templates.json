@@ -54,7 +54,7 @@
     "trigger": "Auth: OTP",
     "kind": "auto",
     "subject": "Your sign-in code: {{code}}",
-    "preheader": "Valid for 10 minutes",
+    "preheader": "Valid for 15 minutes",
     "eyebrow": "Account",
     "title": "Your sign-in code",
     "blocks": [
@@ -82,7 +82,7 @@
     "unsubscribe": false,
     "ar": {
       "subject": "رمز الدخول الخاص بك",
-      "preheader": "الرمز صالح لعشر دقائق",
+      "preheader": "الرمز صالح لخمس عشرة دقيقة",
       "eyebrow": "الأمان",
       "title": "رمز الدخول",
       "blocks": [
@@ -268,7 +268,7 @@
   {
     "file": "05-needs-resubmission",
     "name": "Needs resubmission",
-    "trigger": "Status → rejected",
+    "trigger": "Status → resubmit",
     "kind": "auto",
     "subject": "We need a clearer screenshot",
     "preheader": "One small fix and we can approve you",
@@ -317,17 +317,31 @@
       "title": "نحتاج لقطة أوضح",
       "blocks": [
         {
+          "type": "status",
+          "color": "#FF8AD0",
+          "text": "يحتاج إعادة رفع"
+        },
+        {
           "type": "p",
-          "text": "راجعنا ما أرسلته ولا يمكننا اعتماده بعد"
+          "text": "راجعنا ما أرسلته ولا يمكننا اعتماده بعد. ترك المراجِع هذه الملاحظة:"
         },
         {
           "type": "callout",
+          "color": "#FF37B0",
           "label": "سبب المراجِع",
           "text": "{{reason}}"
         },
         {
-          "type": "p",
-          "text": "ارفع لقطتين: لوحة Welcome مع اسمك، ومنصة التداول Web في Simulation مع ظهور حسابك في الأعلى. أبقِ بريدك أو اسم المستخدم ظاهراً وأخفِ الأرصدة وأرقام البطاقات"
+          "type": "h2",
+          "text": "ماذا تُظهر لقطة صالحة"
+        },
+        {
+          "type": "list",
+          "items": [
+            "اللقطة 1: لوحة NinjaTrader ويب تظهر Welcome واسمك",
+            "اللقطة 2: منصة التداول Web في Simulation مع ظهور حسابك في الأعلى",
+            "أخفِ أرقام البطاقات والأرصدة — ولا تعدّل شيئاً آخر"
+          ]
         },
         {
           "type": "button",
@@ -350,7 +364,7 @@
     "blocks": [
       {
         "type": "status",
-        "color": "#FF8AD0",
+        "color": "#FF37B0",
         "text": "Rejected"
       },
       {
@@ -377,7 +391,7 @@
       "blocks": [
         {
           "type": "status",
-          "color": "#FF8AD0",
+          "color": "#FF37B0",
           "text": "مرفوض"
         },
         {
@@ -403,76 +417,68 @@
     "trigger": "Manual send",
     "kind": "campaign",
     "subject": "Your course is ready",
-    "preheader": "30 videos, written materials and lesson notes",
+    "preheader": "Seven modules are listed in your dashboard",
     "eyebrow": "Course",
     "title": "Your order flow course is ready",
     "blocks": [
       {
         "type": "p",
-        "text": "All thirty videos are live, with the written materials and lesson notes for each module. Log in with this email address to start."
+        "text": "Your curriculum list is unlocked in the dashboard. Full in-app video playback is not live yet — use the public curriculum page for the outline until the player ships."
       },
       {
         "type": "kv",
         "rows": [
           [
-            "Videos",
-            "30"
-          ],
-          [
             "Modules",
             "7 · footprint, profiles, delta, VWAP and more"
           ],
           [
-            "Notes",
-            "PDF per module, in your dashboard"
+            "Where",
+            "Dashboard → Course, or talaria-flow.com/course/"
           ]
         ]
       },
       {
         "type": "button",
-        "label": "Start module 01",
-        "href": "https://www.talaria-flow.com/account/access/"
+        "label": "Open the curriculum",
+        "href": "https://www.talaria-flow.com/account/course/"
       },
       {
         "type": "p",
-        "text": "Watch in order. Each module builds on the previous one."
+        "text": "We will email you again when the video player is ready."
       }
     ],
     "ar": {
       "subject": "دورتك جاهزة",
-      "preheader": "30 فيديو ومواد مكتوبة وملاحظات دروس",
+      "preheader": "سبع وحدات ظاهرة في لوحة التحكم",
       "eyebrow": "الدورة",
       "title": "دورة Order Flow جاهزة الآن",
       "blocks": [
         {
           "type": "p",
-          "text": "الثلاثون فيديو كلها متاحة الآن، مع المواد المكتوبة وملاحظات الدروس لكل وحدة. سجّل الدخول بهذا البريد لتبدأ."
+          "text": "قائمة المنهج فُتحت في لوحة التحكم. تشغيل الفيديو داخل الحساب ليس جاهزاً بعد — استخدم صفحة المنهج العامة حتى يصل المشغّل."
         },
         {
           "type": "kv",
           "rows": [
             [
-              "الفيديوهات",
-              "30"
-            ],
-            [
               "الوحدات",
               "7 · footprint وprofiles وdelta وVWAP والمزيد"
             ],
             [
-              "الملاحظات",
-              "PDF لكل وحدة، في لوحة التحكم"
+              "أين",
+              "لوحة التحكم ← الدورة، أو talaria-flow.com/course/"
             ]
           ]
         },
         {
           "type": "button",
-          "label": "ابدأ الوحدة 01",
-          "href": "https://www.talaria-flow.com/account/access/"
+          "label": "افتح المنهج",
+          "href": "https://www.talaria-flow.com/account/course/"
         },
         {
           "type": "p",
-          "text": "شاهد بالترتيب. كل وحدة تبني على التي قبلها."
+          "text": "سنراسلُك مجدداً عندما يصبح مشغّل الفيديو جاهزاً."
         }
       ]
     }
@@ -483,13 +489,13 @@
     "trigger": "Auth: reset",
     "kind": "auto",
     "subject": "Your password reset code: {{code}}",
-    "preheader": "Valid for 10 minutes",
+    "preheader": "Valid for 15 minutes",
     "eyebrow": "Account",
     "title": "Your password reset code",
     "blocks": [
       {
         "type": "p",
-        "text": "Enter this code on the login page to choose a new password. It works once and expires in 10 minutes."
+        "text": "Enter this code on the login page to choose a new password. It works once and expires in 15 minutes."
       },
       {
         "type": "code",
@@ -506,13 +512,13 @@
     "unsubscribe": false,
     "ar": {
       "subject": "رمز إعادة تعيين كلمة المرور: {{code}}",
-      "preheader": "الرمز صالح لعشر دقائق",
+      "preheader": "الرمز صالح لخمس عشرة دقيقة",
       "eyebrow": "الأمان",
       "title": "رمز إعادة تعيين كلمة المرور",
       "blocks": [
         {
           "type": "p",
-          "text": "أدخل هذا الرمز في صفحة تسجيل الدخول لتعيين كلمة مرور جديدة. الرمز يُستخدم مرة واحدة وينتهي خلال عشر دقائق"
+          "text": "أدخل هذا الرمز في صفحة تسجيل الدخول لتعيين كلمة مرور جديدة. الرمز يُستخدم مرة واحدة وينتهي خلال خمس عشرة دقيقة"
         },
         {
           "type": "code",

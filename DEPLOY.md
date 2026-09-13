@@ -33,7 +33,7 @@ pnpm dlx supabase login
 pnpm dlx supabase link --project-ref <project-ref>
 pnpm dlx supabase db push
 ```
-This applies the seven files in `supabase/migrations/`, in order:
+This applies every file in `supabase/migrations/`, in order:
 
 | File | What it does |
 |---|---|
@@ -44,6 +44,10 @@ This applies the seven files in `supabase/migrations/`, in order:
 | `20260910140000_release_fixes.sql` | `waitlist.email` unique constraint (fixes the upsert), `email_events.send_id` + FKs + status check + unique per send × recipient, `email_sends` campaign columns, "Members read own activity", admin browser writes to submissions / email_sends removed (decisions and campaigns are server-side now) |
 | `20260910180000_drop_unused_campaigns.sql` | drops unused `public.campaigns` (sends live on `email_sends`) |
 | `20260910200000_proof_once_and_webhook_dedupe.sql` | one `submitted` row per user; webhook events unique per provider + type |
+| `20260913120000_resubmit_note.sql` | `profiles.resubmit_note` for the reason shown after a resubmission request |
+| `20260913140000_profiles_blocked.sql` | `profiles.blocked` + `admin_set_blocked` (reject / restore) |
+| `20260913143000_fix_admin_set_blocked.sql` | restore RPC without `session_replication_role` |
+| `20260913180000_protect_admin_privileges.sql` | trigger: only `service_role` / postgres may change `is_admin`, `role`, `blocked`, `resubmit_note` |
 
 Verify: `node scripts/rls-report.mjs` prints the policy set that is now live; Dashboard → Database → Policies should match.
 
@@ -55,20 +59,18 @@ Authentication → URL Configuration:
 Authentication → Providers → Email: **Confirm email ON**, **Secure email change ON**, minimum password length 8. Leave "Allow new users to sign up" ON (signup goes through `/api/auth/signup`, which adds Turnstile + rate limiting on top).
 
 Authentication → Email Templates (English only — GoTrue has one body per slot; product mail in `emails/` is bilingual):
-- *Confirm signup* ← `supabase/templates/01-confirm-email.html` (`{{ .ConfirmationURL }}`). Subject: "Confirm your email".
-- *Magic Link* ← reuse `01-confirm-email.html` if Auth sends a clickable URL. `02-signup-code.html` is the OTP body (`{{ .Token }}`) — paste it here only when the project is set to email OTP (6-digit code), not a magic-link URL. Subject: "Your sign-in code".
-- *Reset password* ← `supabase/templates/07-password-reset.html`. Subject: "Reset your password".
+- *Confirm signup* / *Magic Link* / *Reset password*: the live app sends **OTP codes** through `POST /api/hooks/send-email` (templates 02 and 07). Set Auth OTP expiry to 900 seconds. Paste-ins in `supabase/templates/` are unused while the hook is enabled.
 The logo in these paste-ins is `https://www.talaria-flow.com/assets/email-logo-2x.png` (production origin; required because GoTrue cannot resolve a relative `/assets` path).
 
 Authentication → SMTP: enable **Custom SMTP** and use Resend (after §2):
 `host smtp.resend.com · port 465 · user resend · password <RESEND_API_KEY> · sender support@talaria-flow.com · sender name Talaria Flow`. Without this, Supabase's built-in mailer caps at ~3 emails/hour.
 
 ### 1.4 Application emails
-There is nothing to deploy on the Supabase side for the site's own emails: submission received (03), approved (04), needs resubmission (05) and the campaigns (06/08/09) are rendered and sent by the Vercel functions (`src/lib/server/send-template.ts` → Resend), each logged once in `public.email_events`. No edge functions, no database webhooks — do not add a webhook on `public.submissions`, it would double-send.
+There is nothing to deploy on the Supabase side for the site's own emails: submission received (03), approved (04), needs resubmission (05), application rejected (10) and the campaigns (06/08/09) are rendered and sent by the Node API (`src/lib/server/send-template.ts` → Resend/SMTP), each logged once in `public.email_events`. No edge functions, no database webhooks — do not add a webhook on `public.submissions`, it would double-send.
 
 ### 1.5 Seed and admin
 ```bash
-pnpm seed                    # email templates -> public.email_templates (9 x EN/AR), over the API
+pnpm seed                    # email templates -> public.email_templates (10 x EN/AR), over the API
 psql "$SUPABASE_DB_URL" -f supabase/seed.sql   # same rows without Node; regenerate with `pnpm seed -- --sql`
 pnpm seed:test-accounts      # staging only: the five *@talaria-flow.test accounts (TEST_PASSWORD)
 ```

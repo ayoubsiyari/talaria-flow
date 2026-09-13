@@ -19,13 +19,6 @@ interface HookBody {
   };
 }
 
-function resetUrl(data: NonNullable<HookBody['email_data']>): string {
-  const site = env.siteUrl.replace(/\/+$/, '');
-  const hash = data.token_hash || data.token || '';
-  const redirect = encodeURIComponent(data.redirect_to || `${site}/login/?type=recovery`);
-  return `${site}/auth/v1/verify?token=${encodeURIComponent(hash)}&type=recovery&redirect_to=${redirect}`;
-}
-
 export default handle(async (req: Request) => {
   if (req.method !== 'POST') return methodNotAllowed(['POST']);
   if (!env.sendEmailHookSecret) throw new HttpError(503, 'hook_unconfigured');
@@ -56,8 +49,8 @@ export default handle(async (req: Request) => {
     device: 'Talaria Flow',
     location: 'Account verification',
     time: now,
-    reset_url: resetUrl(data),
-    verify_url: `${env.siteUrl.replace(/\/+$/, '')}/signup/verify?email=${encodeURIComponent(email)}&code=${encodeURIComponent(token)}`,
+    reset_url: `${env.siteUrl.replace(/\/+$/, '')}/login/?type=recovery`,
+    verify_url: `${env.siteUrl.replace(/\/+$/, '')}/signup/verify?email=${encodeURIComponent(email)}`,
   };
 
   const templateId = action === 'recovery' ? '07-password-reset' : '02-signup-code';

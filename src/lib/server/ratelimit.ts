@@ -48,15 +48,15 @@ function memoryIncr(key: string): { count: number; ttl: number } {
   return { count: cur.count, ttl: Math.ceil((cur.resetAt - now) / 1000) };
 }
 
-export type RateLimitAction = 'login' | 'signup' | 'reset' | 'waitlist' | 'proof' | 'unsubscribe' | 'admin-reset' | 'verify' | 'resend';
+export type RateLimitAction = 'login' | 'signup' | 'reset' | 'waitlist' | 'proof' | 'unsubscribe' | 'admin-reset' | 'verify' | 'resend' | 'campaign';
 
-export async function rateLimit(action: RateLimitAction, ip: string, email: string): Promise<void> {
+export async function rateLimit(action: RateLimitAction, ip: string, email: string, max: number = RATE_LIMIT.attempts): Promise<void> {
   if ((!env.redisUrl || !env.redisToken) && env.failClosed) {
     throw new HttpError(500, 'ratelimit_unconfigured', 'UPSTASH_REDIS_REST_URL / KV_REST_API_URL is not set.');
   }
   const key = keyFor(action, ip, email);
   const hit = (await redisIncr(key)) || memoryIncr(key);
-  if (hit.count > RATE_LIMIT.attempts) {
+  if (hit.count > max) {
     throw new HttpError(429, 'rate_limited', `Too many attempts. Try again in ${Math.max(1, Math.ceil(hit.ttl / 60))} min.`);
   }
 }

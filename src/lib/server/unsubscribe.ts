@@ -1,6 +1,6 @@
 /**
  * Signed one-click unsubscribe links. Pure functions (no I/O) so they can be unit-tested; the
- * signing key is SUPABASE_SERVICE_ROLE_KEY, which never leaves the server.
+ * signing key is UNSUBSCRIBE_SECRET (falls back to SUPABASE_SERVICE_ROLE_KEY). It never leaves the server.
  *
  *   /api/unsubscribe?m=<profile id>&k=course|newsletter|tools&t=<hmac>
  *   /api/unsubscribe?e=<email>&k=waitlist&t=<hmac>
@@ -62,7 +62,7 @@ export function unsubscribeUrl(siteUrl: string, target: UnsubscribeTarget, key: 
 }
 
 /** Parse and verify the query string of /api/unsubscribe. Returns the target on success. */
-export function parseUnsubscribe(params: URLSearchParams, key: string): UnsubscribeTarget | null {
+export function parseUnsubscribe(params: URLSearchParams, key: string | string[]): UnsubscribeTarget | null {
   const kind = params.get('k') as UnsubscribeKind | null;
   if (!kind || !UNSUBSCRIBE_KINDS.includes(kind)) return null;
   const target: UnsubscribeTarget =
@@ -71,5 +71,10 @@ export function parseUnsubscribe(params: URLSearchParams, key: string): Unsubscr
       : { kind, memberId: (params.get('m') || '').trim().toLowerCase() };
   if (kind !== 'waitlist' && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.memberId || '')) return null;
   if (kind === 'waitlist' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target.email || '')) return null;
-  return verifyUnsubscribe(target, params.get('t') || '', key) ? target : null;
+  const keys = Array.isArray(key) ? key : [key];
+  const token = params.get('t') || '';
+  for (const k of keys) {
+    if (k && verifyUnsubscribe(target, token, k)) return target;
+  }
+  return null;
 }

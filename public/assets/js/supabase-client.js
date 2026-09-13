@@ -28,7 +28,13 @@
     if (!window.supabase || !env.url || !env.anonKey) return null;
     try {
       return window.supabase.createClient(env.url, env.anonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' },
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          flowType: 'pkce',
+          storage: window.sessionStorage,
+        },
       });
     } catch (e) {
       return null;
@@ -38,8 +44,13 @@
   /** supabase-js persists the session under sb-<ref>-auth-token; its presence means "probably signed in". */
   function hasStoredSession() {
     try {
-      for (var i = 0; i < localStorage.length; i++) {
-        if (/^sb-.*-auth-token$/.test(localStorage.key(i) || '')) return true;
+      var stores = [window.sessionStorage, window.localStorage];
+      for (var s = 0; s < stores.length; s++) {
+        var store = stores[s];
+        if (!store) continue;
+        for (var i = 0; i < store.length; i++) {
+          if (/^sb-.*-auth-token$/.test(store.key(i) || '')) return true;
+        }
       }
     } catch (e) {}
     return false;

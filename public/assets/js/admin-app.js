@@ -63,8 +63,11 @@
   var mounted = false;
   var ranDue = false;
 
+  function statusLabel(st) {
+    return ({ submitted: 'Pending', approved: 'Approved', rejected: 'Needs resubmission', blocked: 'Rejected', none: 'No proof' })[st] || st;
+  }
   function esc(s) {
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function toast(msg, kind) {
     msg = String(msg || '').trim();
@@ -179,7 +182,8 @@
     var filter = (a && a.filter) || '';
     if (!kind) {
       if (/approv/.test(text)) { kind = 'Approved'; filter = filter || 'review'; }
-      else if (/resubmit|reject/.test(text)) { kind = 'Rejected'; filter = filter || 'review'; }
+      else if (/resubmit/.test(text)) { kind = 'Resubmit'; filter = filter || 'review'; }
+      else if (/reject/.test(text)) { kind = 'Rejected'; filter = filter || 'review'; }
       else if (/upload|file/.test(text)) { kind = 'Upload'; filter = filter || 'review'; }
       else if (/waitlist/.test(text)) { kind = 'Waitlist'; filter = filter || 'signup'; }
       else if (/sign[- ]?up|signed up/.test(text)) { kind = 'Sign-up'; filter = filter || 'signup'; }
@@ -187,14 +191,15 @@
       else { kind = 'Upload'; filter = filter || 'review'; }
     }
     if (!filter) {
-      if (kind === 'Approved' || kind === 'Rejected' || kind === 'Upload') filter = 'review';
+      if (kind === 'Approved' || kind === 'Rejected' || kind === 'Resubmit' || kind === 'Upload') filter = 'review';
       else if (kind === 'Sign-up' || kind === 'Waitlist') filter = 'signup';
       else if (kind === 'Email') filter = 'email';
       else filter = 'review';
     }
     var color = (a && a.color) || (
       kind === 'Approved' ? '#2EE8FF' :
-      kind === 'Rejected' ? '#FF8AD0' :
+      kind === 'Rejected' ? '#FF37B0' :
+      kind === 'Resubmit' ? '#FF8AD0' :
       kind === 'Upload' ? '#FBBF24' :
       kind === 'Email' ? '#B7BCCB' : '#8B90A3'
     );
@@ -232,6 +237,11 @@
   }
   function emptyRow(text, cols) {
     return '<tr><td colspan="' + cols + '"><div class="tf-empty" data-empty>' + esc(text) + '</div></td></tr>';
+  }
+  function skeletonRows(n, cols) {
+    var cell = '<td style="padding:14px 10px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="tf-skel"></span></td>';
+    var row = '<tr aria-hidden="true">' + Array(cols + 1).join(cell) + '</tr>';
+    return Array(n + 1).join(row);
   }
   function errorLine(key) {
     var msg = loadErrors[key];
@@ -694,7 +704,7 @@
       return (S.filter === 'all' || m.status === S.filter) && (!q || m.email.toLowerCase().indexOf(q) >= 0 || String(m.note || '').toLowerCase().indexOf(q) >= 0);
     });
     var key = S.sort;
-    var ord = { submitted: 0, approved: 1, rejected: 2, none: 3 };
+    var ord = { submitted: 0, approved: 1, rejected: 2, blocked: 3, none: 4 };
     list = list.slice().sort(function (a, b) {
       var va = key === 'status' ? ord[a.status] : (a[key] || '');
       var vb = key === 'status' ? ord[b.status] : (b[key] || '');
@@ -763,7 +773,7 @@
       wrap.querySelector('[data-dlg-ok]').addEventListener('click', function () {
         var ta = wrap.querySelector('[data-dlg-text]');
         var lang = wrap.getAttribute('data-email-lang') === 'ar' ? 'ar' : 'en';
-        close(opts.textarea ? { ok: true, text: ta ? ta.value : '', lang: lang } : true);
+        close((opts.textarea || opts.langPick) ? { ok: true, text: ta ? ta.value : '', lang: lang } : true);
       });
       var cancel = wrap.querySelector('[data-dlg-cancel]');
       if (cancel) cancel.addEventListener('click', function () { close(false); });
@@ -833,9 +843,9 @@
       if (action === 'approve' && (!m || !m.submissionId)) { out.noProof += 1; continue; }
       if (action === 'resubmit' && m && !m.submissionId && m.status !== 'rejected') { out.noProof += 1; continue; }
       var body = { action: action, id: action === 'restore' ? memberId : ((m && m.submissionId) || memberId) };
+      if (lang === 'ar' || lang === 'en') body.lang = lang;
       if (action === 'resubmit' || action === 'reject') {
         body.reason = String(reason || '').trim().slice(0, 600);
-        if (lang === 'ar' || lang === 'en') body.lang = lang;
       }
       var res;
       try { res = await window.TF.api('/api/admin/submission', { body: body }); }
@@ -1125,10 +1135,11 @@
       '<header class="tf-card-h">' +
       '<span class="tf-card-title"><span class="tf-dot" style="background:' + (COLORS[S.filter] || '#8B90A3') + '"></span><h2>' + (titles[S.filter] || 'All members') + '</h2><span class="tf-card-count">' + list.length + '</span></span>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
-      '<input type="search" data-act="search" placeholder="Search email or note" value="' + esc(S.qInput) + '" style="height:36px;width:220px;padding:0 12px;background:#07080C;border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:13.5px;outline:none">' +
+      '<input type="search" data-act="search" aria-label="Search email or note" placeholder="Search email or note" value="' + esc(S.qInput) + '" style="height:36px;width:220px;padding:0 12px;background:#07080C;border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:13.5px;outline:none">' +
       '<div role="tablist" class="tf-seg">' +
       filters.map(function (f, i) {
-        return '<button type="button" data-act="filter" data-filter="' + f[0] + '" style="height:36px;padding:0 12px;border:0;' + (i < filters.length - 1 ? 'border-right:1px solid rgba(255,255,255,0.08);' : '') + pill(S.filter === f[0]) + ';font-family:Archivo,sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">' + f[1] + ' <span style="font-family:\'Geist Mono\',monospace;font-size:10.5px;color:#8B90A3">' + f[2] + '</span></button>';
+        var on = S.filter === f[0];
+        return '<button type="button" role="tab" aria-selected="' + (on ? 'true' : 'false') + '" data-act="filter" data-filter="' + f[0] + '" style="height:36px;padding:0 12px;border:0;' + (i < filters.length - 1 ? 'border-right:1px solid rgba(255,255,255,0.08);' : '') + pill(on) + ';font-family:Archivo,sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">' + f[1] + ' <span style="font-family:\'Geist Mono\',monospace;font-size:10.5px;color:#8B90A3">' + f[2] + '</span></button>';
       }).join('') + '</div>' +
       '<button type="button" data-act="export" class="btn-neutral scp5" style="height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer">Export CSV</button>' +
       '</div></header>';
@@ -1156,7 +1167,7 @@
         return '<tr style="background:' + (on ? 'rgba(46,232,255,0.05)' : 'transparent') + '">' +
           '<td style="padding:10px 6px;border-bottom:1px solid rgba(255,255,255,0.08);border-left:2px solid ' + (on ? '#2EE8FF' : 'transparent') + '"><input type="checkbox" data-act="toggle" data-id="' + esc(m.id) + '" aria-label="Select ' + esc(m.email) + '" ' + (checked ? 'checked' : '') + ' style="accent-color:#2EE8FF;width:15px;height:15px;margin:0"></td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:500;cursor:pointer;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(m.email) + '</td>' +
-          '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer"><span style="display:inline-flex;align-items:center;gap:7px;font-family:\'Geist Mono\',monospace;font-size:11px;color:' + COLORS[m.status] + '"><span style="width:6px;height:6px;background:' + COLORS[m.status] + ';display:inline-block"></span>' + m.status + '</span></td>' +
+          '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer"><span style="display:inline-flex;align-items:center;gap:7px;font-family:\'Geist Mono\',monospace;font-size:11px;color:' + COLORS[m.status] + '"><span style="width:6px;height:6px;background:' + COLORS[m.status] + ';display:inline-block"></span>' + esc(statusLabel(m.status)) + '</span></td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap;cursor:pointer">' + esc(m.submitted) + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.lang) + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.country || '—') + '</td>' +
@@ -1164,7 +1175,7 @@
           '<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right;position:sticky;right:0;background:' + (on ? '#0C1216' : '#0E1017') + ';z-index:1">' +
           '<button type="button" data-act="row-menu" data-id="' + esc(m.id) + '" aria-haspopup="menu" aria-label="Actions for ' + esc(m.email) + '" style="width:26px;height:26px;border:1px solid rgba(255,255,255,0.16);border-radius:7px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
           '</td></tr>';
-      }).join('') : emptyRow(members.length ? (S.q ? 'No members match this search.' : 'No members in this list.') : 'No members yet.', cols.length + 2)) +
+      }).join('') : (!loaded ? skeletonRows(6, cols.length + 2) : emptyRow(members.length ? (S.q ? 'No members match this search.' : 'No members in this list.') : 'No members yet.', cols.length + 2))) +
       '</tbody></table><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;font-family:\'Geist Mono\',monospace;font-size:11px;color:#8B90A3"><span>' + list.length + ' of ' + c.total + ' members</span><span>Sorted by ' + (cols.filter(function (x) { return x[0] === S.sort; })[0] || cols[2])[1].toLowerCase() + (S.dir > 0 ? ' ascending' : ' descending') + '</span></div></div></section>';
     if (focus) {
       var thumbs = (focus.proofTiles && focus.proofTiles.length) ? focus.proofTiles : (focus.thumbs || []).map(function (t) {
@@ -1173,7 +1184,7 @@
       html += '<section class="tf-card" style="min-width:0;border-top:2px solid ' + COLORS[focus.status] + ';position:sticky;top:20px">' +
         '<header class="tf-card-h">' +
         '<h3 style="font-size:15px;font-weight:600;word-break:break-all">' + esc(focus.email) + '</h3>' +
-        '<span style="display:inline-flex;align-items:center;gap:7px;font-family:\'Geist Mono\',monospace;font-size:11px;color:' + COLORS[focus.status] + ';border:1px solid ' + COLORS[focus.status] + ';border-radius:6px;padding:4px 8px"><span class="tf-dot" style="background:' + COLORS[focus.status] + '"></span>' + focus.status + '</span></header>' +
+        '<span style="display:inline-flex;align-items:center;gap:7px;font-family:\'Geist Mono\',monospace;font-size:11px;color:' + COLORS[focus.status] + ';border:1px solid ' + COLORS[focus.status] + ';border-radius:6px;padding:4px 8px"><span class="tf-dot" style="background:' + COLORS[focus.status] + '"></span>' + esc(statusLabel(focus.status)) + '</span></header>' +
         '<div style="padding:0 18px 20px">' +
         '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)">' +
         '<div style="padding:10px 10px 10px 0"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Signed up</div><div style="font-family:\'Geist Mono\',monospace;font-size:12px;margin-top:3px">' + esc(focus.signup) + '</div></div>' +
@@ -1278,7 +1289,7 @@
         '<button type="button" data-act="pv" data-pv="ar" style="height:28px;padding:0 10px;border:0;border-left:1px solid rgba(255,255,255,0.08);' + pill(S.pv === 'ar') + ';font-size:12px;font-weight:600;cursor:pointer">AR</button></div></div>' +
         '<div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;background:#0E1017">' +
         '<div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:11.5px;color:#8B90A3">From <b style="color:#B7BCCB;font-weight:500">Talaria Flow &lt;support@talaria-flow.com&gt;</b> · Subject <b data-preview-subject style="color:#F2F4F8;font-weight:500">' + esc(S.previewSubject || subject) + '</b></div>' +
-        '<iframe title="Email preview" data-preview-frame style="width:100%;height:560px;border:0;background:#fff;display:block"></iframe></div></div></div>';
+        '<iframe title="Email preview" sandbox="" data-preview-frame style="width:100%;height:560px;border:0;background:#fff;display:block"></iframe></div></div></div>';
     }
 
     if (tab === 'history') {
@@ -1368,7 +1379,7 @@
       '<div style="display:inline-flex;border:1px solid rgba(255,255,255,0.16);border-radius:8px;overflow:hidden">' +
       '<button type="button" data-act="pv" data-pv="en" style="height:28px;padding:0 10px;border:0;' + pill(S.pv === 'en') + ';font-size:12px;font-weight:600;cursor:pointer">EN</button>' +
       '<button type="button" data-act="pv" data-pv="ar" style="height:28px;padding:0 10px;border:0;border-left:1px solid rgba(255,255,255,0.08);' + pill(S.pv === 'ar') + ';font-size:12px;font-weight:600;cursor:pointer">AR</button></div></div>' +
-      '<iframe title="Email preview" data-preview-frame style="width:100%;height:520px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:#fff;display:block"></iframe></div></div></div>';
+      '<iframe title="Email preview" sandbox="" data-preview-frame style="width:100%;height:520px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:#fff;display:block"></iframe></div></div></div>';
   }
 
   function renderWaitlist() {
@@ -1379,12 +1390,12 @@
       cardHead('#8B90A3', 'Waitlist', waitlist.length, '<button type="button" data-act="email-waitlist" class="tf-card-link"' + (waitlist.length ? '' : ' disabled') + '>Email the waitlist →</button>') +
       errorLine('waitlist') +
       '<div class="tf-table-wrap"><table style="min-width:520px"><thead><tr>' +
-      ['Email', 'Source', 'Language', 'Joined'].map(function (h) {
+      ['Email', 'Source', 'Language', 'Joined', ''].map(function (h) {
         return '<th style="text-align:left;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.16);font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3;font-weight:500">' + h + '</th>';
       }).join('') + '</tr></thead><tbody>' +
       (waitlist.length ? waitlist.map(function (w) {
-        return '<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:500">' + esc(w.email) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:13px;color:#B7BCCB">' + esc(w.source) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(w.lang) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(w.joined) + '</td></tr>';
-      }).join('') : emptyRow('No one on the waitlist yet.', 4)) + '</tbody></table></div></section>';
+        return '<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:500">' + esc(w.email) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:13px;color:#B7BCCB">' + esc(w.source) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(w.lang) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3">' + esc(w.joined) + '</td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right"><button type="button" data-act="wait-del" data-email="' + esc(w.email) + '" style="border:0;background:none;color:#FF8AD0;font:500 13px Archivo,sans-serif;cursor:pointer">Remove</button></td></tr>';
+      }).join('') : emptyRow('No one on the waitlist yet.', 5)) + '</tbody></table></div></section>';
   }
 
   var dlgWasOpen = false;
@@ -1518,7 +1529,7 @@
 
   function memberCsv(list) {
     return 'email,status,submitted,lang,country,note\n' + list.map(function (m) {
-      return [m.email, m.status, m.submitted, m.lang, m.country || '', m.note].map(csvEscape).join(',');
+      return [m.email, statusLabel(m.status), m.submitted, m.lang, m.country || '', m.note].map(csvEscape).join(',');
     }).join('\n');
   }
 
@@ -1586,9 +1597,9 @@
       return;
     }
     if (act === 'bulk-approve') {
-      var ok = await dialog({ title: 'Approve ' + S.selected.size + ' members?', body: 'Sets status to approved and sends the confirmation email to each member with a submission.', ok: 'Approve all' });
-      if (!ok) return;
-      await decide(Array.from(S.selected), 'approved');
+      var ok = await dialog({ title: 'Approve ' + S.selected.size + ' members?', body: 'Sets status to approved and sends the confirmation email to each member with a submission.', langPick: true, lang: 'en', ok: 'Approve all' });
+      if (!ok || (ok !== true && !ok.ok)) return;
+      await decide(Array.from(S.selected), 'approved', '', ok.lang || 'en');
       return;
     }
     if (act === 'bulk-reject') {
@@ -1610,7 +1621,10 @@
     }
     if (act === 'row-approve') {
       S.focus = el.getAttribute('data-id');
-      await decide([S.focus], 'approved');
+      var apMem = members.filter(function (x) { return String(x.id) === String(S.focus); })[0];
+      var apRes = await dialog({ title: 'Approve this member?', body: 'Sends the confirmation email.', langPick: true, lang: apMem && apMem.lang === 'ar' ? 'ar' : 'en', ok: 'Approve' });
+      if (!apRes || !apRes.ok) return;
+      await decide([S.focus], 'approved', '', apRes.lang);
       return;
     }
     if (act === 'row-reject' || act === 'resubmit' || act === 'reject') {
@@ -1634,6 +1648,8 @@
     if (act === 'row-restore' || act === 'restore') {
       S.focus = el.getAttribute('data-id') || S.focus;
       if (!S.focus) { toast('Select a member first.'); return; }
+      var rst = await dialog({ title: 'Restore access?', body: 'This member will be able to upload proof again.', ok: 'Restore access' });
+      if (!rst) return;
       await decide([S.focus], 'restore');
       return;
     }
@@ -1773,6 +1789,17 @@
       var use = tplById(el.getAttribute('data-tpl'));
       if (!use || use.kind === 'auto') { toast('That template sends automatically.'); return; }
       S.tpl = use.id; S.subject = ''; go('/admin/campaigns/?tpl=' + encodeURIComponent(use.file || use.id)); return;
+    }
+    if (act === 'wait-del') {
+      var em = el.getAttribute('data-email') || '';
+      var sure = await dialog({ title: 'Remove ' + em + '?', body: 'Removes this address from the tools waitlist.', ok: 'Remove' });
+      if (!sure) return;
+      var wr = await window.TF.api('/api/admin/member', { body: { action: 'delete-waitlist', email: em } });
+      if (!wr.ok) { toast(apiMessage(wr, 'Could not remove this address.'), 'error'); return; }
+      waitlist = waitlist.filter(function (w) { return w.email !== em; });
+      toast('Removed ' + em + '.');
+      paint();
+      return;
     }
     if (act === 'email-waitlist') { S.audience = 'waitlist'; S.tpl = '09'; S.subject = ''; go('/admin/campaigns/?audience=waitlist&tpl=09'); return; }
     if (act === 'export-wait') {
@@ -1923,7 +1950,9 @@
     S.count = null;
     S.countKey = '';
     if (window.TF.emailTemplatesError) toast(window.TF.emailTemplatesError);
-    await loadLive();
+    var boot = loadLive();
+    applyRoute();
+    await boot;
     applyRoute();
     if (!S.focus && members[0]) S.focus = members[0].id;
     if (!window.__tfDlgEsc) {

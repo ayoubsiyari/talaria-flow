@@ -36,18 +36,21 @@ test('waitlist: source and lang are enums', () => {
   assert.equal(waitlistSchema.safeParse({ email: 'a@b.co', lang: 'fr' }).success, false);
 });
 
-test('proof: 1-4 files, own incoming path only, note capped', () => {
+test('proof: 2-4 files, own incoming path only, note capped', () => {
   const uid = '11111111-2222-4333-8444-555555555555';
-  const file = (ext) => ({ path: `${uid}/incoming/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee.${ext}`, name: 'shot.png' });
-  assert.equal(proofFinishSchema.safeParse({ files: [file('png')] }).success, true);
+  const file = (ext, id) => ({ path: `${uid}/incoming/${id}.${ext}`, name: 'shot.png' });
+  const a = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+  const b = 'aaaaaaaa-bbbb-4ccc-8ddd-ffffffffffff';
+  assert.equal(proofFinishSchema.safeParse({ files: [file('png', a)] }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ files: [file('png', a), file('jpg', b)] }).success, true);
   assert.equal(proofFinishSchema.safeParse({ resend: true }).success, true);
   assert.equal(proofFinishSchema.safeParse({ resend: false }).success, false);
   assert.equal(proofFinishSchema.safeParse({ files: [] }).success, false);
-  assert.equal(proofFinishSchema.safeParse({ files: Array(PROOF_MAX_FILES + 1).fill(file('jpg')) }).success, false);
-  assert.equal(proofFinishSchema.safeParse({ files: [file('gif')] }).success, false);
-  assert.equal(proofFinishSchema.safeParse({ files: [{ path: `${uid}/final/x.png`, name: 'x' }] }).success, false);
-  assert.equal(proofFinishSchema.safeParse({ files: [{ path: '../etc/passwd', name: 'x' }] }).success, false);
-  assert.equal(proofFinishSchema.safeParse({ note: 'x'.repeat(1001), files: [file('webp')] }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ files: Array(PROOF_MAX_FILES + 1).fill(file('jpg', a)) }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ files: [file('gif', a), file('png', b)] }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ files: [{ path: `${uid}/final/x.png`, name: 'x' }, file('png', b)] }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ files: [{ path: '../etc/passwd', name: 'x' }, file('png', b)] }).success, false);
+  assert.equal(proofFinishSchema.safeParse({ note: 'x'.repeat(1001), files: [file('webp', a), file('png', b)] }).success, false);
 });
 
 test('sniffImage: magic bytes decide, not the extension', () => {
