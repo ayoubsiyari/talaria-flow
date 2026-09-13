@@ -724,13 +724,32 @@
       var titleId = 'tf-dlg-title-' + (++dlgSeq);
       var wrap = document.createElement('div');
       wrap.setAttribute('data-admin-dialog', '');
+      wrap.setAttribute('data-email-lang', opts.lang === 'ar' ? 'ar' : 'en');
       var single = opts.ok === 'Close';
       wrap.innerHTML = '<div data-admin-dialog-panel role="dialog" aria-modal="true" aria-labelledby="' + titleId + '"><h3 id="' + titleId + '">' + esc(opts.title) + '</h3>' +
         (opts.body ? '<p>' + opts.body + '</p>' : '') +
         (opts.textarea ? '<textarea data-dlg-text aria-label="' + esc(opts.textareaLabel || 'Reason') + '" placeholder="' + esc(opts.placeholder || '') + '">' + esc(opts.value || '') + '</textarea>' : '') +
+        (opts.langPick
+          ? '<div data-dlg-lang><span>Email language</span><div role="group" aria-label="Email language">' +
+            '<button type="button" data-dlg-lang-btn="en">EN</button>' +
+            '<button type="button" data-dlg-lang-btn="ar">AR</button></div></div>'
+          : '') +
         '<div class="dlg-actions"><button type="button" data-dlg-ok class="' + (single ? 'scp5' : 'btn-primary scp4') + '">' + esc(opts.ok || 'Confirm') + '</button>' + (single ? '' : '<button type="button" data-dlg-cancel class="scp5">Cancel</button>') + '</div></div>';
       document.body.appendChild(wrap);
       var panel = wrap.querySelector('[data-admin-dialog-panel]');
+      function paintLang() {
+        var cur = wrap.getAttribute('data-email-lang') || 'en';
+        wrap.querySelectorAll('[data-dlg-lang-btn]').forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-dlg-lang-btn') === cur ? 'true' : 'false');
+        });
+      }
+      paintLang();
+      wrap.querySelectorAll('[data-dlg-lang-btn]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          wrap.setAttribute('data-email-lang', btn.getAttribute('data-dlg-lang-btn') === 'ar' ? 'ar' : 'en');
+          paintLang();
+        });
+      });
       var untrap = trapFocus(wrap);
       function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); close(false); } }
       document.addEventListener('keydown', onKey, true);
@@ -743,7 +762,8 @@
       }
       wrap.querySelector('[data-dlg-ok]').addEventListener('click', function () {
         var ta = wrap.querySelector('[data-dlg-text]');
-        close(opts.textarea ? { ok: true, text: ta ? ta.value : '' } : true);
+        var lang = wrap.getAttribute('data-email-lang') === 'ar' ? 'ar' : 'en';
+        close(opts.textarea ? { ok: true, text: ta ? ta.value : '', lang: lang } : true);
       });
       var cancel = wrap.querySelector('[data-dlg-cancel]');
       if (cancel) cancel.addEventListener('click', function () { close(false); });
@@ -802,7 +822,7 @@
    * row, sends template 04/05 and writes activity_log. Local rows are only touched on a 200.
    * Resolves { done, failed, emailSent, emailSkipped, noProof, errors[] }.
    */
-  async function setMemberStatus(ids, status, reason) {
+  async function setMemberStatus(ids, status, reason, lang) {
     var out = { done: 0, failed: 0, emailSent: 0, emailSkipped: 0, noProof: 0, errors: [] };
     for (var i = 0; i < ids.length; i++) {
       var m = members.filter(function (x) { return String(x.id) === String(ids[i]); })[0];
@@ -813,7 +833,10 @@
       if (action === 'approve' && (!m || !m.submissionId)) { out.noProof += 1; continue; }
       if (action === 'resubmit' && m && !m.submissionId && m.status !== 'rejected') { out.noProof += 1; continue; }
       var body = { action: action, id: action === 'restore' ? memberId : ((m && m.submissionId) || memberId) };
-      if (action === 'resubmit' || action === 'reject') body.reason = String(reason || '').trim().slice(0, 600);
+      if (action === 'resubmit' || action === 'reject') {
+        body.reason = String(reason || '').trim().slice(0, 600);
+        if (lang === 'ar' || lang === 'en') body.lang = lang;
+      }
       var res;
       try { res = await window.TF.api('/api/admin/submission', { body: body }); }
       catch (e) { res = { ok: false, body: { message: (e && e.message) || 'Network error' } }; }
@@ -871,13 +894,13 @@
     if (!parts.length) toast(res.failed ? (res.errors[0] || 'Request failed.') : 'Nothing changed.', res.failed ? 'error' : 'ok');
     else toast(parts.join(' — '), res.failed ? 'error' : 'ok');
   }
-  async function decide(ids, status, reason) {
+  async function decide(ids, status, reason, lang) {
     closeRowMenu();
     if (S.busy) { toast('Please wait…', 'wait'); return; }
     S.busy = true;
     toast('Working…', 'wait');
     var res;
-    try { res = await setMemberStatus(ids, status, reason); }
+    try { res = await setMemberStatus(ids, status, reason, lang); }
     finally { S.busy = false; }
     decisionToast(res, status);
     if (res.done) {
@@ -1569,10 +1592,10 @@
       return;
     }
     if (act === 'bulk-reject') {
-      var res = await dialog({ title: 'Request resubmission', body: 'This reason is sent to every selected member with a submission.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission' });
+      var res = await dialog({ title: 'Request resubmission', body: 'This reason is sent to every selected member with a submission.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission', langPick: true, lang: 'en' });
       if (!res || !res.ok) return;
       if (!String(res.text || '').trim()) { toast('Add a reason before requesting resubmission.'); return; }
-      await decide(Array.from(S.selected), 'rejected', res.text.trim());
+      await decide(Array.from(S.selected), 'rejected', res.text.trim(), res.lang);
       return;
     }
     if (act === 'bulk-email' || act === 'email-one' || act === 'row-email') {
@@ -1592,18 +1615,20 @@
     }
     if (act === 'row-reject' || act === 'resubmit' || act === 'reject') {
       S.focus = el.getAttribute('data-id') || S.focus;
-      var rowRes = await dialog({ title: 'Request resubmission', body: 'This reason is sent with the resubmission email. The member can upload again.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission' });
+      var rowMem = members.filter(function (x) { return String(x.id) === String(S.focus); })[0];
+      var rowRes = await dialog({ title: 'Request resubmission', body: 'This reason is sent with the resubmission email. The member can upload again.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission', langPick: true, lang: rowMem && rowMem.lang === 'ar' ? 'ar' : 'en' });
       if (!rowRes || !rowRes.ok) return;
       if (!String(rowRes.text || '').trim()) { toast('Add a reason before requesting resubmission.', 'error'); return; }
-      await decide([S.focus], 'rejected', rowRes.text.trim());
+      await decide([S.focus], 'rejected', rowRes.text.trim(), rowRes.lang);
       return;
     }
     if (act === 'row-block' || act === 'block') {
       S.focus = el.getAttribute('data-id') || S.focus;
-      var blockRes = await dialog({ title: 'Reject this application?', body: 'Sends a rejection email. The member cannot upload again until you restore access.', textarea: true, placeholder: 'e.g. We cannot accept this application.', ok: 'Reject' });
+      var blockMem = members.filter(function (x) { return String(x.id) === String(S.focus); })[0];
+      var blockRes = await dialog({ title: 'Reject this application?', body: 'Sends a rejection email. The member cannot upload again until you restore access.', textarea: true, placeholder: 'e.g. We cannot accept this application.', ok: 'Reject', langPick: true, lang: blockMem && blockMem.lang === 'ar' ? 'ar' : 'en' });
       if (!blockRes || !blockRes.ok) return;
       if (!String(blockRes.text || '').trim()) { toast('Add a reason before rejecting.', 'error'); return; }
-      await decide([S.focus], 'blocked', blockRes.text.trim());
+      await decide([S.focus], 'blocked', blockRes.text.trim(), blockRes.lang);
       return;
     }
     if (act === 'row-restore' || act === 'restore') {

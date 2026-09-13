@@ -116,6 +116,7 @@ export const adminDecisionSchema = z
     action: z.enum(['approve', 'resubmit', 'reject', 'restore']),
     id: z.string().trim().min(1).max(80),
     reason: z.string().trim().max(600).optional(),
+    lang: z.enum(['en', 'ar']).optional(),
   })
   .refine((v) => (v.action !== 'resubmit' && v.action !== 'reject') || (v.reason && v.reason.length >= 1), {
     message: 'reason is required',

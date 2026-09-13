@@ -80,7 +80,7 @@ export default handle(async (req: Request) => {
     filter: 'review',
   });
 
-  const lang = member.lang === 'ar' ? 'ar' : 'en';
+  const lang = input.lang === 'ar' || input.lang === 'en' ? input.lang : member.lang === 'ar' ? 'ar' : 'en';
   const email = await sendTemplate({
     templateId,
     to: member.email,
