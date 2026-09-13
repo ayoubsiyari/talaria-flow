@@ -66,8 +66,64 @@
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   }
-  function toast(msg) {
-    if (window.tfToast) window.tfToast(msg);
+  function toast(msg, kind) {
+    msg = String(msg || '').trim();
+    if (!msg) return;
+    kind = kind === 'error' || kind === 'wait' ? kind : 'ok';
+    var el = document.querySelector('[data-admin-toast]');
+    if (!el) {
+      el = document.createElement('div');
+      el.setAttribute('data-admin-toast', '');
+      el.setAttribute('role', 'status');
+      document.body.appendChild(el);
+    }
+    el.setAttribute('data-kind', kind);
+    el.textContent = msg;
+    el.classList.add('is-on');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.classList.remove('is-on'); }, kind === 'wait' ? 8000 : 4200);
+  }
+  window.tfToast = toast;
+  var rowMenuEl = null;
+  function closeRowMenu() {
+    if (rowMenuEl) { rowMenuEl.remove(); rowMenuEl = null; }
+  }
+  function menuItem(act, id, label, color) {
+    return '<button type="button" role="menuitem" data-act="' + act + '" data-id="' + esc(id) + '" style="display:block;width:100%;height:36px;padding:0 12px;border:0;background:transparent;color:' + (color || '#F2F4F8') + ';font:500 13.5px Archivo,sans-serif;text-align:left;cursor:pointer">' + esc(label) + '</button>';
+  }
+  function openRowMenu(btn) {
+    var id = elId(btn);
+    var m = members.filter(function (x) { return String(x.id) === String(id); })[0];
+    if (!m) return;
+    closeRowMenu();
+    var menu = document.createElement('div');
+    menu.setAttribute('data-admin-row-menu', '');
+    menu.setAttribute('role', 'menu');
+    var html = '';
+    html += menuItem('open', m.id, 'View details');
+    if (m.submissionId && m.status === 'submitted') html += menuItem('row-approve', m.id, 'Approve', '#2EE8FF');
+    if (m.status === 'submitted' || m.status === 'rejected') {
+      html += menuItem('row-reject', m.id, 'Request resubmission', '#FF8AD0');
+      html += menuItem('row-block', m.id, 'Reject', '#FF37B0');
+    }
+    if (m.status === 'blocked') html += menuItem('row-restore', m.id, 'Restore access', '#2EE8FF');
+    html += menuItem('row-email', m.id, 'Send email');
+    menu.innerHTML = html;
+    document.body.appendChild(menu);
+    var r = btn.getBoundingClientRect();
+    var mw = 220;
+    var left = Math.min(Math.max(8, r.right - mw), window.innerWidth - mw - 8);
+    var top = r.bottom + 6;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    var box = menu.getBoundingClientRect();
+    if (box.bottom > window.innerHeight - 8) {
+      menu.style.top = Math.max(8, r.top - box.height - 6) + 'px';
+    }
+    rowMenuEl = menu;
+  }
+  function elId(el) {
+    return el && el.getAttribute ? (el.getAttribute('data-id') || '') : '';
   }
   function fmtDate(iso) {
     if (!iso) return '—';
@@ -788,7 +844,7 @@
   }
   function decisionToast(res, status) {
     var verb = status === 'approved' ? 'Approved' : status === 'blocked' ? 'Rejected' : status === 'restore' ? 'Access restored' : 'Resubmission requested';
-    if (res.failed && !res.done) { toast(res.errors[0] || 'Request failed.'); return; }
+    if (res.failed && !res.done) { toast(res.errors[0] || 'Request failed.', 'error'); return; }
     var parts = [];
     if (res.done > 1) parts.push(verb + ' ' + res.done + ' members');
     else if (res.done === 1) parts.push(verb);
@@ -799,12 +855,14 @@
     }
     if (res.noProof) parts.push(res.noProof + ' skipped: no proof uploaded yet.');
     if (res.failed) parts.push(res.failed + ' failed: ' + res.errors[0]);
-    if (!parts.length) toast(res.failed ? (res.errors[0] || 'Request failed.') : 'Nothing changed.');
-    else toast(parts.join(' — '));
+    if (!parts.length) toast(res.failed ? (res.errors[0] || 'Request failed.') : 'Nothing changed.', res.failed ? 'error' : 'ok');
+    else toast(parts.join(' — '), res.failed ? 'error' : 'ok');
   }
   async function decide(ids, status, reason) {
-    if (S.busy) { toast('Please wait…'); return; }
+    closeRowMenu();
+    if (S.busy) { toast('Please wait…', 'wait'); return; }
     S.busy = true;
+    toast('Working…', 'wait');
     var res;
     try { res = await setMemberStatus(ids, status, reason); }
     finally { S.busy = false; }
@@ -1067,19 +1125,9 @@
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.lang) + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.country || '—') + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap;cursor:pointer">' + esc(m.lastEmail) + '</td>' +
-          '<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right;position:sticky;right:0;background:' + (on ? '#0C1216' : '#0E1017') + ';z-index:1"><span style="display:inline-flex;gap:4px">' +
-          (m.status === 'submitted' || m.status === 'rejected'
-            ? (m.submissionId
-              ? '<button type="button" data-act="row-approve" data-id="' + esc(m.id) + '" aria-label="Approve ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(46,232,255,0.5);border-radius:8px;background:transparent;color:#2EE8FF;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></button>'
-              : '') +
-              '<button type="button" data-act="row-reject" data-id="' + esc(m.id) + '" aria-label="Request resubmission from ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,138,208,0.5);border-radius:8px;background:transparent;color:#FF8AD0;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"></path></svg></button>' +
-              '<button type="button" data-act="row-block" data-id="' + esc(m.id) + '" aria-label="Reject ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,55,176,0.6);border-radius:8px;background:transparent;color:#FF37B0;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>'
-            : m.status === 'blocked'
-            ? '<button type="button" data-act="row-restore" data-id="' + esc(m.id) + '" aria-label="Restore access for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(46,232,255,0.5);border-radius:8px;background:transparent;color:#2EE8FF;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0"></path></svg></button>'
-            : '') +
-          '<button type="button" data-act="row-email" data-id="' + esc(m.id) + '" aria-label="Send email to ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#F2F4F8;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></button>' +
-          '<button type="button" data-act="open" data-id="' + esc(m.id) + '" aria-label="Details for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
-          '</span></td></tr>';
+          '<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right;position:sticky;right:0;background:' + (on ? '#0C1216' : '#0E1017') + ';z-index:1">' +
+          '<button type="button" data-act="row-menu" data-id="' + esc(m.id) + '" aria-haspopup="menu" aria-label="Actions for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
+          '</td></tr>';
       }).join('') : emptyRow(members.length ? (S.q ? 'No members match this search.' : 'No members in this list.') : 'No members yet.', cols.length + 2)) +
       '</tbody></table><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;font-family:\'Geist Mono\',monospace;font-size:11px;color:#8B90A3"><span>' + list.length + ' of ' + c.total + ' members</span><span>Sorted by ' + (cols.filter(function (x) { return x[0] === S.sort; })[0] || cols[2])[1].toLowerCase() + (S.dir > 0 ? ' ascending' : ' descending') + '</span></div></div></section>';
     if (focus) {
@@ -1531,6 +1579,11 @@
       openDlg(ids, el);
       return;
     }
+    if (act === 'row-menu') {
+      if (rowMenuEl && rowMenuEl.querySelector('[data-id="' + el.getAttribute('data-id') + '"]')) { closeRowMenu(); return; }
+      openRowMenu(el);
+      return;
+    }
     if (act === 'row-approve') {
       S.focus = el.getAttribute('data-id');
       await decide([S.focus], 'approved');
@@ -1540,7 +1593,7 @@
       S.focus = el.getAttribute('data-id') || S.focus;
       var rowRes = await dialog({ title: 'Request resubmission', body: 'This reason is sent with the resubmission email. The member can upload again.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission' });
       if (!rowRes || !rowRes.ok) return;
-      if (!String(rowRes.text || '').trim()) { toast('Add a reason before requesting resubmission.'); return; }
+      if (!String(rowRes.text || '').trim()) { toast('Add a reason before requesting resubmission.', 'error'); return; }
       await decide([S.focus], 'rejected', rowRes.text.trim());
       return;
     }
@@ -1548,7 +1601,7 @@
       S.focus = el.getAttribute('data-id') || S.focus;
       var blockRes = await dialog({ title: 'Reject this application?', body: 'Sends a rejection email. The member cannot upload again until you restore access.', textarea: true, placeholder: 'e.g. We cannot accept this application.', ok: 'Reject' });
       if (!blockRes || !blockRes.ok) return;
-      if (!String(blockRes.text || '').trim()) { toast('Add a reason before rejecting.'); return; }
+      if (!String(blockRes.text || '').trim()) { toast('Add a reason before rejecting.', 'error'); return; }
       await decide([S.focus], 'blocked', blockRes.text.trim());
       return;
     }
@@ -1626,7 +1679,7 @@
       var rm = members.filter(function (x) { return String(x.id) === String(S.focus); })[0];
       if (!rm) return;
       var rr = await window.TF.api('/api/admin/member', { body: { action: 'reset-password', id: rm.id } });
-      toast(rr.ok ? 'Password reset sent to ' + rm.email + '.' : apiMessage(rr, 'Could not send the reset email.'));
+      toast(rr.ok ? 'Password reset sent to ' + rm.email + '.' : apiMessage(rr, 'Could not send the reset email.'), rr.ok ? 'ok' : 'error');
       return;
     }
     if (act === 'delete') {
@@ -1635,12 +1688,12 @@
       var sure = await dialog({ title: 'Delete ' + m.email + '?', body: 'This removes the member, their submissions and proof files. It cannot be undone.', ok: 'Delete member' });
       if (!sure) return;
       var dr = await window.TF.api('/api/admin/member', { body: { action: 'delete', id: m.id } });
-      if (!dr.ok) { toast(apiMessage(dr, 'Could not delete this member.')); return; }
+      if (!dr.ok) { toast(apiMessage(dr, 'Could not delete this member.'), 'error'); return; }
       members = members.filter(function (x) { return String(x.id) !== String(m.id); });
       S.selected.delete(String(m.id));
       writeSelected(S.selected);
       S.focus = members[0] ? members[0].id : '';
-      toast('Member deleted.');
+      toast('Member deleted.', 'ok');
       await loadLive();
       paint();
       return;
@@ -1851,11 +1904,22 @@
       window.__tfDlgEsc = true;
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
+          if (rowMenuEl) { closeRowMenu(); return; }
           if (S.calOpen || S.clkOpen) { closePickers(); paint(); return; }
           if (S.dlg) { S.dlg = null; paint(); }
         }
       });
       document.addEventListener('click', function (e) {
+        var item = e.target.closest && e.target.closest('[data-admin-row-menu] [data-act]');
+        if (item) {
+          e.preventDefault();
+          e.stopPropagation();
+          var act = item.getAttribute('data-act');
+          closeRowMenu();
+          onAction(act, item);
+          return;
+        }
+        if (rowMenuEl && !e.target.closest('[data-act="row-menu"]') && !e.target.closest('[data-admin-row-menu]')) closeRowMenu();
         if (!S.calOpen && !S.clkOpen) return;
         if (e.target.closest('[data-pop]')) return;
         closePickers();
