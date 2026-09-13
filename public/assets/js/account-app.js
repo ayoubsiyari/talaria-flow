@@ -388,7 +388,16 @@
     if (!S.files.length) return '<p style="font-size:13px;color:#8B90A3">' + dirSpan(copy.noFiles) + '</p>';
     return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">' +
       S.files.map(function (f) {
-        return '<div style="aspect-ratio:4/3;border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:#0E1017;display:grid;place-items:center;padding:8px;color:#7C8296;font-family:\'Geist Mono\',monospace;font-size:var(--fs-mono);text-align:center;overflow-wrap:anywhere">' + esc(f.file_name || f.name || 'screenshot') + '</div>';
+        var src = f.preview || '';
+        var name = esc(f.file_name || f.name || 'screenshot');
+        if (!src) {
+          return '<div style="display:block;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C">' +
+            '<div style="display:grid;place-items:center;width:100%;aspect-ratio:4/3;color:#8B90A3;font:400 11px \'Geist Mono\',monospace">Unavailable</div>' +
+            '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</span></div>';
+        }
+        return '<a href="' + esc(src) + '" target="_blank" rel="noopener" style="display:block;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C">' +
+          '<img src="' + esc(src) + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover">' +
+          '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</span></a>';
       }).join('') + '</div>';
   }
 
@@ -706,8 +715,17 @@
       S.reason = (sub && sub.reviewer_note) || '';
       S.files = [];
       if (sub && sub.id) {
-        var files = await sb.from('submission_files').select('file_name, created_at').eq('submission_id', sub.id).order('created_at', { ascending: true });
+        var files = await sb.from('submission_files').select('file_name, file_path, created_at').eq('submission_id', sub.id).order('created_at', { ascending: true });
         S.files = files.data || [];
+        var paths = S.files.map(function (f) { return f.file_path; }).filter(Boolean);
+        if (paths.length) {
+          var signed = await sb.storage.from('proofs').createSignedUrls(paths, 600);
+          var rows = (signed && signed.data) || [];
+          S.files = S.files.map(function (f, i) {
+            f.preview = (rows[i] && rows[i].signedUrl) || '';
+            return f;
+          });
+        }
       }
     } catch (err) {}
     try {

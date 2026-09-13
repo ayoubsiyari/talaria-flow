@@ -692,7 +692,8 @@
     var submit = document.getElementById('submit-proof');
     if (drop && drop.getAttribute('data-bound')) return;
     if (drop) drop.setAttribute('data-bound', '1');
-    var files = [];
+    if (!window.TF._proofUploads) window.TF._proofUploads = [];
+    var files = window.TF._proofUploads;
     function showReview() {
       if (window.TF.refreshAccount) window.TF.refreshAccount();
       else showDashState('review');
@@ -701,6 +702,7 @@
       if (f && f.preview) { try { URL.revokeObjectURL(f.preview); } catch (e) {} }
     }
     function syncSend() {
+      window.TF._proofUploads = files;
       var on = files.length >= 2;
       var empty = drop && drop.querySelector('[data-upload-empty]');
       var grid = drop && drop.querySelector('[data-upload-grid]');
@@ -763,7 +765,6 @@
       drop.appendChild(input);
       drop.addEventListener('click', function (e) {
         if (e.target.closest('[data-upload-remove]')) return;
-        if (files.length && !e.target.closest('[data-upload-add]')) return;
         if (files.length >= 4) return;
         input.click();
       });
@@ -820,6 +821,7 @@
         }
         files.forEach(revokeFile);
         files = [];
+        window.TF._proofUploads = files;
         syncSend();
         await showSentDialog(auth.user.email || '');
         showReview();
