@@ -545,7 +545,31 @@
     });
   }
 
-  var loading = null;
+  function shortProofName(path) {
+    var base = String(path || '').split('/').pop() || 'file';
+    var i = base.lastIndexOf('.');
+    var ext = i >= 0 ? base.slice(i) : '';
+    var stem = i >= 0 ? base.slice(0, i) : base;
+    return stem.slice(0, 8) + '…' + ext;
+  }
+  async function signMemberProofs(m) {
+    if (!m || m.proofTiles) return;
+    var paths = m.thumbs || [];
+    if (!paths.length) { m.proofTiles = []; return; }
+    try {
+      var sb = window.TF.getClient();
+      var res = await sb.storage.from('proofs').createSignedUrls(paths, 600);
+      var rows = (res && res.data) || [];
+      m.proofTiles = paths.map(function (path, i) {
+        var row = rows[i] || {};
+        return { path: path, url: row.signedUrl || '', shortName: shortProofName(path) };
+      });
+    } catch (e) {
+      m.proofTiles = paths.map(function (path) {
+        return { path: path, url: '', shortName: shortProofName(path) };
+      });
+    }
+  }
   // One round-trip set per page load; failures are recorded per panel (loadErrors) and toasted.
   function loadLive() {
     if (loading) return loading;
@@ -998,7 +1022,9 @@
       }).join('') : emptyRow(members.length ? (S.q ? 'No members match this search.' : 'No members in this list.') : 'No members yet.', cols.length + 2)) +
       '</tbody></table><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;font-family:\'Geist Mono\',monospace;font-size:11px;color:#8B90A3"><span>' + list.length + ' of ' + c.total + ' members</span><span>Sorted by ' + (cols.filter(function (x) { return x[0] === S.sort; })[0] || cols[2])[1].toLowerCase() + (S.dir > 0 ? ' ascending' : ' descending') + '</span></div></div></section>';
     if (focus) {
-      var thumbs = focus.thumbs || [];
+      var thumbs = (focus.proofTiles && focus.proofTiles.length) ? focus.proofTiles : (focus.thumbs || []).map(function (t) {
+        return { path: t, url: '', shortName: shortProofName(t) };
+      });
       html += '<section class="tf-card" style="min-width:0;border-top:2px solid ' + COLORS[focus.status] + ';position:sticky;top:20px">' +
         '<header class="tf-card-h">' +
         '<h3 style="font-size:15px;font-weight:600;word-break:break-all">' + esc(focus.email) + '</h3>' +
@@ -1011,9 +1037,19 @@
       if (focus.submissionId) {
         html += '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Proof · ' + focus.files + ' file' + (focus.files === 1 ? '' : 's') + '</div>' +
           (thumbs.length
-            ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:8px">' +
+            ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:8px">' +
               thumbs.map(function (t) {
-                return '<button type="button" data-act="lightbox" data-src="' + esc(t) + '" aria-label="Open proof ' + esc(String(t).split('/').pop()) + '" style="aspect-ratio:4/3;border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:#07080C;color:#7C8296;font-family:\'Geist Mono\',monospace;font-size:10.5px;cursor:zoom-in">' + esc(String(t).split('/').pop()) + '</button>';
+                var src = t.url || '';
+                var name = t.shortName || shortProofName(t.path);
+                if (!src) {
+                  return '<div style="display:block;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C">' +
+                    '<div style="display:grid;place-items:center;width:100%;aspect-ratio:4/3;color:#8B90A3;font:400 11px \'Geist Mono\',monospace">' +
+                    '<span style="display:flex;flex-direction:column;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 19 6-6 3 3 4-4 5 5"/><circle cx="8.5" cy="9.5" r="1.2"/></svg>Unavailable</span></div>' +
+                    '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span></div>';
+                }
+                return '<a href="' + esc(src) + '" target="_blank" rel="noopener" data-act="lightbox" data-src="' + esc(t.path) + '" aria-label="Open proof ' + esc(name) + '" style="display:block;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:#07080C">' +
+                  '<img src="' + esc(src) + '" alt="" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover">' +
+                  '<span style="display:block;padding:6px 8px;font:400 10.5px \'Geist Mono\',monospace;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span></a>';
               }).join('') + '</div>'
             : '<p style="margin-top:8px;font-size:13px;color:#8B90A3">Files are not available for preview.</p>') +
           '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Member note</div>' +
@@ -1214,6 +1250,10 @@
     if (!main || main.hasAttribute('data-email-editor')) return;
     var route = parseRoute();
     applyRoute();
+    if (route.view === 'members') {
+      var focusM = members.filter(function (m) { return String(m.id) === String(S.focus); })[0];
+      await signMemberProofs(focusM);
+    }
     var c = countsOf();
     // innerHTML replaces every node, so remember where focus was and put it back on the matching control.
     var active = document.activeElement;
