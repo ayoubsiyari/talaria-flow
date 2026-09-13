@@ -260,13 +260,15 @@ a[class*="btn"] span,
 }
 button[role="switch"] { gap: 0; }
 [data-upload-add]{
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:stretch!important;
-  gap:0!important;
-  width:100%;
-  height:auto!important;
+  display:grid!important;
+  place-items:center!important;
+  width:26px!important;
+  height:26px!important;
   padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  flex:none!important;
+  cursor:pointer;
 }
 /* 390px: link-buttons keep one line but shrink so the longest label still fits the 358px column. */
 @media (max-width: 480px) {
