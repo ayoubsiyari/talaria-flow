@@ -738,8 +738,9 @@
     "title": "Page not found · Talaria Flow"
   },
   "cookies": {
-    "body": "We only use cookies needed to run the site and remember your language. There is no advertising or tracking. OK dismisses this notice.",
-    "ok": "OK",
+    "body": "We use cookies that are needed to run the site and remember your language. No advertising, no tracking.",
+    "ok": "Accept",
+    "reject": "Essential only",
     "more": "Learn more",
     "label": "Cookie notice"
   }

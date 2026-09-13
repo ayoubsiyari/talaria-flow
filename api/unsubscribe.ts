@@ -1,6 +1,5 @@
 /**
- * GET  /api/unsubscribe?...  -> confirmation page (prefetch-safe, does not mutate)
- * POST /api/unsubscribe?...  -> apply unsubscribe (mail-client one-click or the confirm form)
+ * GET or POST /api/unsubscribe?...  apply a signed unsubscribe (email footer + List-Unsubscribe)
  */
 import { handle, clientIp, HttpError } from '../src/lib/server/http.ts';
 import { rateLimit } from '../src/lib/server/ratelimit.ts';
@@ -24,13 +23,10 @@ function hmacKeys(): string[] {
   return [...new Set(keys)];
 }
 
-export function page(opts: { title: string; line: string; status?: number; siteUrl: string; confirmHref?: string }): Response {
-  const confirm = opts.confirmHref
-    ? `<form method="post" action="${esc(opts.confirmHref)}"><button type="submit" style="height:40px;padding:0 16px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;font:600 14px Archivo,sans-serif;cursor:pointer">Unsubscribe</button></form>`
-    : `<p><a href="${esc(opts.siteUrl)}/">Back to talaria-flow.com</a></p>`;
+export function page(opts: { title: string; line: string; status?: number; siteUrl: string }): Response {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="color-scheme" content="dark"><title>${esc(opts.title)} · Talaria Flow</title>
 <style>html,body{margin:0;min-height:100%;background:#07080C;color:#F2F4F8;font-family:Archivo,"Helvetica Neue",Arial,system-ui,sans-serif}body{display:grid;place-items:center;padding:32px 20px;box-sizing:border-box;min-height:100vh}main{max-width:520px;width:100%;background:#0E1017;border:1px solid rgba(255,255,255,.08);border-top:3px solid #2EE8FF;border-radius:14px;padding:32px 28px}h1{margin:0 0 12px;font-size:24px;line-height:1.2;letter-spacing:-.02em}p{margin:0 0 20px;font-size:16px;line-height:1.6;color:#B7BCCB}a{color:#2EE8FF}small{display:block;font-family:"Geist Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3;margin-bottom:14px}</style></head>
-<body><main><small>Talaria Flow</small><h1>${esc(opts.title)}</h1><p>${esc(opts.line)}</p>${confirm}</main></body></html>`;
+<body><main><small>Talaria Flow</small><h1>${esc(opts.title)}</h1><p>${esc(opts.line)}</p><p><a href="${esc(opts.siteUrl)}/">Back to talaria-flow.com</a></p></main></body></html>`;
   return new Response(html, {
     status: opts.status || 200,
     headers: {
@@ -52,15 +48,6 @@ export default handle(async (req: Request) => {
   const target = parseUnsubscribe(url.searchParams, hmacKeys());
   if (!target) {
     return page({ status: 400, siteUrl, title: 'This link is not valid', line: 'The unsubscribe link is incomplete or has been altered. Open the latest email from us and use the link in its footer, or manage your preferences from your account.' });
-  }
-
-  if (req.method === 'GET') {
-    return page({
-      siteUrl,
-      title: 'Unsubscribe?',
-      line: `Confirm to stop ${LABEL[target.kind]}. Review emails about your own submissions are not affected.`,
-      confirmHref: url.pathname + url.search,
-    });
   }
 
   const sb = adminClient();

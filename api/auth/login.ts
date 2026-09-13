@@ -37,6 +37,7 @@ export default handle(async (req: Request) => {
 
   if (status !== 200 || !data.access_token || !data.refresh_token || !data.user) {
     const code = data.error_code || data.error || '';
+    if (code === 'email_not_confirmed') return error(403, 'email_not_confirmed', 'Confirm your email first.');
     if (/over_request_rate_limit|too_many/.test(code)) return error(429, 'rate_limited', 'Too many attempts.');
     return error(401, 'invalid_credentials', 'Wrong email or password.');
   }

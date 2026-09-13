@@ -33,7 +33,7 @@
           autoRefreshToken: true,
           detectSessionInUrl: true,
           flowType: 'pkce',
-          storage: window.sessionStorage,
+          storage: window.localStorage,
         },
       });
     } catch (e) {

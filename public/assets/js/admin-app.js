@@ -1289,7 +1289,7 @@
         '<button type="button" data-act="pv" data-pv="ar" style="height:28px;padding:0 10px;border:0;border-left:1px solid rgba(255,255,255,0.08);' + pill(S.pv === 'ar') + ';font-size:12px;font-weight:600;cursor:pointer">AR</button></div></div>' +
         '<div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;background:#0E1017">' +
         '<div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:11.5px;color:#8B90A3">From <b style="color:#B7BCCB;font-weight:500">Talaria Flow &lt;support@talaria-flow.com&gt;</b> · Subject <b data-preview-subject style="color:#F2F4F8;font-weight:500">' + esc(S.previewSubject || subject) + '</b></div>' +
-        '<iframe title="Email preview" sandbox="" data-preview-frame style="width:100%;height:560px;border:0;background:#fff;display:block"></iframe></div></div></div>';
+        '<iframe title="Email preview" data-preview-frame style="width:100%;height:560px;border:0;background:#fff;display:block"></iframe></div></div></div>';
     }
 
     if (tab === 'history') {
@@ -1379,7 +1379,7 @@
       '<div style="display:inline-flex;border:1px solid rgba(255,255,255,0.16);border-radius:8px;overflow:hidden">' +
       '<button type="button" data-act="pv" data-pv="en" style="height:28px;padding:0 10px;border:0;' + pill(S.pv === 'en') + ';font-size:12px;font-weight:600;cursor:pointer">EN</button>' +
       '<button type="button" data-act="pv" data-pv="ar" style="height:28px;padding:0 10px;border:0;border-left:1px solid rgba(255,255,255,0.08);' + pill(S.pv === 'ar') + ';font-size:12px;font-weight:600;cursor:pointer">AR</button></div></div>' +
-      '<iframe title="Email preview" sandbox="" data-preview-frame style="width:100%;height:520px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:#fff;display:block"></iframe></div></div></div>';
+      '<iframe title="Email preview" data-preview-frame style="width:100%;height:520px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:#fff;display:block"></iframe></div></div></div>';
   }
 
   function renderWaitlist() {
