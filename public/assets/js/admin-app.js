@@ -96,6 +96,7 @@
       reject: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>',
       restore: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0"></path></svg>',
       email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>',
+      history: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>',
     };
     return icons[kind] || '';
   }
@@ -119,6 +120,7 @@
     }
     if (m.status === 'blocked') html += menuItem('row-restore', m.id, 'Restore access', 'restore', '#2EE8FF');
     html += menuItem('row-email', m.id, 'Send email', 'email');
+    html += menuItem('email-hist', m.id, 'Email history', 'history');
     menu.innerHTML = html;
     document.body.appendChild(menu);
     var r = btn.getBoundingClientRect();
@@ -1199,8 +1201,6 @@
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">No proof uploaded yet.</p>';
       }
       html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-wrap:wrap;gap:14px;font-size:13px">' +
-        '<button type="button" data-act="email-one" style="border:0;background:none;padding:0;color:#2EE8FF;font-weight:600;cursor:pointer">Send email</button>' +
-        '<button type="button" data-act="email-hist" style="border:0;background:none;padding:0;color:#B7BCCB;font-weight:500;cursor:pointer">Email history</button>' +
         '<button type="button" data-act="reset-pw" style="border:0;background:none;padding:0;color:#B7BCCB;font-weight:500;cursor:pointer">Reset password</button>' +
         '<button type="button" data-act="delete" style="border:0;background:none;padding:0;color:#FF8AD0;font-weight:500;cursor:pointer;margin-left:auto">Delete member</button></div></div></section>';
     }
