@@ -361,7 +361,7 @@
       '<div data-upload-empty>' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 10px;display:block"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg>' +
       '<div dir="ltr" style="font-size:var(--fs-body);text-align:left"><strong style="font-weight:600"><span data-i18n="dashboard.dropStrong">Drop screenshots here</span></strong> <span style="color:#B7BCCB"><span data-i18n="dashboard.dropRest">or click to choose</span></span></div></div>' +
-      '<div data-upload-grid style="display:none;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;width:100%"></div>' +
+      '<div data-upload-grid style="display:none;grid-template-columns:repeat(auto-fill,150px);gap:12px;width:100%;justify-content:start;align-items:start;text-align:left"></div>' +
       '<p style="margin-top:6px;font-family:\'Geist Mono\',monospace;font-size:11.5px;letter-spacing:.04em;color:#8B90A3"><span data-i18n="dashboard.dropMeta">PNG, JPG or WEBP · up to 4 files · 5 MB each</span></p>' +
       '<span data-upload-count style="position:absolute;top:10px;right:12px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3">0 / 4</span></div>' +
       '<label style="display:flex;flex-direction:column;gap:8px;margin-top:24px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3"><span data-i18n="dashboard.noteLabel">Note for the reviewer</span> <span style="color:#7C8296"><span data-i18n="dashboard.optional">(optional)</span></span>' +
