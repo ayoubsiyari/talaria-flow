@@ -1177,26 +1177,16 @@
           '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Member note</div>' +
           '<p style="margin-top:4px;font-size:13.5px;color:#B7BCCB">' + esc(focus.note) + '</p>' +
           (focus.status === 'rejected' && focus.reason ? '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Reason sent</div><p style="margin-top:4px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '');
-        if (focus.status === 'submitted' || focus.status === 'rejected') {
-          html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
-            (focus.submissionId && focus.status === 'submitted' ? '<button type="button" data-act="approve" class="btn-primary scp4" style="height:38px;padding:0 14px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;font-size:13.5px;font-weight:600;cursor:pointer">Approve &amp; send confirmation</button>' : '') +
-            '<button type="button" data-act="resubmit" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font-size:13.5px;font-weight:600;cursor:pointer">Request resubmission</button>' +
-            '<button type="button" data-act="block" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,55,176,0.55);border-radius:10px;background:transparent;color:#FF37B0;font-size:13.5px;font-weight:600;cursor:pointer">Reject</button></div>';
-        } else if (focus.status === 'blocked') {
-          html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
-            '<button type="button" data-act="restore" data-id="' + esc(focus.id) + '" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
-        } else {
-          html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Approved' + (focus.decidedAt ? ' on ' + esc(fmtDay(focus.decidedAt)) : '') + '. Nothing to decide.</p>';
+        if (focus.status === 'blocked') {
+          html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>';
+        } else if (focus.status === 'approved') {
+          html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Approved' + (focus.decidedAt ? ' on ' + esc(fmtDay(focus.decidedAt)) : '') + '.</p>';
         }
       } else if (focus.status === 'blocked') {
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
-          (focus.reason ? '<p style="margin-top:8px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '') +
-          '<button type="button" data-act="restore" data-id="' + esc(focus.id) + '" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
+          (focus.reason ? '<p style="margin-top:8px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '');
       } else if (focus.status === 'rejected') {
-        html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Asked to resubmit' + (focus.reason ? ': ' + esc(focus.reason) : '') + '.</p>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
-          '<button type="button" data-act="resubmit" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font-size:13.5px;font-weight:600;cursor:pointer">Request resubmission</button>' +
-          '<button type="button" data-act="block" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,55,176,0.55);border-radius:10px;background:transparent;color:#FF37B0;font-size:13.5px;font-weight:600;cursor:pointer">Reject</button></div>';
+        html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Asked to resubmit' + (focus.reason ? ': ' + esc(focus.reason) : '') + '.</p>';
       } else {
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">No proof uploaded yet.</p>';
       }
