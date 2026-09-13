@@ -102,6 +102,7 @@ export default handle(async (req: Request) => {
   }
 
   await storage.remove(input.files.map((f) => f.path));
+  await sb.from('profiles').update({ resubmit_note: null }).eq('id', caller.id);
   await sb.from('activity_log').insert({ kind: 'submitted', actor_id: caller.id, submission_id: submissionId, text: `${caller.email} submitted ${encoded.length} screenshot${encoded.length === 1 ? '' : 's'}`, color: '#FBBF24', filter: 'review' });
 
   const email = await sendProofReceived(sb, { caller, submissionId, fileCount: encoded.length });

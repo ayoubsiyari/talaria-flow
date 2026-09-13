@@ -76,6 +76,7 @@ export default handle(async (req: Request) => {
     if (paths.length) await sb.storage.from('proofs').remove(paths);
     const { error: delErr } = await sb.from('submissions').delete().eq('id', submission.id);
     if (delErr) throw new Error(delErr.message);
+    await sb.from('profiles').update({ resubmit_note: reason || 'Please upload new screenshots.' }).eq('id', member.id);
   }
 
   return json({ ok: true, id: submission.id, status: approve ? 'approved' : 'none', email: { ok: email.ok, skipped: Boolean(email.skipped) } });

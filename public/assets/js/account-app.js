@@ -34,6 +34,8 @@
         rejected: 'The reviewer asked for a clearer screenshot. Upload again to continue.',
       },
       accessCta: { none: 'Upload proof', review: 'View submission', approved: 'View details', rejected: 'Upload again' },
+      resubmitNotice: 'Your last submission was not accepted. Upload new screenshots to continue.',
+      resubmitCta: 'Upload again',
       courseBodyLocked: 'Opens once your course access is approved and released.',
       courseBodyOpen: 'Thirty videos with written materials and lesson notes per module.',
       courseCtaLocked: 'See what is inside', courseCtaOpen: 'Continue',
@@ -76,6 +78,7 @@
     activity: [],
     files: [],
     reason: '',
+    resubmitNote: '',
     pwOpen: false,
     pwOk: false,
   };
@@ -149,6 +152,8 @@
         approved: str('accessCta.approved', base.accessCta.approved),
         rejected: str('accessCta.rejected', base.accessCta.rejected),
       },
+      resubmitNotice: str('resubmitNotice', base.resubmitNotice),
+      resubmitCta: str('resubmitCta', base.resubmitCta),
       courseBodyLocked: str('courseBodyLocked', base.courseBodyLocked),
       courseBodyOpen: str('courseBodyOpen', base.courseBodyOpen),
       courseCtaLocked: str('courseCtaLocked', base.courseCtaLocked),
@@ -309,6 +314,18 @@
     }
   }
 
+  function resubmitBanner(withCta) {
+    if (S.state !== 'rejected') return '';
+    var copy = t();
+    var reason = S.reason ? '<p dir="auto" style="margin:8px 0 0;font-size:14px;color:#B7BCCB;line-height:1.5">' + esc(S.reason) + '</p>' : '';
+    var cta = withCta
+      ? '<a href="/account/access/" style="display:inline-flex;align-items:center;margin-top:12px;font-size:13.5px;font-weight:600;color:#FF8AD0">' + dirSpan(copy.resubmitCta) + ' →</a>'
+      : '';
+    return '<div role="status" style="margin-top:20px;padding:16px 18px;border:1px solid rgba(255,138,208,0.45);border-radius:12px;background:rgba(255,55,176,0.08)">' +
+      '<div style="font-weight:600;color:#FF8AD0">' + dirSpan(copy.resubmitNotice) + '</div>' +
+      reason + cta + '</div>';
+  }
+
   function renderOverview() {
     var copy = t();
     var open = courseOpen();
@@ -321,6 +338,7 @@
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px">' +
       '<h1 dir="' + tdir() + '" style="font-size:24px;font-weight:700;letter-spacing:' + lsH() + ';line-height:1.15;text-align:left;flex:0 1 auto;margin:0">' + hello + '</h1>' +
       '<span style="font-family:\'Geist Mono\',\'Cairo\',monospace;font-size:11px;color:#8B90A3;flex:none">' + dirSpan(copy.memberSince) + ' ' + esc(S.since) + '</span></div>' +
+      resubmitBanner(true) +
       '<div data-two style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:20px">' +
       '<a href="/account/access/" class="scp-acc" style="display:flex;flex-direction:column;gap:14px;padding:16px 18px;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-top:2px solid ' + accent + ';border-radius:12px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 dir="' + tdir() + '" style="font-size:15px;font-weight:600;text-align:left">' + copy.courseAccess + '</h2>' +
@@ -380,7 +398,7 @@
       '<div style="border-top:2px solid ' + (state === 'none' ? '#B7BCCB' : state === 'rejected' ? '#FF37B0' : tag) + ';padding:24px 0 0">' +
       '<h2 style="font-size:clamp(24px,2.4vw,30px);font-weight:600;letter-spacing:-0.025em;line-height:1.15"><span data-i18n="' + titleKey + '">' + titleFallback + '</span></h2>' +
       '<p style="margin-top:10px;font-size:var(--fs-body);color:#B7BCCB;max-width:64ch;text-wrap:pretty">' + extra + (bodyKey ? '<span data-i18n="' + bodyKey + '">' + bodyFallback + '</span>' : bodyFallback) + '</p>' +
-      timeline(state === 'none' ? 2 : state === 'review' ? 3 : state === 'approved' ? 4 : 2) + '</div>';
+      timeline(state === 'none' ? 2 : state === 'review' ? 3 : state === 'approved' ? 4 : 3) + '</div>';
   }
 
   function filesGrid() {
@@ -460,6 +478,7 @@
     var copy = t();
     var ar = lang() === 'ar';
     return eyebrow(copy.account) + title(copy.profile) +
+      resubmitBanner(true) +
       '<form data-account-profile style="max-width:480px;display:flex;flex-direction:column;gap:22px;margin-top:28px">' +
       '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3">' + dirSpan(copy.name) +
       '<input name="name" value="' + esc(S.name) + '" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.16);padding:10px 0;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:16px;outline:none"></label>' +
@@ -700,6 +719,7 @@
       window.TF.setLang(auth.profile.lang);
     }
     if (auth.profile && auth.profile.notify) S.prefs = Object.assign(S.prefs, auth.profile.notify, { review: true });
+    S.resubmitNote = (auth.profile && auth.profile.resubmit_note) || '';
     await loadStatus(auth.user.id);
   }
 
@@ -713,6 +733,10 @@
       var status = sub && sub.status;
       S.state = !status || status === 'none' ? 'none' : status === 'submitted' || status === 'review' ? 'review' : status === 'approved' ? 'approved' : 'rejected';
       S.reason = (sub && sub.reviewer_note) || '';
+      if (S.state === 'none' && S.resubmitNote) {
+        S.state = 'rejected';
+        S.reason = S.resubmitNote;
+      }
       S.files = [];
       if (sub && sub.id) {
         var files = await sb.from('submission_files').select('file_name, file_path, created_at').eq('submission_id', sub.id).order('created_at', { ascending: true });
