@@ -115,7 +115,9 @@ test('admin schemas: decision needs a reason when rejecting; campaigns union; te
   assert.equal(adminDecisionSchema.safeParse({ action: 'approve', id: U(2) }).success, true);
   assert.equal(adminDecisionSchema.safeParse({ action: 'reject', id: U(2) }).success, false);
   assert.equal(adminDecisionSchema.safeParse({ action: 'reject', id: U(2), reason: '  ' }).success, false);
-  assert.equal(adminDecisionSchema.safeParse({ action: 'reject', id: U(2), reason: 'Blurry' }).success, true);
+  assert.equal(adminDecisionSchema.safeParse({ action: 'resubmit', id: U(2) }).success, false);
+  assert.equal(adminDecisionSchema.safeParse({ action: 'resubmit', id: U(2), reason: 'Blurry' }).success, true);
+  assert.equal(adminDecisionSchema.safeParse({ action: 'restore', id: U(2) }).success, true);
   assert.equal(adminDecisionSchema.safeParse({ action: 'reject', id: U(2), reason: 'x'.repeat(601) }).success, false);
   assert.equal(adminDecisionSchema.safeParse({ action: 'approve', id: `s-${U(2)}` }).success, true, 'mock fixture ids are accepted; unknown ids 404 server-side');
   assert.equal(adminDecisionSchema.safeParse({ action: 'approve', id: '' }).success, false);

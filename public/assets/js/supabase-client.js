@@ -196,8 +196,13 @@
     if (!session || !session.user) return { user: null, profile: null, isAdmin: false };
     var user = session.user;
     var profileRes = await client.from('profiles')
-      .select('id, email, is_admin, role, name, first_name, last_name, country, lang, notify, created_at, resubmit_note')
+      .select('id, email, is_admin, role, name, first_name, last_name, country, lang, notify, created_at, resubmit_note, blocked')
       .eq('id', user.id).maybeSingle();
+    if (profileRes.error && /blocked/i.test(profileRes.error.message || '')) {
+      profileRes = await client.from('profiles')
+        .select('id, email, is_admin, role, name, first_name, last_name, country, lang, notify, created_at, resubmit_note')
+        .eq('id', user.id).maybeSingle();
+    }
     if (profileRes.error && /resubmit_note/i.test(profileRes.error.message || '')) {
       profileRes = await client.from('profiles')
         .select('id, email, is_admin, role, name, first_name, last_name, country, lang, notify, created_at')

@@ -2,14 +2,15 @@
   window.TF = window.TF || {};
 
   var SELECTED_KEY = 'TF_ADMIN_SELECTED';
-  var COLORS = { submitted: '#FBBF24', approved: '#2EE8FF', rejected: '#FF8AD0', none: '#8B90A3', scheduled: '#2EE8FF', sending: '#FBBF24', sent: '#B7BCCB', failed: '#FF8AD0', cancelled: '#7C8296' };
+  var COLORS = { submitted: '#FBBF24', approved: '#2EE8FF', rejected: '#FF8AD0', blocked: '#FF37B0', none: '#8B90A3', scheduled: '#2EE8FF', sending: '#FBBF24', sent: '#B7BCCB', failed: '#FF8AD0', cancelled: '#7C8296' };
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var TPL_META = [
     { id: '01', file: '01-confirm-email', name: 'Confirm your email', kind: 'auto', trigger: 'Auth: signup', subject: 'Confirm your email' },
     { id: '02', file: '02-signup-code', name: 'Sign-in code', kind: 'auto', trigger: 'Auth: OTP', subject: 'Your sign-in code' },
     { id: '03', file: '03-submission-received', name: 'Submission received', kind: 'auto', trigger: 'On upload', subject: 'We received your proof' },
     { id: '04', file: '04-approved', name: 'Approved', kind: 'auto', trigger: 'Status → approved', subject: 'Approved — you are in' },
-    { id: '05', file: '05-needs-resubmission', name: 'Needs resubmission', kind: 'auto', trigger: 'Status → rejected', subject: 'We need a clearer screenshot' },
+    { id: '05', file: '05-needs-resubmission', name: 'Needs resubmission', kind: 'auto', trigger: 'Status → resubmit', subject: 'We need a clearer screenshot' },
+    { id: '10', file: '10-application-rejected', name: 'Application rejected', kind: 'auto', trigger: 'Status → blocked', subject: 'We cannot approve your application' },
     { id: '06', file: '06-course-ready', name: 'Course ready', kind: 'campaign', trigger: 'Manual / scheduled', subject: 'Your course is ready' },
     { id: '07', file: '07-password-reset', name: 'Password reset', kind: 'auto', trigger: 'Auth: reset', subject: 'Your password reset code' },
     { id: '08', file: '08-newsletter', name: 'Newsletter', kind: 'campaign', trigger: 'Manual / scheduled', subject: 'Talaria Flow — this week in order flow' },
@@ -212,6 +213,7 @@
       pending: members.filter(function (m) { return m.status === 'submitted'; }).length,
       approved: members.filter(function (m) { return m.status === 'approved'; }).length,
       rejected: members.filter(function (m) { return m.status === 'rejected'; }).length,
+      blocked: members.filter(function (m) { return m.status === 'blocked'; }).length,
       none: members.filter(function (m) { return m.status === 'none'; }).length,
       total: members.length,
       waitlist: waitlist.length,
@@ -224,6 +226,7 @@
       pending: Number(s.pending) || 0,
       approved: Number(s.approved) || 0,
       rejected: Number(s.resubmission != null ? s.resubmission : s.rejected) || 0,
+      blocked: Number(s.blocked != null ? s.blocked : fromRows.blocked) || 0,
       none: Number(s.no_proof != null ? s.no_proof : s.none) || 0,
       total: Number(s.total) || 0,
       waitlist: Number(s.waitlist) || 0,
@@ -475,7 +478,13 @@
   }
 
   async function loadMembers(sb) {
-    var profs = await sb.from('profiles').select('id, email, is_admin, role, first_name, last_name, name, country, lang, notify, created_at');
+    var profs = await sb.from('profiles').select('id, email, is_admin, role, first_name, last_name, name, country, lang, notify, created_at, resubmit_note, blocked');
+    if (profs.error && /blocked|resubmit_note/i.test(profs.error.message || '')) {
+      profs = await sb.from('profiles').select('id, email, is_admin, role, first_name, last_name, name, country, lang, notify, created_at, resubmit_note');
+    }
+    if (profs.error && /resubmit_note/i.test(profs.error.message || '')) {
+      profs = await sb.from('profiles').select('id, email, is_admin, role, first_name, last_name, name, country, lang, notify, created_at');
+    }
     var subs = await sb.from('submissions').select('id, user_id, status, note, reviewer_note, file_count, created_at, decided_at');
     var filesRes = await sb.from('submission_files').select('submission_id, file_path, file_name');
     var profiles = rowsOf(profs).filter(function (p) { return !p.is_admin && p.role !== 'admin'; });
@@ -487,12 +496,16 @@
       var thumbs = fileRows.filter(function (f) { return sub && f.submission_id === sub.id; }).map(function (f) { return f.file_path; });
       var last = lastEmailByRecipient[String(p.email || '').toLowerCase()];
       var first = p.first_name || (p.name ? String(p.name).split(' ')[0] : '');
+      var status = 'none';
+      if (p.blocked) status = 'blocked';
+      else if (sub && (sub.status === 'submitted' || sub.status === 'approved')) status = sub.status;
+      else if ((sub && sub.status === 'rejected') || p.resubmit_note) status = 'rejected';
       return {
         id: p.id,
         email: p.email,
         firstName: first || '',
         lastName: p.last_name || '',
-        status: (sub && (sub.status === 'submitted' || sub.status === 'approved' || sub.status === 'rejected')) ? sub.status : 'none',
+        status: status,
         submitted: sub ? fmtDate(sub.created_at) : '—',
         submittedAt: sub ? sub.created_at : '',
         decidedAt: sub ? (sub.decided_at || '') : '',
@@ -506,7 +519,7 @@
         lastEmail: last ? tplNameOf(last.templateId) : '—',
         submissionId: sub ? sub.id : null,
         thumbs: thumbs,
-        reason: (sub && sub.reviewer_note) || '',
+        reason: (sub && sub.reviewer_note) || p.resubmit_note || '',
       };
     });
   }
@@ -725,9 +738,11 @@
     for (var i = 0; i < ids.length; i++) {
       var m = members.filter(function (x) { return String(x.id) === String(ids[i]); })[0];
       if (!m) continue;
-      if (!m.submissionId) { out.noProof += 1; continue; }
-      var body = { action: status === 'approved' ? 'approve' : 'reject', id: m.submissionId };
-      if (status === 'rejected') body.reason = String(reason || '').trim().slice(0, 600);
+      var action = status === 'approved' ? 'approve' : status === 'blocked' ? 'reject' : status === 'restore' ? 'restore' : 'resubmit';
+      if (action === 'approve' && !m.submissionId) { out.noProof += 1; continue; }
+      if (action === 'resubmit' && !m.submissionId && m.status !== 'rejected') { out.noProof += 1; continue; }
+      var body = { action: action, id: action === 'restore' ? m.id : (m.submissionId || m.id) };
+      if (action === 'resubmit' || action === 'reject') body.reason = String(reason || '').trim().slice(0, 600);
       var res;
       try { res = await window.TF.api('/api/admin/submission', { body: body }); }
       catch (e) { res = { ok: false, body: { message: (e && e.message) || 'Network error' } }; }
@@ -740,31 +755,40 @@
       var r = res.body || {};
       m.status = r.status || status;
       m.decidedAt = new Date().toISOString();
-      if (status === 'rejected' || m.status === 'none') {
-        m.status = 'none';
+      if (action === 'resubmit' || action === 'reject' || action === 'restore') {
         m.submissionId = null;
         m.thumbs = [];
         m.files = 0;
         m.proofTiles = [];
-        m.reason = '';
         m.submitted = '—';
         m.submittedAt = '';
       }
-      if (m.status === 'rejected') m.reason = body.reason || '';
+      if (action === 'resubmit') {
+        m.status = 'rejected';
+        m.reason = body.reason || '';
+      }
+      if (action === 'reject') {
+        m.status = 'blocked';
+        m.reason = body.reason || '';
+      }
+      if (action === 'restore') {
+        m.status = 'none';
+        m.reason = '';
+      }
       if (r.email && r.email.ok && !r.email.skipped) {
         out.emailSent += 1;
-        m.lastEmail = status === 'approved' ? 'Approved' : 'Needs resubmission';
-      } else out.emailSkipped += 1;
+        m.lastEmail = action === 'approve' ? 'Approved' : action === 'reject' ? 'Application rejected' : 'Needs resubmission';
+      } else if (action !== 'restore') out.emailSkipped += 1;
     }
     return out;
   }
   function decisionToast(res, status) {
-    var verb = status === 'approved' ? 'Approved' : 'Resubmission requested';
+    var verb = status === 'approved' ? 'Approved' : status === 'blocked' ? 'Rejected' : status === 'restore' ? 'Access restored' : 'Resubmission requested';
     if (res.failed && !res.done) { toast(res.errors[0] || 'Request failed.'); return; }
     var parts = [];
     if (res.done > 1) parts.push(verb + ' ' + res.done + ' members');
     else if (res.done === 1) parts.push(verb);
-    if (res.done) {
+    if (res.done && status !== 'restore') {
       if (res.emailSent && !res.emailSkipped) parts.push(res.emailSent > 1 ? 'emails sent.' : (status === 'approved' ? 'confirmation email sent.' : 'email sent.'));
       else if (res.emailSkipped && !res.emailSent) parts.push('email skipped (already sent).');
       else parts.push(res.emailSent + ' emails sent, ' + res.emailSkipped + ' skipped (already sent).');
@@ -781,7 +805,7 @@
     finally { S.busy = false; }
     decisionToast(res, status);
     if (res.done) {
-      if (status === 'rejected') S.reason = '';
+      if (status === 'rejected' || status === 'blocked') S.reason = '';
       S.selected = new Set();
       writeSelected(S.selected);
       await loadLive();
@@ -987,9 +1011,9 @@
   }
 
   function renderMembers(c) {
-    var titles = { submitted: 'Pending review', approved: 'Approved', rejected: 'Needs resubmission', none: 'No proof yet' };
+    var titles = { submitted: 'Pending review', approved: 'Approved', rejected: 'Needs resubmission', blocked: 'Rejected', none: 'No proof yet' };
     var list = filteredMembers();
-    var filters = [['all', 'All', c.total], ['submitted', 'Pending', c.pending], ['approved', 'Approved', c.approved], ['rejected', 'Resubmission', c.rejected], ['none', 'No proof', c.none]];
+    var filters = [['all', 'All', c.total], ['submitted', 'Pending', c.pending], ['approved', 'Approved', c.approved], ['rejected', 'Resubmission', c.rejected], ['blocked', 'Rejected', c.blocked || 0], ['none', 'No proof', c.none]];
     var cols = [['email', 'Member'], ['status', 'Status'], ['submitted', 'Submitted'], ['lang', 'Lang'], ['country', 'Country'], ['lastEmail', 'Last email']];
     var focus = members.filter(function (m) { return String(m.id) === String(S.focus); })[0];
     if (!focus || (list.length && !list.some(function (m) { return String(m.id) === String(focus.id); }))) focus = list[0] || members[0];
@@ -1039,9 +1063,14 @@
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;cursor:pointer">' + esc(m.country || '—') + '</td>' +
           '<td data-act="open" data-id="' + esc(m.id) + '" style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);font-family:\'Geist Mono\',monospace;font-size:12px;color:#8B90A3;white-space:nowrap;cursor:pointer">' + esc(m.lastEmail) + '</td>' +
           '<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;text-align:right;position:sticky;right:0;background:' + (on ? '#0C1216' : '#0E1017') + ';z-index:1"><span style="display:inline-flex;gap:4px">' +
-          (m.submissionId && (m.status === 'submitted' || m.status === 'rejected')
-            ? '<button type="button" data-act="row-approve" data-id="' + esc(m.id) + '" aria-label="Approve ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(46,232,255,0.5);border-radius:8px;background:transparent;color:#2EE8FF;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></button>' +
-              '<button type="button" data-act="row-reject" data-id="' + esc(m.id) + '" aria-label="Request resubmission from ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,138,208,0.5);border-radius:8px;background:transparent;color:#FF8AD0;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"></path></svg></button>'
+          (m.status === 'submitted' || m.status === 'rejected'
+            ? (m.submissionId
+              ? '<button type="button" data-act="row-approve" data-id="' + esc(m.id) + '" aria-label="Approve ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(46,232,255,0.5);border-radius:8px;background:transparent;color:#2EE8FF;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></button>'
+              : '') +
+              '<button type="button" data-act="row-reject" data-id="' + esc(m.id) + '" aria-label="Request resubmission from ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,138,208,0.5);border-radius:8px;background:transparent;color:#FF8AD0;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"></path></svg></button>' +
+              '<button type="button" data-act="row-block" data-id="' + esc(m.id) + '" aria-label="Reject ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,55,176,0.6);border-radius:8px;background:transparent;color:#FF37B0;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>'
+            : m.status === 'blocked'
+            ? '<button type="button" data-act="row-restore" data-id="' + esc(m.id) + '" aria-label="Restore access for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(46,232,255,0.5);border-radius:8px;background:transparent;color:#2EE8FF;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0"></path></svg></button>'
             : '') +
           '<button type="button" data-act="row-email" data-id="' + esc(m.id) + '" aria-label="Send email to ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#F2F4F8;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></button>' +
           '<button type="button" data-act="open" data-id="' + esc(m.id) + '" aria-label="Details for ' + esc(m.email) + '" style="width:30px;height:30px;border:1px solid rgba(255,255,255,0.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>' +
@@ -1083,14 +1112,25 @@
           '<p style="margin-top:4px;font-size:13.5px;color:#B7BCCB">' + esc(focus.note) + '</p>' +
           (focus.status === 'rejected' && focus.reason ? '<div style="margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Reason sent</div><p style="margin-top:4px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '');
         if (focus.status === 'submitted' || focus.status === 'rejected') {
-          html += '<label style="display:flex;flex-direction:column;gap:6px;margin-top:14px;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Reason (sent if resubmission is requested)' +
-            '<textarea data-act="reason" placeholder="e.g. Email address isn\'t visible in the screenshot." style="width:100%;min-height:64px;resize:vertical;background:#07080C;border:1px solid rgba(255,255,255,0.16);border-radius:10px;padding:10px 12px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:13.5px;line-height:1.5;outline:none;box-sizing:border-box">' + esc(S.reason) + '</textarea></label>' +
-            '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
-            '<button type="button" data-act="approve" class="btn-primary scp4" style="height:38px;padding:0 14px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;font-size:13.5px;font-weight:600;cursor:pointer">Approve &amp; send confirmation</button>' +
-            '<button type="button" data-act="reject" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font-size:13.5px;font-weight:600;cursor:pointer">Request resubmission</button></div>';
+          html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
+            (focus.submissionId && focus.status === 'submitted' ? '<button type="button" data-act="approve" class="btn-primary scp4" style="height:38px;padding:0 14px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;font-size:13.5px;font-weight:600;cursor:pointer">Approve &amp; send confirmation</button>' : '') +
+            '<button type="button" data-act="resubmit" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font-size:13.5px;font-weight:600;cursor:pointer">Request resubmission</button>' +
+            '<button type="button" data-act="block" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,55,176,0.55);border-radius:10px;background:transparent;color:#FF37B0;font-size:13.5px;font-weight:600;cursor:pointer">Reject</button></div>';
+        } else if (focus.status === 'blocked') {
+          html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
+            '<button type="button" data-act="restore" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
         } else {
           html += '<p style="margin-top:14px;font-size:13px;color:#8B90A3">Approved' + (focus.decidedAt ? ' on ' + esc(fmtDay(focus.decidedAt)) : '') + '. Nothing to decide.</p>';
         }
+      } else if (focus.status === 'blocked') {
+        html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Rejected. This member cannot upload until you restore access.</p>' +
+          (focus.reason ? '<p style="margin-top:8px;font-size:13.5px;color:#B7BCCB">' + esc(focus.reason) + '</p>' : '') +
+          '<button type="button" data-act="restore" class="scp5" style="height:38px;margin-top:12px;padding:0 14px;border:1px solid rgba(46,232,255,0.5);border-radius:10px;background:transparent;color:#2EE8FF;font-size:13.5px;font-weight:600;cursor:pointer">Restore access</button>';
+      } else if (focus.status === 'rejected') {
+        html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">Asked to resubmit' + (focus.reason ? ': ' + esc(focus.reason) : '') + '.</p>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">' +
+          '<button type="button" data-act="resubmit" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:10px;background:transparent;color:#F2F4F8;font-size:13.5px;font-weight:600;cursor:pointer">Request resubmission</button>' +
+          '<button type="button" data-act="block" class="scp5" style="height:38px;padding:0 14px;border:1px solid rgba(255,55,176,0.55);border-radius:10px;background:transparent;color:#FF37B0;font-size:13.5px;font-weight:600;cursor:pointer">Reject</button></div>';
       } else {
         html += '<p style="margin-top:14px;font-size:13.5px;color:#8B90A3">No proof uploaded yet.</p>';
       }
@@ -1491,12 +1531,27 @@
       await decide([S.focus], 'approved');
       return;
     }
-    if (act === 'row-reject') {
-      S.focus = el.getAttribute('data-id');
-      var rowRes = await dialog({ title: 'Request resubmission', body: 'This reason is sent with the resubmission email.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission' });
+    if (act === 'row-reject' || act === 'resubmit' || act === 'reject') {
+      S.focus = el.getAttribute('data-id') || S.focus;
+      var rowRes = await dialog({ title: 'Request resubmission', body: 'This reason is sent with the resubmission email. The member can upload again.', textarea: true, placeholder: 'e.g. Email address isn\'t visible in the screenshot.', ok: 'Request resubmission' });
       if (!rowRes || !rowRes.ok) return;
       if (!String(rowRes.text || '').trim()) { toast('Add a reason before requesting resubmission.'); return; }
       await decide([S.focus], 'rejected', rowRes.text.trim());
+      return;
+    }
+    if (act === 'row-block' || act === 'block') {
+      S.focus = el.getAttribute('data-id') || S.focus;
+      var blockRes = await dialog({ title: 'Reject this application?', body: 'Sends a rejection email. The member cannot upload again until you restore access.', textarea: true, placeholder: 'e.g. We cannot accept this application.', ok: 'Reject' });
+      if (!blockRes || !blockRes.ok) return;
+      if (!String(blockRes.text || '').trim()) { toast('Add a reason before rejecting.'); return; }
+      await decide([S.focus], 'blocked', blockRes.text.trim());
+      return;
+    }
+    if (act === 'row-restore' || act === 'restore') {
+      S.focus = el.getAttribute('data-id') || S.focus;
+      var rest = await dialog({ title: 'Restore access?', body: 'This member will be able to upload proof again. No email is sent.', ok: 'Restore access' });
+      if (!rest) return;
+      await decide([S.focus], 'restore');
       return;
     }
     if (act === 'dlg-close') {
@@ -1558,12 +1613,6 @@
     }
     if (act === 'approve') {
       await decide([S.focus], 'approved');
-      return;
-    }
-    if (act === 'reject') {
-      var reason = (document.querySelector('[data-act="reason"]') || {}).value || S.reason;
-      if (!String(reason || '').trim()) { toast('Add a reason before requesting resubmission.'); return; }
-      await decide([S.focus], 'rejected', reason.trim());
       return;
     }
     if (act === 'reason') { S.reason = el.value; return; }

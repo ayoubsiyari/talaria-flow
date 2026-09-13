@@ -1,7 +1,7 @@
 (function () {
   window.TF = window.TF || {};
 
-  var COLORS = { none: '#8B90A3', review: '#FBBF24', approved: '#2EE8FF', rejected: '#FF8AD0' };
+  var COLORS = { none: '#8B90A3', review: '#FBBF24', approved: '#2EE8FF', rejected: '#FF8AD0', blocked: '#FF37B0' };
   var MODULES = [
     ['Auction Market Theory', 4],
     ['Volume Profile & Market Profile', 6],
@@ -26,16 +26,19 @@
       deleteAccount: 'Delete account', deleteNote: 'Removes your account and uploaded screenshots. Course access cannot be restored.', delete: 'Delete',
       saved: 'Saved.', saveFailed: 'Could not save. Try again.', deleted: 'Account deleted.',
       deleteTitle: 'Delete your account?', deleteConfirm: 'Delete account',
-      tags: { none: 'Not submitted', review: 'Under review', approved: 'Approved', rejected: 'Needs resubmission' },
+      tags: { none: 'Not submitted', review: 'Under review', approved: 'Approved', rejected: 'Needs resubmission', blocked: 'Rejected' },
       accessBody: {
         none: 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.',
         review: 'A person is checking your screenshots. You will get an email either way.',
         approved: 'Your registration is confirmed. Course access lands here before 31 December 2026.',
         rejected: 'The reviewer asked for a clearer screenshot. Upload again to continue.',
+        blocked: 'This application was rejected. Contact admin support — you cannot upload again until access is restored.',
       },
-      accessCta: { none: 'Upload proof', review: 'View submission', approved: 'View details', rejected: 'Upload again' },
+      accessCta: { none: 'Upload proof', review: 'View submission', approved: 'View details', rejected: 'Upload again', blocked: 'Contact support' },
       resubmitNotice: 'Your last submission was not accepted. Upload new screenshots to continue.',
       resubmitCta: 'Upload again',
+      blockedNotice: 'Your application was rejected. Contact admin support — you cannot submit again until an admin restores your access.',
+      blockedCta: 'Email admin support',
       courseBodyLocked: 'Opens once your course access is approved and released.',
       courseBodyOpen: 'Thirty videos with written materials and lesson notes per module.',
       courseCtaLocked: 'See what is inside', courseCtaOpen: 'Continue',
@@ -43,7 +46,7 @@
       modState: { locked: 'Locked', open: 'Open', done: 'Done' },
       videos: function (n) { return n + ' videos · notes PDF'; },
       noActivity: 'No activity yet.',
-      activityKinds: { proof: 'You uploaded {n} screenshot(s)', decision_approved: 'Your proof was approved', decision_rejected: 'The reviewer asked you to upload again', account: 'Account created', reset: 'Password reset requested' },
+      activityKinds: { proof: 'You uploaded {n} screenshot(s)', decision_approved: 'Your proof was approved', decision_rejected: 'The reviewer asked you to upload again', decision_blocked: 'Your application was rejected', account: 'Account created', reset: 'Password reset requested' },
       yourFiles: 'Your files', noFiles: 'No files on record.',
       prefs: [
         ['review', 'Review updates', 'Approved, needs resubmission and other decisions about your proof. Always on.'],
@@ -79,6 +82,7 @@
     files: [],
     reason: '',
     resubmitNote: '',
+    blocked: false,
     pwOpen: false,
     pwOk: false,
   };
@@ -139,21 +143,26 @@
         review: str('tags.review', base.tags.review),
         approved: str('tags.approved', base.tags.approved),
         rejected: str('tags.rejected', base.tags.rejected),
+        blocked: str('tags.blocked', base.tags.blocked),
       },
       accessBody: {
         none: str('accessBody.none', base.accessBody.none),
         review: str('accessBody.review', base.accessBody.review),
         approved: str('accessBody.approved', base.accessBody.approved),
         rejected: str('accessBody.rejected', base.accessBody.rejected),
+        blocked: str('accessBody.blocked', base.accessBody.blocked),
       },
       accessCta: {
         none: str('accessCta.none', base.accessCta.none),
         review: str('accessCta.review', base.accessCta.review),
         approved: str('accessCta.approved', base.accessCta.approved),
         rejected: str('accessCta.rejected', base.accessCta.rejected),
+        blocked: str('accessCta.blocked', base.accessCta.blocked),
       },
       resubmitNotice: str('resubmitNotice', base.resubmitNotice),
       resubmitCta: str('resubmitCta', base.resubmitCta),
+      blockedNotice: str('blockedNotice', base.blockedNotice),
+      blockedCta: str('blockedCta', base.blockedCta),
       courseBodyLocked: str('courseBodyLocked', base.courseBodyLocked),
       courseBodyOpen: str('courseBodyOpen', base.courseBodyOpen),
       courseCtaLocked: str('courseCtaLocked', base.courseCtaLocked),
@@ -173,6 +182,7 @@
         proof: str('activityKinds.proof', base.activityKinds.proof),
         decision_approved: str('activityKinds.decision_approved', base.activityKinds.decision_approved),
         decision_rejected: str('activityKinds.decision_rejected', base.activityKinds.decision_rejected),
+        decision_blocked: str('activityKinds.decision_blocked', base.activityKinds.decision_blocked),
         account: str('activityKinds.account', base.activityKinds.account),
         reset: str('activityKinds.reset', base.activityKinds.reset),
       },
@@ -232,7 +242,12 @@
       var m = text.match(/(\d+)/);
       return kinds.proof.replace('{n}', m ? m[1] : '');
     }
-    if (kind === 'decision') return /approved|اعتمد/i.test(text) ? kinds.decision_approved : kinds.decision_rejected;
+    if (kind === 'decision') {
+      if (/approved|اعتمد/i.test(text)) return kinds.decision_approved;
+      if (/asked to resubmit|resubmit/i.test(text)) return kinds.decision_rejected;
+      if (/rejected|رُفض/i.test(text)) return kinds.decision_blocked;
+      return kinds.decision_rejected;
+    }
     if (kinds[kind]) return kinds[kind];
     return esc(text);
   }
@@ -269,7 +284,7 @@
       '<div style="font-family:\'Geist Mono\',monospace;font-size:11px;color:#8B90A3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(S.email) + '</div></div></div>';
     NAV.forEach(function (item, i) {
       var on = item.key === tab;
-      var dot = item.key === 'access' && (S.state === 'rejected' || S.state === 'none') ? COLORS[S.state] : 'transparent';
+      var dot = item.key === 'access' && (S.state === 'rejected' || S.state === 'none' || S.state === 'blocked') ? COLORS[S.state] : 'transparent';
       html += '<a href="' + item.href + '" style="display:flex;align-items:center;justify-content:space-between;width:100%;height:38px;padding:0 10px;border:0;border-radius:8px;font-size:14px;font-weight:' + (on ? '600' : '500') + ';color:' + (on ? '#F2F4F8' : '#B7BCCB') + ';background:' + (on ? 'rgba(46,232,255,0.08)' : 'transparent') + ';text-align:left;box-sizing:border-box"><span dir="' + tdir() + '">' + copy.nav[i] + '</span><span style="width:6px;height:6px;border-radius:50%;background:' + dot + '"></span></a>';
     });
     html += '<a href="/" data-account-logout style="display:flex;align-items:center;height:38px;padding:0 10px;margin-top:12px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;font-size:14px;color:#8B90A3">' + dirSpan(copy.logout) + '</a>';
@@ -314,9 +329,20 @@
     }
   }
 
-  function resubmitBanner(withCta) {
-    if (S.state !== 'rejected') return '';
+  function supportMailto() {
+    return 'mailto:support@talaria-flow.com?subject=' + encodeURIComponent('Application rejected');
+  }
+  function statusBanner(withCta) {
     var copy = t();
+    if (S.state === 'blocked') {
+      var blockedCta = withCta
+        ? '<a href="' + supportMailto() + '" style="display:inline-flex;align-items:center;margin-top:12px;font-size:13.5px;font-weight:600;color:#FF8AD0">' + dirSpan(copy.blockedCta) + ' →</a>'
+        : '';
+      return '<div role="status" style="margin-top:20px;padding:16px 18px;border:1px solid rgba(255,55,176,0.55);border-radius:12px;background:rgba(255,55,176,0.08)">' +
+        '<div style="font-weight:600;color:#FF8AD0">' + dirSpan(copy.blockedNotice) + '</div>' +
+        blockedCta + '</div>';
+    }
+    if (S.state !== 'rejected') return '';
     var reason = S.reason ? '<p dir="auto" style="margin:8px 0 0;font-size:14px;color:#B7BCCB;line-height:1.5">' + esc(S.reason) + '</p>' : '';
     var cta = withCta
       ? '<a href="/account/access/" style="display:inline-flex;align-items:center;margin-top:12px;font-size:13.5px;font-weight:600;color:#FF8AD0">' + dirSpan(copy.resubmitCta) + ' →</a>'
@@ -338,7 +364,7 @@
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px">' +
       '<h1 dir="' + tdir() + '" style="font-size:24px;font-weight:700;letter-spacing:' + lsH() + ';line-height:1.15;text-align:left;flex:0 1 auto;margin:0">' + hello + '</h1>' +
       '<span style="font-family:\'Geist Mono\',\'Cairo\',monospace;font-size:11px;color:#8B90A3;flex:none">' + dirSpan(copy.memberSince) + ' ' + esc(S.since) + '</span></div>' +
-      resubmitBanner(true) +
+      statusBanner(true) +
       '<div data-two style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:20px">' +
       '<a href="/account/access/" class="scp-acc" style="display:flex;flex-direction:column;gap:14px;padding:16px 18px;background:#0E1017;border:1px solid rgba(255,255,255,0.08);border-top:2px solid ' + accent + ';border-radius:12px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 dir="' + tdir() + '" style="font-size:15px;font-weight:600;text-align:left">' + copy.courseAccess + '</h2>' +
@@ -436,6 +462,10 @@
         '<p style="margin-top:6px;font-size:14px;color:#8B90A3;max-width:56ch"><span data-i18n="dashboard.nextBody">Course access lands in your inbox before 31 December 2026. Keep an eye on the email you signed up with.</span></p></div>' +
         '<a href="/account/course/" class="scp2" style="display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid #2EE8FF;color:#2EE8FF;border-radius:10px;font-size:14px;font-weight:600;white-space:nowrap"><span data-i18n="dashboard.viewCurriculum">View curriculum</span></a></div></div>';
     }
+    if (S.state === 'blocked') {
+      return accessHead('blocked', '#FF37B0', 'dashboard.blocked.title', 'Application rejected', 'dashboard.blocked.body', 'We cannot approve this application. You cannot upload again until an admin restores your access. Email support if you think this is a mistake.', '') +
+        '<p style="margin-top:28px"><a href="' + supportMailto() + '" class="scp2" style="display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid #FF8AD0;color:#FF8AD0;border-radius:10px;font-size:14px;font-weight:600">' + dirSpan(copy.blockedCta) + '</a></p></div>';
+    }
     if (S.state === 'rejected') {
       var reason = S.reason ? '<span dir="auto">' + esc(S.reason) + '</span>' : '<span data-i18n="dashboard.rejected.body">the screenshot doesn\'t show your account email or username. Please upload one where it is visible, then submit again.</span>';
       return accessHead('rejected', '#FF8AD0', 'dashboard.rejected.title', 'Needs resubmission', null, reason, '<span data-i18n="dashboard.rejected.reasonLead" style="color:#F2F4F8">Reason from the reviewer: </span>') +
@@ -478,7 +508,7 @@
     var copy = t();
     var ar = lang() === 'ar';
     return eyebrow(copy.account) + title(copy.profile) +
-      resubmitBanner(true) +
+      statusBanner(true) +
       '<form data-account-profile style="max-width:480px;display:flex;flex-direction:column;gap:22px;margin-top:28px">' +
       '<label style="display:flex;flex-direction:column;gap:6px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3">' + dirSpan(copy.name) +
       '<input name="name" value="' + esc(S.name) + '" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.16);padding:10px 0;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:16px;outline:none"></label>' +
@@ -720,6 +750,7 @@
     }
     if (auth.profile && auth.profile.notify) S.prefs = Object.assign(S.prefs, auth.profile.notify, { review: true });
     S.resubmitNote = (auth.profile && auth.profile.resubmit_note) || '';
+    S.blocked = !!(auth.profile && auth.profile.blocked);
     await loadStatus(auth.user.id);
   }
 
@@ -736,6 +767,9 @@
       if (S.state === 'none' && S.resubmitNote) {
         S.state = 'rejected';
         S.reason = S.resubmitNote;
+      }
+      if (S.blocked) {
+        S.state = 'blocked';
       }
       S.files = [];
       if (sub && sub.id) {

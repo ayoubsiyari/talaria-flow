@@ -816,7 +816,7 @@
         if (!res.ok) {
           var code = res.body && res.body.error;
           if (code === 'already_pending') { showReview(); return; }
-          toast(apiErrorMsg(res));
+          if (code === 'blocked') { toast(apiErrorMsg(res)); return; }
           return;
         }
         files.forEach(revokeFile);

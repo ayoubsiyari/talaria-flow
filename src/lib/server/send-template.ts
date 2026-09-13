@@ -26,6 +26,7 @@ const ALIAS: Record<string, string> = {
   'signin-code': '02-signup-code',
   'approved': '04-approved',
   'needs-resubmission': '05-needs-resubmission',
+  'application-rejected': '10-application-rejected',
   'course-ready': '06-course-ready',
   'password-reset': '07-password-reset',
   'newsletter': '08-newsletter',

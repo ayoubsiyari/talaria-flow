@@ -33,6 +33,11 @@ export default handle(async (req: Request) => {
   const sb = adminClient();
   const storage = sb.storage.from(BUCKET);
 
+  const { data: profile } = await sb.from('profiles').select('blocked').eq('id', caller.id).maybeSingle();
+  if (profile && profile.blocked) {
+    throw new HttpError(403, 'blocked', 'Your application was rejected. Email support@talaria-flow.com to restore access.');
+  }
+
   const { data: latest } = await sb.from('submissions').select('id, status').eq('user_id', caller.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
   if ('resend' in input) {
     if (!latest || latest.status !== 'submitted') throw new HttpError(409, 'not_pending', 'There is no proof under review to email about.');

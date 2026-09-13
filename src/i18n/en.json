@@ -429,7 +429,8 @@
       "none": "Not submitted",
       "review": "Under review",
       "approved": "Approved",
-      "rejected": "Needs resubmission"
+      "rejected": "Needs resubmission",
+      "blocked": "Rejected"
     },
     "none": {
       "title": "Upload your proof to get started",
@@ -447,6 +448,10 @@
       "title": "Needs resubmission",
       "reasonLead": "Reason from the reviewer: ",
       "body": "the screenshot doesn't show your account email or username. Please upload one where it is visible, then submit again."
+    },
+    "blocked": {
+      "title": "Application rejected",
+      "body": "We cannot approve this application. You cannot upload again until an admin restores your access. Email support if you think this is a mistake."
     },
     "timeline": {
       "0": "Account",
@@ -618,13 +623,15 @@
       "none": "Not submitted",
       "review": "Under review",
       "approved": "Approved",
-      "rejected": "Needs resubmission"
+      "rejected": "Needs resubmission",
+      "blocked": "Rejected"
     },
     "accessBody": {
       "none": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.",
       "review": "A person is checking your screenshots. You will get an email either way.",
       "approved": "Your registration is confirmed. Course access lands here before 31 December 2026.",
-      "rejected": "The reviewer asked for a clearer screenshot. Upload again to continue."
+      "rejected": "The reviewer asked for a clearer screenshot. Upload again to continue.",
+      "blocked": "This application was rejected. Contact admin support — you cannot upload again until access is restored."
     },
     "nav": {
       "0": "Overview",
@@ -681,12 +688,14 @@
       "none": "Upload proof",
       "review": "View submission",
       "approved": "View details",
-      "rejected": "Upload again"
+      "rejected": "Upload again",
+      "blocked": "Contact support"
     },
     "activityKinds": {
       "proof": "You uploaded {n} screenshot(s)",
       "decision_approved": "Your proof was approved",
       "decision_rejected": "The reviewer asked you to upload again",
+      "decision_blocked": "Your application was rejected",
       "account": "Account created",
       "reset": "Password reset requested"
     },
@@ -699,7 +708,11 @@
     "resendEmail": "Resend the confirmation email",
     "resendOk": "Confirmation email sent.",
     "resendFail": "Could not send the email. Try again.",
-    "moduleLocked": "Module {n}"
+    "moduleLocked": "Module {n}",
+    "resubmitNotice": "Your last submission was not accepted. Upload new screenshots to continue.",
+    "resubmitCta": "Upload again",
+    "blockedNotice": "Your application was rejected. Contact admin support — you cannot submit again until an admin restores your access.",
+    "blockedCta": "Email admin support"
   },
   "notfound": {
     "axis": "Page not found",

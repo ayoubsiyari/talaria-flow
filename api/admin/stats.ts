@@ -31,7 +31,7 @@ export default handle(async (req: Request) => {
   const sb = adminClient();
 
   const [{ data: profiles, error: pErr }, { data: subs, error: sErr }, wait, scheduled] = await Promise.all([
-    sb.from('profiles').select('id, is_admin, role'),
+    sb.from('profiles').select('id, is_admin, role, blocked, resubmit_note'),
     sb.from('submissions').select('user_id, status, created_at'),
     sb.from('waitlist').select('*', { count: 'exact', head: true }),
     sb.from('email_sends').select('*', { count: 'exact', head: true }).eq('state', 'scheduled'),
@@ -45,12 +45,17 @@ export default handle(async (req: Request) => {
   let pending = 0;
   let approved = 0;
   let resubmission = 0;
+  let blocked = 0;
   let noProof = 0;
   for (const p of members) {
+    if (p.blocked) {
+      blocked += 1;
+      continue;
+    }
     const status = normStatus(latest.get(p.id) || null);
     if (status === 'submitted') pending += 1;
     else if (status === 'approved') approved += 1;
-    else if (status === 'rejected') resubmission += 1;
+    else if (status === 'rejected' || p.resubmit_note) resubmission += 1;
     else noProof += 1;
   }
 
@@ -59,6 +64,7 @@ export default handle(async (req: Request) => {
     pending,
     approved,
     resubmission,
+    blocked,
     no_proof: noProof,
     total: members.length,
     waitlist: wait.count || 0,

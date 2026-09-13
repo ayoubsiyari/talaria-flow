@@ -113,13 +113,14 @@ export const uuid = z.string().uuid();
 /** POST /api/admin/submission */
 export const adminDecisionSchema = z
   .object({
-    action: z.enum(['approve', 'reject']),
-    // Not `uuid`: the route looks the row up server-side (unknown ids -> 404) and the local mock
-    // seeds fixture submissions with ids like `s-<member uuid>`.
+    action: z.enum(['approve', 'resubmit', 'reject', 'restore']),
     id: z.string().trim().min(1).max(80),
     reason: z.string().trim().max(600).optional(),
   })
-  .refine((v) => v.action !== 'reject' || (v.reason && v.reason.length >= 1), { message: 'reason is required when rejecting', path: ['reason'] });
+  .refine((v) => (v.action !== 'resubmit' && v.action !== 'reject') || (v.reason && v.reason.length >= 1), {
+    message: 'reason is required',
+    path: ['reason'],
+  });
 
 export const campaignAudience = z.enum(['approved', 'submitted', 'rejected', 'none', 'all', 'waitlist']);
 export const campaignLang = z.enum(['all', 'en', 'ar']);

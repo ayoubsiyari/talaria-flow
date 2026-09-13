@@ -338,6 +338,66 @@
     }
   },
   {
+    "file": "10-application-rejected",
+    "name": "Application rejected",
+    "trigger": "Status → blocked",
+    "kind": "auto",
+    "subject": "We cannot approve your application",
+    "preheader": "Contact support if you think this is a mistake",
+    "eyebrow": "Review",
+    "accent": "#FF37B0",
+    "title": "We cannot approve your application",
+    "blocks": [
+      {
+        "type": "status",
+        "color": "#FF8AD0",
+        "text": "Rejected"
+      },
+      {
+        "type": "p",
+        "text": "We reviewed your proof and cannot accept this application. You cannot upload again until an admin reopens your access."
+      },
+      {
+        "type": "callout",
+        "color": "#FF37B0",
+        "label": "Note",
+        "text": "{{reason}}"
+      },
+      {
+        "type": "p",
+        "text": "If you believe this is a mistake, email <b style=\"color:#F2F4F8\">support@talaria-flow.com</b> from {{email}}."
+      }
+    ],
+    "unsubscribe": false,
+    "ar": {
+      "subject": "لا يمكننا اعتماد طلبك",
+      "preheader": "تواصل مع الدعم إن ظننت أن هذا خطأ",
+      "eyebrow": "المراجعة",
+      "title": "لا يمكننا اعتماد طلبك",
+      "blocks": [
+        {
+          "type": "status",
+          "color": "#FF8AD0",
+          "text": "مرفوض"
+        },
+        {
+          "type": "p",
+          "text": "راجعنا إثباتك ولا يمكننا قبول هذا الطلب. لا يمكنك الرفع مجدداً حتى يعيد أحد المشرفين فتح وصولك."
+        },
+        {
+          "type": "callout",
+          "color": "#FF37B0",
+          "label": "ملاحظة",
+          "text": "{{reason}}"
+        },
+        {
+          "type": "p",
+          "text": "إن ظننت أن هذا خطأ، راسل <b style=\"color:#F2F4F8\">support@talaria-flow.com</b> من {{email}}."
+        }
+      ]
+    }
+  },
+  {
     "file": "06-course-ready",
     "name": "Course ready",
     "trigger": "Manual send",

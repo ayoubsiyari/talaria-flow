@@ -14,7 +14,7 @@ const specs = JSON.parse(readFileSync(new URL('../../emails/templates.json', imp
 const ARABIC = /[\u0600-\u06FF]/;
 // Every merge field the nine specs use (emails/README.md); campaigns (08) are entirely merge-driven.
 const SAMPLE = {
-  email: 'member@example.com', first_name: 'Sam', confirm_url: 'https://x/confirm', token: 't', code: '123456',
+  email: 'member@example.com', first_name: 'Sam', confirm_url: 'https://x/confirm', token: 't', code: '123456', verify_url: 'https://x/verify',
   device: 'Chrome on Windows', location: 'London, UK', time: '2026-09-09 10:00', submitted_at: '2026-09-09', file_count: '2',
   reason: 'Second screenshot is missing the Simulation label', course_url: 'https://x/course', reset_url: 'https://x/reset',
   subject: 'Hello', preheader: 'Pre', issue_label: 'Issue 1', title: 'Title', intro: 'Intro', body: '<p>Body</p>',
@@ -24,10 +24,10 @@ const SAMPLE = {
 const isMerge = (s) => /^\{\{\s*[a-z_]+\s*\}\}$/.test(String(s || ''));
 const fill = (html) => html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, k) => SAMPLE[k] ?? `<<${k}>>`);
 
-test('templates.json has the nine templates, each with an Arabic variant', () => {
-  assert.equal(specs.length, 9);
+test('templates.json has the ten templates, each with an Arabic variant', () => {
+  assert.equal(specs.length, 10);
   for (const s of specs) {
-    assert.match(s.file, /^0[1-9]-[a-z-]+$/, s.file);
+    assert.match(s.file, /^(0[1-9]|10)-[a-z-]+$/, s.file);
     assert.ok(s.subject && s.title && Array.isArray(s.blocks) && s.blocks.length, `${s.file} en body`);
     assert.ok(s.ar && s.ar.subject && s.ar.title && Array.isArray(s.ar.blocks) && s.ar.blocks.length, `${s.file} ar body`);
     if (!isMerge(s.ar.title)) assert.ok(ARABIC.test(s.ar.title) && ARABIC.test(s.ar.subject), `${s.file} ar copy is Arabic`);
@@ -37,7 +37,7 @@ test('templates.json has the nine templates, each with an Arabic variant', () =>
 
 test('every template renders to a complete HTML document in EN and AR', () => {
   const rows = templateRows(specs);
-  assert.equal(rows.length, 18);
+  assert.equal(rows.length, 20);
   for (const row of rows) {
     const html = fill(TFEmail.render(row.spec, {}));
     assert.ok(html.startsWith('<!doctype html>'), `${row.id}/${row.lang} doctype`);
@@ -58,7 +58,7 @@ test('every template renders to a complete HTML document in EN and AR', () => {
   }
 });
 
-test('transactional templates (01-05, 07) hide the unsubscribe link; campaigns (06, 08, 09) show it', () => {
+test('transactional templates hide the unsubscribe link; campaigns (06, 08, 09) show it', () => {
   for (const s of specs) {
     const campaign = s.kind === 'campaign';
     assert.equal(s.unsubscribe === false, !campaign, `${s.file}: unsubscribe flag`);
