@@ -1,7 +1,4 @@
--- Hard reject: member cannot upload again until an admin restores access.
-alter table public.profiles
-  add column if not exists blocked boolean not null default false;
-
+-- Fix restore: postgres is not superuser, so session_replication_role SET 500s.
 create or replace function public.protect_profile_privileges()
 returns trigger
 language plpgsql
@@ -26,8 +23,6 @@ begin
 end;
 $$;
 
--- Admin API (service role) sets blocked. Do not use session_replication_role:
--- the postgres role on self-hosted Supabase is not superuser, so that SET 500s.
 create or replace function public.admin_set_blocked(p_id uuid, p_blocked boolean)
 returns boolean
 language plpgsql
