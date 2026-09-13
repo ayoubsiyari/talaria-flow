@@ -30,7 +30,7 @@
       country: 'Country',
       tags: { none: 'Not submitted', review: 'Under review', approved: 'Approved', rejected: 'Needs resubmission', blocked: 'Rejected' },
       accessBody: {
-        none: 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.',
+        none: 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Blur anything private; keep your email or username visible.',
         review: 'A person is checking your screenshots. You will get an email either way.',
         approved: 'Your registration is confirmed. Course access lands here before 31 December 2026.',
         rejected: 'The reviewer asked for a clearer screenshot. Upload again to continue.',
@@ -410,8 +410,8 @@
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg>' +
       '<div dir="' + tdir() + '" style="font-size:var(--fs-body);text-align:center"><strong style="font-weight:600"><span data-i18n="dashboard.dropStrong">Drop screenshots here</span></strong> <span style="color:#B7BCCB"><span data-i18n="dashboard.dropRest">or click to choose</span></span></div></div>' +
       '<div data-upload-grid></div>' +
-      '<p style="margin-top:6px;font-family:\'Geist Mono\',monospace;font-size:11.5px;letter-spacing:.04em;color:#8B90A3"><span data-i18n="dashboard.dropMeta">PNG, JPG or WEBP · up to 4 files · 5 MB each</span></p>' +
-      '<span data-upload-count style="position:absolute;top:10px;right:12px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3">0 / 4</span></div>' +
+      '<p style="margin-top:6px;font-family:\'Geist Mono\',monospace;font-size:11.5px;letter-spacing:.04em;color:#8B90A3"><span data-i18n="dashboard.dropMeta">PNG, JPG or WEBP · 2 files · 5 MB each</span></p>' +
+      '<span data-upload-count style="position:absolute;top:10px;right:12px;font:400 11px \'Geist Mono\',monospace;color:#8B90A3">0 / 2</span></div>' +
       '<label style="display:flex;flex-direction:column;gap:8px;margin-top:24px;font-family:\'Geist Mono\',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B90A3"><span data-i18n="dashboard.noteLabel">Note for the reviewer</span> <span style="color:#7C8296"><span data-i18n="dashboard.optional">(optional)</span></span>' +
       '<textarea id="upload-note" data-i18n-placeholder="dashboard.notePh" placeholder="Anything that helps us match your NinjaTrader account to this one." class="scp1" style="width:100%;min-height:96px;resize:vertical;background:#07080C;border:1px solid rgba(255,255,255,0.16);padding:12px 14px;color:#F2F4F8;font-family:Archivo,sans-serif;font-size:15px;line-height:1.5;outline:none;box-sizing:border-box;border-radius:10px"></textarea></label>' +
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin-top:20px">' +
@@ -475,7 +475,7 @@
       return accessHead('rejected', '#FF8AD0', 'dashboard.rejected.title', 'Needs resubmission', null, reason, '<span data-i18n="dashboard.rejected.reasonLead" style="color:#F2F4F8">Reason from the reviewer: </span>') +
         uploadBox(true) + '</div>';
     }
-    return accessHead('none', '#8B90A3', 'dashboard.none.title', 'Upload your proof to get started', 'dashboard.none.body', 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.', '') +
+    return accessHead('none', '#8B90A3', 'dashboard.none.title', 'Upload your proof to get started', 'dashboard.none.body', 'Two screenshots are required: (1) the NinjaTrader dashboard showing "Welcome, your name" and (2) the NinjaTrader Web trading platform (Simulation). Blur anything private; keep your email or username visible.', '') +
       uploadBox(false) + '</div>';
   }
 

@@ -36,7 +36,7 @@ test('waitlist: source and lang are enums', () => {
   assert.equal(waitlistSchema.safeParse({ email: 'a@b.co', lang: 'fr' }).success, false);
 });
 
-test('proof: 2-4 files, own incoming path only, note capped', () => {
+test('proof: exactly 2 files, own incoming path only, note capped', () => {
   const uid = '11111111-2222-4333-8444-555555555555';
   const file = (ext, id) => ({ path: `${uid}/incoming/${id}.${ext}`, name: 'shot.png' });
   const a = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';

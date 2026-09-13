@@ -40,7 +40,7 @@
     "verify": "Verification failed. Reload the page and try again.",
     "checkEmail": "Account created. Check your inbox and confirm your email.",
     "resent": "We sent a new code.",
-    "fileRule": "PNG, JPG or WEBP only, up to 5 MB each, 4 files.",
+    "fileRule": "PNG, JPG or WEBP only, up to 5 MB each, 2 files.",
     "submitted": "Submitted for review.",
     "uploadFailed": "Something went wrong. Try again.",
     "waitlistOk": "Thanks — you are on the list.",
@@ -434,7 +434,7 @@
     },
     "none": {
       "title": "Upload your proof to get started",
-      "body": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible."
+      "body": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Blur anything private; keep your email or username visible."
     },
     "review": {
       "title": "Under review",
@@ -465,7 +465,7 @@
     "uploadAgain": "Upload again",
     "dropStrong": "Drop screenshots here",
     "dropRest": "or click to choose",
-    "dropMeta": "PNG, JPG or WEBP · up to 4 files · 5 MB each",
+    "dropMeta": "PNG, JPG or WEBP · 2 files · 5 MB each",
     "noteLabel": "Note for the reviewer",
     "optional": "(optional)",
     "notePh": "Anything that helps us match the NinjaTrader account to this one",
@@ -627,7 +627,7 @@
       "blocked": "Rejected"
     },
     "accessBody": {
-      "none": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Up to two more are optional. Blur anything private; keep your email or username visible.",
+      "none": "Two screenshots are required: (1) the NinjaTrader dashboard showing \"Welcome, your name\" and (2) the NinjaTrader Web trading platform (Simulation). Blur anything private; keep your email or username visible.",
       "review": "A person is checking your screenshots. You will get an email either way.",
       "approved": "Your registration is confirmed. Course access lands here before 31 December 2026.",
       "rejected": "The reviewer asked for a clearer screenshot. Upload again to continue.",

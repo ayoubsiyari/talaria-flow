@@ -61,7 +61,7 @@ export const waitlistSchema = z.object({
 });
 
 export const PROOF_MIN_FILES = 2;
-export const PROOF_MAX_FILES = 4;
+export const PROOF_MAX_FILES = 2;
 export const PROOF_MAX_BYTES = 5 * 1024 * 1024;
 export const PROOF_MIME = ['image/png', 'image/jpeg', 'image/webp'] as const;
 

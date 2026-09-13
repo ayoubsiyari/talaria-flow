@@ -707,7 +707,7 @@
       var empty = drop && drop.querySelector('[data-upload-empty]');
       var grid = drop && drop.querySelector('[data-upload-grid]');
       var count = drop && drop.querySelector('[data-upload-count]');
-      if (count) count.textContent = files.length + ' / 4';
+      if (count) count.textContent = files.length + ' / 2';
       if (empty) empty.style.display = files.length ? 'none' : '';
       if (grid) {
         grid.style.display = files.length ? 'flex' : 'none';
@@ -717,9 +717,13 @@
             '<img src="' + f.preview + '" alt="">' +
             '<figcaption>' + name + '</figcaption>' +
             '<button type="button" data-upload-remove="' + f.id + '" aria-label="Remove">×</button></figure>';
-        }).join('') + (files.length < 4
+        }).join('') + (files.length < 2
           ? '<div data-upload-add role="button"><span data-upload-add-slot><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2EE8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg></span><span>+ Add</span></div>'
           : '');
+      }
+      if (drop) {
+        drop.style.cursor = files.length >= 2 ? 'default' : 'pointer';
+        drop.setAttribute('aria-disabled', files.length >= 2 ? 'true' : 'false');
       }
       if (!submit) return;
       submit.disabled = !on;
@@ -747,7 +751,7 @@
       var bad = picked.filter(function (f) { return !OK_TYPES[f.type] || f.size > MAX_BYTES; });
       if (bad.length) toast(authMsg('fileRule'));
       picked.filter(function (f) { return OK_TYPES[f.type] && f.size <= MAX_BYTES; }).forEach(function (file) {
-        if (files.length >= 4) return;
+        if (files.length >= 2) return;
         files.push({ id: randomId(), name: file.name, file: file, type: file.type, preview: URL.createObjectURL(file) });
       });
       syncSend();
@@ -765,7 +769,7 @@
       drop.appendChild(input);
       drop.addEventListener('click', function (e) {
         if (e.target.closest('[data-upload-remove]')) return;
-        if (files.length >= 4) return;
+        if (files.length >= 2) return;
         input.click();
       });
       drop.addEventListener('click', function (e) {
