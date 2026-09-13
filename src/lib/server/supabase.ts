@@ -29,11 +29,27 @@ export interface Caller {
 /** Validate an access token with GoTrue and load the caller's profile row. */
 export async function callerFromToken(token: string | null): Promise<Caller | null> {
   if (!token) return null;
-  const res = await fetch(`${env.supabaseUrl}/auth/v1/user`, {
-    headers: { apikey: env.supabaseAnonKey, authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  const user = (await res.json()) as { id: string; email?: string; email_confirmed_at?: string; confirmed_at?: string };
+  const bases: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of [process.env.SUPABASE_INTERNAL_URL, 'http://127.0.0.1:8000', process.env.SUPABASE_URL]) {
+    const base = String(raw || '').replace(/\/+$/, '');
+    if (!base || seen.has(base)) continue;
+    seen.add(base);
+    bases.push(base);
+  }
+  let user: { id: string; email?: string; email_confirmed_at?: string; confirmed_at?: string } | null = null;
+  for (const base of bases) {
+    try {
+      const res = await fetch(`${base}/auth/v1/user`, {
+        headers: { apikey: env.supabaseAnonKey, authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) continue;
+      const body = (await res.json()) as { id: string; email?: string; email_confirmed_at?: string; confirmed_at?: string };
+      if (body?.id) { user = body; break; }
+    } catch {
+      /* try the next GoTrue base */
+    }
+  }
   if (!user?.id) return null;
   const { data } = await adminClient().from('profiles').select('is_admin, role').eq('id', user.id).maybeSingle();
   return {

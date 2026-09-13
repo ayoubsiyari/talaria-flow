@@ -70,9 +70,10 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   };
 
-  async function accessToken() {
+  async function accessToken(forceRefresh) {
     if (!client) return null;
     try {
+      if (forceRefresh) await client.auth.refreshSession();
       var res = await client.auth.getSession();
       return res && res.data && res.data.session ? res.data.session.access_token : null;
     } catch (e) { return null; }
@@ -87,11 +88,17 @@
       headers['content-type'] = 'application/json';
       body = JSON.stringify(body);
     }
-    if (opts.auth !== false) {
-      var token = await accessToken();
-      if (token) headers.authorization = 'Bearer ' + token;
+    async function send(token) {
+      var h = Object.assign({}, headers);
+      if (token) h.authorization = 'Bearer ' + token;
+      return fetch(path, { method: opts.method || (body !== undefined ? 'POST' : 'GET'), headers: h, body: body, credentials: 'same-origin' });
     }
-    var res = await fetch(path, { method: opts.method || (body !== undefined ? 'POST' : 'GET'), headers: headers, body: body, credentials: 'same-origin' });
+    var token = opts.auth === false ? null : await accessToken();
+    var res = await send(token);
+    if (res.status === 401 && opts.auth !== false) {
+      var next = await accessToken(true);
+      if (next && next !== token) res = await send(next);
+    }
     var out = null;
     try { out = await res.json(); } catch (e) { out = null; }
     return { ok: res.ok, status: res.status, body: out || {} };

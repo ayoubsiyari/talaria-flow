@@ -27,7 +27,7 @@ export default handle(async (req: Request) => {
   // 22P02 = malformed uuid: Postgres refuses to even compare it, which for us just means "no such row".
   if (findErr && findErr.code !== '22P02') throw new Error(findErr.message);
   if (!submission) throw new HttpError(404, 'not_found', 'Submission not found.');
-  if (submission.status !== 'submitted') throw new HttpError(409, 'already_decided', 'This submission has already been decided.');
+  if (submission.status === 'approved') throw new HttpError(409, 'already_decided', 'This submission has already been decided.');
   const { data: member } = await sb.from('profiles').select('id, email, lang, first_name, name').eq('id', submission.user_id).maybeSingle();
   if (!member || !member.email) throw new HttpError(404, 'not_found', 'Member not found.');
 
