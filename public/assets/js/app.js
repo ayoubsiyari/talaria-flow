@@ -247,8 +247,10 @@
           location.href = '/account/';
           return;
         }
-        showSignupVerify(form, email);
-        setNoindex();
+        var next = (res.body && res.body.next) || ('/signup/verify?email=' + encodeURIComponent(email));
+        try { sessionStorage.setItem('tf-signup-email', email); } catch (eSt) {}
+        if (window.TF.navigate) window.TF.navigate(next);
+        else location.href = next;
       } catch (err) {
         setFieldError(emailIn, emailErr, authMsg('uploadFailed'));
       } finally {
@@ -854,9 +856,143 @@
     });
   }
 
+  function readPendingSignupEmail() {
+    var q = new URLSearchParams(location.search).get('email');
+    if (q) return String(q).trim().toLowerCase();
+    try { var s = sessionStorage.getItem('tf-signup-email'); if (s) return s; } catch (e) {}
+    var m = ('; ' + document.cookie).match(/; tf-signup-email=([^;]*)/);
+    return m ? decodeURIComponent(m[1]).trim().toLowerCase() : '';
+  }
+
+  function initSignupVerify() {
+    var form = document.getElementById('signup-verify-form');
+    if (!form || form.getAttribute('data-bound')) return;
+    var email = readPendingSignupEmail();
+    if (!email) {
+      if (window.TF.navigate) window.TF.navigate('/signup/');
+      else location.href = '/signup/';
+      return;
+    }
+    form.setAttribute('data-bound', '1');
+    try { sessionStorage.setItem('tf-signup-email', email); } catch (e0) {}
+    var ar = ((window.TF.currentLang && window.TF.currentLang()) || localStorage.getItem('tf-lang') || 'en') === 'ar';
+    var h1 = document.getElementById('signup-verify-h1');
+    if (h1) h1.textContent = ar ? 'أدخل رمزك' : 'Enter your code';
+    var lede = document.getElementById('signup-verify-lede');
+    if (lede) {
+      lede.innerHTML = ar
+        ? ('أرسلنا رمزاً من 6 أرقام إلى <strong style="color:#F2F4F8;font-weight:600"></strong>. ينتهي خلال 15 دقيقة.')
+        : ('We sent a 6-digit code to <strong style="color:#F2F4F8;font-weight:600"></strong>. It expires in 15 minutes.');
+      var strong = lede.querySelector('strong');
+      if (strong) strong.textContent = email;
+    }
+    var boxHost = document.getElementById('signup-verify-boxes');
+    var err = document.getElementById('signup-verify-err');
+    var resend = document.getElementById('signup-verify-resend');
+    var btn = form.querySelector('[type="submit"]');
+    var boxes = [];
+    var BOX = 'width:48px;height:56px;box-sizing:border-box;background:#07080C;border:1px solid rgba(255,255,255,.16);border-radius:10px;color:#F2F4F8;font:400 22px "Geist Mono",monospace;text-align:center;outline:none';
+    function setBoxesError(on) {
+      boxes.forEach(function (b) {
+        b.style.border = on ? '1px solid #FF37B0' : '1px solid rgba(255,255,255,.16)';
+      });
+      if (err) {
+        err.style.display = on ? 'block' : 'none';
+        err.textContent = on ? 'That code is not right. Check the email or send a new one.' : '';
+      }
+    }
+    function codeValue() { return boxes.map(function (b) { return b.value; }).join(''); }
+    function fillCode(str) {
+      var digits = String(str || '').replace(/\D/g, '').slice(0, 6).split('');
+      boxes.forEach(function (b, i) { b.value = digits[i] || ''; });
+    }
+    if (boxHost && !boxHost.getAttribute('data-ready')) {
+      boxHost.setAttribute('data-ready', '1');
+      for (var i = 0; i < 6; i++) {
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.inputMode = 'numeric';
+        inp.autocomplete = i === 0 ? 'one-time-code' : 'off';
+        inp.maxLength = 1;
+        inp.setAttribute('aria-label', 'Digit ' + (i + 1));
+        inp.style.cssText = BOX;
+        inp.addEventListener('focus', function () { this.style.border = '1px solid #2EE8FF'; });
+        inp.addEventListener('blur', function () {
+          if (!(err && err.style.display === 'block')) this.style.border = '1px solid rgba(255,255,255,.16)';
+        });
+        boxes.push(inp);
+        boxHost.appendChild(inp);
+      }
+      boxes.forEach(function (inp, idx) {
+        inp.addEventListener('input', function (e) {
+          var v = (inp.value || '').replace(/\D/g, '');
+          if (v.length > 1) { fillCode(v); if (boxes[Math.min(v.length, 5)]) boxes[Math.min(v.length, 5)].focus(); return; }
+          inp.value = v.slice(-1);
+          if (inp.value && boxes[idx + 1]) boxes[idx + 1].focus();
+        });
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Backspace' && !inp.value && boxes[idx - 1]) { boxes[idx - 1].focus(); boxes[idx - 1].value = ''; e.preventDefault(); }
+        });
+        inp.addEventListener('paste', function (e) {
+          var text = (e.clipboardData && e.clipboardData.getData('text')) || '';
+          if (/\d{6}/.test(text.replace(/\s/g, ''))) { e.preventDefault(); fillCode(text); boxes[5].focus(); }
+        });
+      });
+    }
+    var qCode = new URLSearchParams(location.search).get('code');
+    if (qCode) fillCode(qCode);
+    var left = 60;
+    function tickResend() {
+      if (!resend) return;
+      if (left > 0) {
+        resend.disabled = true;
+        resend.textContent = (ar ? 'إعادة الإرسال' : 'Resend code') + ' · ' + left + 's';
+        left -= 1;
+        setTimeout(tickResend, 1000);
+      } else {
+        resend.disabled = false;
+        resend.textContent = ar ? 'إعادة الإرسال' : 'Resend code';
+      }
+    }
+    tickResend();
+    async function submitCode() {
+      var code = codeValue();
+      if (!/^\d{6}$/.test(code)) { setBoxesError(true); return; }
+      setBoxesError(false);
+      setPending(btn, true);
+      try {
+        var token = await window.TF.turnstile('verify');
+        var res = await window.TF.api('/api/auth/verify', { auth: false, body: { email: email, token: code, purpose: 'signup', turnstileToken: token } });
+        if (!res.ok) { setBoxesError(true); return; }
+        await window.TF.adoptSession(res.body.session);
+        var dest = (res.body.user && res.body.user.is_admin) ? '/admin/' : '/account/';
+        location.href = dest;
+      } catch (err2) {
+        setBoxesError(true);
+      } finally {
+        setPending(btn, false);
+      }
+    }
+    form.addEventListener('submit', function (e) { e.preventDefault(); submitCode(); });
+    if (resend) resend.addEventListener('click', async function () {
+      if (resend.disabled) return;
+      setPending(resend, true);
+      try {
+        var token = await window.TF.turnstile('resend');
+        await window.TF.api('/api/auth/resend', { auth: false, body: { email: email, purpose: 'signup', turnstileToken: token } });
+        left = 60;
+        tickResend();
+      } finally {
+        setPending(resend, false);
+      }
+    });
+    if (qCode && /^\d{6}$/.test(String(qCode).replace(/\D/g, '').slice(0, 6))) submitCode();
+  }
+
   window.TF = window.TF || {};
   window.TF.bootApp = function () {
     initSignup();
+    initSignupVerify();
     initLogin();
     initDashboard();
     initAdminEmails();

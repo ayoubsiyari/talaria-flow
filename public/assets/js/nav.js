@@ -27,6 +27,7 @@
     '/': '/index.html',
     '/login': '/login/index.html',
     '/signup': '/signup/index.html',
+    '/signup/verify': '/signup/verify/index.html',
     '/tools': '/tools/index.html',
     '/ninjatrader': '/ninjatrader/index.html',
     '/legal/privacy': '/legal/privacy/index.html',

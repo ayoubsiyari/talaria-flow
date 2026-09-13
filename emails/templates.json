@@ -60,12 +60,17 @@
     "blocks": [
       {
         "type": "p",
-        "text": "Enter this code on the sign-in page. It works once and expires in 10 minutes."
+        "text": "Enter this code on the verification page, or tap the button. It works once and expires in 15 minutes."
       },
       {
         "type": "code",
         "value": "{{code}}",
         "note": "Requested from {{device}} · {{location}} · {{time}}"
+      },
+      {
+        "type": "button",
+        "label": "Verify email",
+        "href": "{{verify_url}}"
       },
       {
         "type": "callout",
@@ -83,16 +88,23 @@
       "blocks": [
         {
           "type": "p",
-          "text": "استخدم هذا الرمز لإكمال تسجيل الدخول"
+          "text": "أدخل الرمز في صفحة التحقق، أو اضغط الزر. صالح لخمس عشرة دقيقة"
+        },
+        {
+          "type": "code",
+          "value": "{{code}}",
+          "note": "{{device}} · {{location}} · {{time}}"
+        },
+        {
+          "type": "button",
+          "label": "تأكيد البريد",
+          "href": "{{verify_url}}"
         },
         {
           "type": "callout",
-          "label": "الرمز",
-          "text": "{{code}}"
-        },
-        {
-          "type": "p",
-          "text": "الرمز صالح لعشر دقائق. إن لم تطلبه فتجاهل هذه الرسالة"
+          "color": "#FBBF24",
+          "label": "لست أنت؟",
+          "text": "لا تشارك هذا الرمز مع أحد. إن لم تطلبه فتجاهل الرسالة"
         }
       ]
     }

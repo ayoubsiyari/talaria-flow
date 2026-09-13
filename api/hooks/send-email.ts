@@ -57,6 +57,7 @@ export default handle(async (req: Request) => {
     location: 'Account verification',
     time: now,
     reset_url: resetUrl(data),
+    verify_url: `${env.siteUrl.replace(/\/+$/, '')}/signup/verify?email=${encodeURIComponent(email)}&code=${encodeURIComponent(token)}`,
   };
 
   const templateId = action === 'recovery' ? '07-password-reset' : '02-signup-code';
