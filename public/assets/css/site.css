@@ -594,6 +594,11 @@ html[data-lang="ar"] [data-ar-only],html[data-lang="ar"] [data-en-orig]{display:
 [data-en-orig] p,[data-en-orig] ul{margin-top:6px}
 /* Arabic list items carry dir=rtl, so their markers sit on the right: move the indent with them. */
 html[data-lang="ar"] [data-sec] > div > ul{padding-left:0!important;padding-right:18px}
+html[data-lang="ar"] [data-ar-only],
+html[data-lang="ar"] [data-sec] > div > h1,
+html[data-lang="ar"] [data-sec] > div > h2,
+html[data-lang="ar"] [data-sec] > div > p,
+html[data-lang="ar"] [data-sec] > div > ul > li{text-align:right!important}
 #guide [data-om-starter]{background:#07080C!important}
 #guide [data-om-starter] > :last-child{display:none!important}
 #guide [data-tf-stage] svg{display:block}
