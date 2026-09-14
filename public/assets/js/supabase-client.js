@@ -41,7 +41,12 @@
     }
   }
 
-  /** supabase-js persists the session under sb-<ref>-auth-token; its presence means "probably signed in". */
+  /** supabase-js persists the session under sb-<ref>-auth-token (sometimes chunked as .0, .1). */
+  function isAuthTokenKey(key) {
+    key = String(key || '');
+    if (/code-verifier|pkce/i.test(key)) return false;
+    return /^sb-.*-auth-token(\.\d+)?$/.test(key) || /^sb-.*-auth-token/.test(key);
+  }
   function hasStoredSession() {
     try {
       var stores = [window.sessionStorage, window.localStorage];
@@ -49,7 +54,9 @@
         var store = stores[s];
         if (!store) continue;
         for (var i = 0; i < store.length; i++) {
-          if (/^sb-.*-auth-token$/.test(store.key(i) || '')) return true;
+          var key = store.key(i) || '';
+          if (isAuthTokenKey(key)) return true;
+          if (/^sb-/.test(key) && /"access_token"/.test(store.getItem(key) || '')) return true;
         }
       }
     } catch (e) {}
@@ -230,13 +237,15 @@
     if (typeof fn !== 'function') return function () {};
     sessionListeners.push(fn);
     try {
-      if (!sessionResolved && hasStoredSession()) fn({ user: null, profile: null, isAdmin: false, pending: true });
-      else fn(sessionState);
+      if (!sessionResolved && (hasStoredSession() || document.documentElement.getAttribute('data-tf-session'))) {
+        fn({ user: null, profile: null, isAdmin: false, pending: true });
+      } else fn(sessionState);
     } catch (err) {}
     return function () { sessionListeners = sessionListeners.filter(function (x) { return x !== fn; }); };
   };
   window.TF.refreshSession = async function () {
     var state = await window.TF.getCurrentUser();
+    if ((!state || !state.user) && hasStoredSession() && !sessionResolved) return state;
     publishSession(state);
     return state;
   };
@@ -259,7 +268,11 @@
       // Clearing the HttpOnly cookie then logs the visitor out immediately after /api/auth/login.
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') syncSessionCookie(session);
       if (event === 'INITIAL_SESSION' && session) syncSessionCookie(session);
-      if (event === 'SIGNED_OUT') syncSessionCookie(null);
+      if (event === 'SIGNED_OUT') {
+        syncSessionCookie(null);
+        publishSession({ user: null, profile: null, isAdmin: false });
+        return;
+      }
       if (event === 'INITIAL_SESSION' && !session && hasStoredSession()) return;
       window.TF.refreshSession();
     });

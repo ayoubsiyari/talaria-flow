@@ -16,8 +16,10 @@ html[data-tf-session] footer a[href*="/login/"],
 html[data-tf-session] footer a[href*="/signup/"],
 html[data-tf-session] [data-hd] [data-login],
 html[data-tf-session] [data-hd] [data-signup],
+html[data-tf-session] [data-hd] a[href="/login/"],
+html[data-tf-session] [data-hd] a[href="/signup/"],
 html[data-tf-session] [data-drawer] a[href*="/login/"],
-html[data-tf-session] [data-drawer] a[href*="/signup/"]{display:none!important}
+html[data-tf-session] [data-drawer] a[href*="/signup/"]{display:none!important;visibility:hidden!important}
 
 /* Header — Site Header.dc.html */
 [data-menu]{display:none}
