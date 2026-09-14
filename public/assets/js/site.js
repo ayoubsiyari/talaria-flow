@@ -28,6 +28,12 @@
     (document.head || document.documentElement).appendChild(s);
   })();
 
+  (function hidePendingGuestChrome() {
+    if (window.TF && window.TF.hasStoredSession && window.TF.hasStoredSession()) {
+      document.documentElement.setAttribute('data-tf-session', '1');
+    }
+  })();
+
   (function splitBrand() {
     var btn = document.getElementById('brand-menu-btn');
     if (!btn || btn.getAttribute('data-split') === '1') return;
@@ -198,7 +204,6 @@
     document.documentElement.lang = lang;
     document.documentElement.setAttribute('data-lang', lang);
     document.documentElement.dir = 'ltr';
-    document.documentElement.classList.add('i18n-ready');
     // Legal pages: the English-original block under each section and the translation banner
     // exist only when lang === 'ar'. In English they are removed from the flow (hidden attribute,
     // in addition to the CSS rule) so no empty banner box or duplicate text can render.
@@ -261,6 +266,9 @@
       requestAnimationFrame(function () { try { placeIndicator(); } catch (e2) {} });
     } catch (e) {}
     applySeo(lang);
+    if (!(document.documentElement.getAttribute('data-tf-session') && !lastSession)) {
+      document.documentElement.classList.add('i18n-ready');
+    }
   }
 
   function setMeta(attr, name, value) {
