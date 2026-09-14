@@ -5,6 +5,14 @@
 
 html,body{overflow-x:hidden}
 
+/* Hide guest login/signup in chrome while a stored session is being restored. */
+html[data-tf-session] footer a[href*="/login/"],
+html[data-tf-session] footer a[href*="/signup/"],
+html[data-tf-session] [data-hd] [data-login],
+html[data-tf-session] [data-hd] [data-signup],
+html[data-tf-session] [data-drawer] a[href*="/login/"],
+html[data-tf-session] [data-drawer] a[href*="/signup/"]{display:none!important}
+
 /* Header — Site Header.dc.html */
 [data-menu]{display:none}
 @media (max-width:1000px){

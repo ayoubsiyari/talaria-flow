@@ -775,13 +775,28 @@
     if (window.TF.applyI18n) window.TF.applyI18n();
   }
 
+  function hideGuestAuthLinks() {
+    document.querySelectorAll(
+      'footer a[href*="/login/"], footer a[href*="/signup/"], [data-hd] [data-login], [data-hd] [data-signup], [data-drawer] a[href*="/login/"], [data-drawer] a[href*="/signup/"]'
+    ).forEach(function (el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+
   function applySessionHeader(state) {
     cacheGuest();
+    if (state && state.pending) {
+      document.documentElement.setAttribute('data-tf-session', '1');
+      hideGuestAuthLinks();
+      return;
+    }
     if (!state || !state.user) {
       lastSession = null;
+      document.documentElement.removeAttribute('data-tf-session');
       showGuestHeader();
       return;
     }
+    document.documentElement.setAttribute('data-tf-session', '1');
     lastSession = state;
     var email = state.user.email || '';
     var name = (state.profile && (state.profile.name || [state.profile.first_name, state.profile.last_name].filter(Boolean).join(' '))) || '';
@@ -864,9 +879,7 @@
       drawerLink('#logout', 'header.logout', lookup('header.logout', lang) || 'Log out', logout);
     }
 
-    document.querySelectorAll('footer a[href*="/login/"], footer a[href*="/signup/"]').forEach(function (el) {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    });
+    hideGuestAuthLinks();
     if (window.TF.applyI18n) window.TF.applyI18n();
   }
 
@@ -1087,6 +1100,12 @@
   if (window.TF && window.TF.useSession) {
     window.TF.useSession(applySessionHeader);
   } else if (window.TF && window.TF.getCurrentUser) {
-    window.TF.getCurrentUser().then(applySessionHeader).catch(function () {});
+    if (window.TF.hasStoredSession && window.TF.hasStoredSession()) applySessionHeader({ pending: true });
+    window.TF.getCurrentUser().then(applySessionHeader).catch(function () {
+      applySessionHeader({ user: null, profile: null, isAdmin: false });
+    });
+  } else if (document.documentElement.getAttribute('data-tf-session')) {
+    cacheGuest();
+    hideGuestAuthLinks();
   }
 })();

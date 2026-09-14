@@ -7,7 +7,7 @@
 <link rel="manifest" href="/site.webmanifest">
 
 <meta charset="utf-8">
-<script>(function(){try{var a=/\/admin(?:\/|$)/.test(location.pathname),q=/[?&]lang=(en|ar)(?:&|$)/.exec(location.search),l=a?'en':(q?q[1]:(localStorage.getItem('tf-lang')||'en'));if(q&&!a)localStorage.setItem('tf-lang',l);document.documentElement.lang=l;document.documentElement.setAttribute('data-lang',l);if(l==='ar'){var p=document.createElement('link');p.rel='preload';p.as='font';p.type='font/woff2';p.crossOrigin='anonymous';p.href='/fonts/Cairo-wght.woff2';document.head.appendChild(p)}}catch(e){document.documentElement.setAttribute('data-lang','en')}})();</script>
+<script>(function(){try{var a=/\/admin(?:\/|$)/.test(location.pathname),q=/[?&]lang=(en|ar)(?:&|$)/.exec(location.search),l=a?'en':(q?q[1]:(localStorage.getItem('tf-lang')||'en'));if(q&&!a)localStorage.setItem('tf-lang',l);document.documentElement.lang=l;document.documentElement.setAttribute('data-lang',l);var st=[localStorage,sessionStorage],s,i;for(s=0;s<st.length;s++){for(i=0;i<st[s].length;i++){if(/^sb-.*-auth-token$/.test(st[s].key(i)||'')){document.documentElement.setAttribute('data-tf-session','1');s=st.length;break}}}if(l==='ar'){var p=document.createElement('link');p.rel='preload';p.as='font';p.type='font/woff2';p.crossOrigin='anonymous';p.href='/fonts/Cairo-wght.woff2';document.head.appendChild(p)}}catch(e){document.documentElement.setAttribute('data-lang','en')}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/Archivo-wdth-wght.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/GeistMono-wght.woff2">

@@ -55,6 +55,7 @@
     } catch (e) {}
     return false;
   }
+  window.TF.hasStoredSession = hasStoredSession;
 
   var vendorLoading = null;
   function loadVendor() {
@@ -193,7 +194,9 @@
 
   var sessionListeners = [];
   var sessionState = { user: null, profile: null, isAdmin: false };
+  var sessionResolved = false;
   function publishSession(state) {
+    sessionResolved = true;
     sessionState = state || { user: null, profile: null, isAdmin: false };
     sessionListeners.slice().forEach(function (fn) {
       try { fn(sessionState); } catch (err) {}
@@ -226,7 +229,10 @@
   window.TF.useSession = function (fn) {
     if (typeof fn !== 'function') return function () {};
     sessionListeners.push(fn);
-    try { fn(sessionState); } catch (err) {}
+    try {
+      if (!sessionResolved && hasStoredSession()) fn({ user: null, profile: null, isAdmin: false, pending: true });
+      else fn(sessionState);
+    } catch (err) {}
     return function () { sessionListeners = sessionListeners.filter(function (x) { return x !== fn; }); };
   };
   window.TF.refreshSession = async function () {
@@ -254,6 +260,7 @@
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') syncSessionCookie(session);
       if (event === 'INITIAL_SESSION' && session) syncSessionCookie(session);
       if (event === 'SIGNED_OUT') syncSessionCookie(null);
+      if (event === 'INITIAL_SESSION' && !session && hasStoredSession()) return;
       window.TF.refreshSession();
     });
     window.TF.refreshSession();
