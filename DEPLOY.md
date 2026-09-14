@@ -111,7 +111,34 @@ Add once the domain is verified:
 |---|---|---|
 | TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@talaria-flow.com; fo=1; adkim=s; aspf=r` |
 
-Run with `p=none` for two weeks while you watch the aggregate reports, then move to `p=quarantine` and finally `p=reject`. `adkim=s` requires DKIM to align with `talaria-flow.com` (it does — Resend signs with the root domain); `aspf=r` lets the `send.` return path pass SPF alignment.
+Run with `p=none` for two weeks while you watch the aggregate reports, then move to `p=quarantine` and finally `p=reject`. BIMI (the Gmail sender circle) needs `p=quarantine` or `p=reject`. Live DNS is already `p=quarantine`. `adkim=s` requires DKIM to align with `talaria-flow.com` (it does — Resend signs with the root domain); `aspf=r` lets the `send.` return path pass SPF alignment.
+
+### 2.2.1 Gmail brand circle (BIMI)
+
+The logo **inside** the email is already `email-logo-2x.png`. The grey person next to the sender name is a **Gmail avatar**. Gmail only fills that circle with BIMI + a paid certificate.
+
+Already in this repo (served live after deploy):
+
+- Logo: `https://www.talaria-flow.com/.well-known/bimi/logo.svg` (SVG Tiny PS, square, solid `#07080C` background)
+- After you buy a VMC/CMC, put the PEM at `https://www.talaria-flow.com/.well-known/bimi/vmc.pem`
+
+**You still have to do this (DNS + certificate). Code cannot finish it.**
+
+1. In GoDaddy DNS (or whatever hosts `talaria-flow.com`) add:
+
+| Type | Name | Value |
+|---|---|---|
+| TXT | `default._bimi` | `v=BIMI1;l=https://www.talaria-flow.com/.well-known/bimi/logo.svg;` |
+
+2. Buy a **Verified Mark Certificate (VMC)** or **Common Mark Certificate (CMC)** for the Talaria mark from [DigiCert](https://www.digicert.com/tls-ssl/verified-mark-certificates) or Entrust. Gmail will **not** show the circle without `a=` pointing at that PEM. VMC needs a registered trademark and shows a checkmark; CMC is the cheaper “logo only” path.
+
+3. Save the PEM as `public/.well-known/bimi/vmc.pem`, deploy, then **replace** the TXT with:
+
+`v=BIMI1;l=https://www.talaria-flow.com/.well-known/bimi/logo.svg;a=https://www.talaria-flow.com/.well-known/bimi/vmc.pem;`
+
+4. Wait up to 48 hours. Check [BIMI Inspector](https://bimigroup.org/bimi-generator/) and send a **new** mail to Gmail (old threads keep the old avatar).
+
+Do not put spaces around `l=` / `a=`. The SVG must stay Tiny PS (`version="1.2"` `baseProfile="tiny-ps"`), square, no scripts, no external files.
 
 ### 2.3 Receiving mail at support@ (replies)
 Resend only sends. To *receive* at `support@talaria-flow.com`, use Cloudflare → Email → Email Routing → enable, add destination inbox, then create the rule `support@talaria-flow.com → your-inbox@…`. Cloudflare adds these root records automatically:
