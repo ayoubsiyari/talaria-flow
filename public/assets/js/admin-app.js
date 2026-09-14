@@ -575,6 +575,12 @@
       var thumbs = fileRows.filter(function (f) { return sub && f.submission_id === sub.id; }).map(function (f) { return f.file_path; });
       var last = lastEmailByRecipient[String(p.email || '').toLowerCase()];
       var first = p.first_name || (p.name ? String(p.name).split(' ')[0] : '');
+      var surname = p.last_name || '';
+      if (!surname && p.name) {
+        var rest = String(p.name).trim();
+        if (first && rest.toLowerCase().indexOf(String(first).toLowerCase()) === 0) rest = rest.slice(String(first).length).trim();
+        surname = rest;
+      }
       var status = 'none';
       if (p.blocked) status = 'blocked';
       else if (sub && (sub.status === 'submitted' || sub.status === 'approved')) status = sub.status;
@@ -583,7 +589,7 @@
         id: p.id,
         email: p.email,
         firstName: first || '',
-        lastName: p.last_name || '',
+        lastName: surname || '',
         status: status,
         submitted: sub ? fmtDate(sub.created_at) : '—',
         submittedAt: sub ? sub.created_at : '',
@@ -1190,6 +1196,10 @@
         '<span style="display:inline-flex;align-items:center;gap:7px;font-family:\'Geist Mono\',monospace;font-size:11px;color:' + COLORS[focus.status] + ';border:1px solid ' + COLORS[focus.status] + ';border-radius:6px;padding:4px 8px"><span class="tf-dot" style="background:' + COLORS[focus.status] + '"></span>' + esc(statusLabel(focus.status)) + '</span></header>' +
         '<div style="padding:0 18px 20px">' +
         '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)">' +
+        '<div style="padding:10px 10px 10px 0"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">First name</div><div style="font-size:13px;margin-top:3px;word-break:break-word">' + esc(focus.firstName || '—') + '</div></div>' +
+        '<div style="padding:10px;border-left:1px solid rgba(255,255,255,0.08)"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Last name</div><div style="font-size:13px;margin-top:3px;word-break:break-word">' + esc(focus.lastName || '—') + '</div></div>' +
+        '<div style="padding:10px 0 10px 10px;border-left:1px solid rgba(255,255,255,0.08)"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Country</div><div style="font-family:\'Geist Mono\',monospace;font-size:12px;margin-top:3px">' + esc(focus.country || '—') + '</div></div></div>' +
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(255,255,255,0.08)">' +
         '<div style="padding:10px 10px 10px 0"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Signed up</div><div style="font-family:\'Geist Mono\',monospace;font-size:12px;margin-top:3px">' + esc(focus.signup) + '</div></div>' +
         '<div style="padding:10px;border-left:1px solid rgba(255,255,255,0.08)"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Language</div><div style="font-family:\'Geist Mono\',monospace;font-size:12px;margin-top:3px">' + esc(focus.lang) + '</div></div>' +
         '<div style="padding:10px 0 10px 10px;border-left:1px solid rgba(255,255,255,0.08)"><div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8B90A3">Emails sent</div><div style="font-family:\'Geist Mono\',monospace;font-size:12px;margin-top:3px">' + esc(focus.emails) + '</div></div></div>';
