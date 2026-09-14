@@ -7,9 +7,16 @@
   "cleanUrls": true,
   "trailingSlash": true,
   "functions": {
-    "api/proof.ts": { "maxDuration": 60, "memory": 1024 },
-    "api/admin/campaigns.ts": { "maxDuration": 60 },
-    "api/cron/send-campaigns.ts": { "maxDuration": 60 }
+    "api/proof.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/admin/campaigns.ts": {
+      "maxDuration": 60
+    },
+    "api/cron/send-campaigns.ts": {
+      "maxDuration": 60
+    }
   },
   "headers": [
     {
@@ -41,7 +48,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com 'sha256-3Xuw2Ope0h/vTkDPGuy8S/PHpUcSlTmzwsW/r5/FM8M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         }
       ]
     },

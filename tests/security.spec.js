@@ -31,7 +31,7 @@ test.describe('security headers (vercel.json)', () => {
     for (const path of ['/', '/course/', '/login/']) {
       const h = (await request.get(path)).headers();
       expect(h['content-security-policy'], path).toMatch(/default-src 'self'/);
-      expect(h['content-security-policy']).toMatch(/script-src 'self' https:\/\/challenges\.cloudflare\.com 'sha256-/);
+      expect(h['content-security-policy']).toMatch(/script-src 'self' https:\/\/challenges\.cloudflare\.com/);
       expect(h['content-security-policy']).toMatch(/frame-ancestors 'none'/);
       expect(h['content-security-policy']).not.toMatch(/script-src[^;]*'unsafe-inline'/);
       expect(h['strict-transport-security']).toMatch(/max-age=63072000; includeSubDomains; preload/);
@@ -48,7 +48,7 @@ test.describe('security headers (vercel.json)', () => {
     await page.goto('/login/');
     await page.waitForLoadState('networkidle');
     expect(violations).toEqual([]);
-    // The language bootstrap ran (it is the only inline script).
+    // Language bootstrap is /assets/js/boot.js (script-src 'self').
     expect(await page.evaluate(() => document.documentElement.getAttribute('data-lang'))).toMatch(/^(en|ar)$/);
   });
 });

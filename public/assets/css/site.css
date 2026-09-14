@@ -11,15 +11,15 @@ footer [data-cookie-settings]:focus{
   color:#F2F4F8!important
 }
 
-/* Hide guest login/signup in chrome while a stored session is being restored. */
-html[data-tf-session] footer a[href*="/login/"],
-html[data-tf-session] footer a[href*="/signup/"],
-html[data-tf-session] [data-hd] [data-login],
-html[data-tf-session] [data-hd] [data-signup],
-html[data-tf-session] [data-hd] a[href="/login/"],
-html[data-tf-session] [data-hd] a[href="/signup/"],
-html[data-tf-session] [data-drawer] a[href*="/login/"],
-html[data-tf-session] [data-drawer] a[href*="/signup/"]{display:none!important;visibility:hidden!important}
+/* Guest CTAs stay hidden until boot.js adds .tf-guest (logged-in visitors never see them). */
+html:not(.tf-guest) footer a[href*="/login/"],
+html:not(.tf-guest) footer a[href*="/signup/"],
+html:not(.tf-guest) [data-hd] [data-login],
+html:not(.tf-guest) [data-hd] [data-signup],
+html:not(.tf-guest) [data-hd] a[href="/login/"],
+html:not(.tf-guest) [data-hd] a[href="/signup/"],
+html:not(.tf-guest) [data-drawer] a[href*="/login/"],
+html:not(.tf-guest) [data-drawer] a[href*="/signup/"]{display:none!important;visibility:hidden!important}
 
 /* Header — Site Header.dc.html */
 [data-menu]{display:none}

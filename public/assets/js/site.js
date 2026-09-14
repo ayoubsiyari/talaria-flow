@@ -795,16 +795,19 @@
     cacheGuest();
     if (state && state.pending) {
       document.documentElement.setAttribute('data-tf-session', '1');
+      document.documentElement.classList.remove('tf-guest');
       hideGuestAuthLinks();
       return;
     }
     if (!state || !state.user) {
       lastSession = null;
       document.documentElement.removeAttribute('data-tf-session');
+      document.documentElement.classList.add('tf-guest');
       showGuestHeader();
       return;
     }
     document.documentElement.setAttribute('data-tf-session', '1');
+    document.documentElement.classList.remove('tf-guest');
     lastSession = state;
     var email = state.user.email || '';
     var name = (state.profile && (state.profile.name || [state.profile.first_name, state.profile.last_name].filter(Boolean).join(' '))) || '';
