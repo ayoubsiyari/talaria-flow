@@ -1074,7 +1074,7 @@
     a.type = 'button';
     a.setAttribute('data-cookie-settings', '');
     a.setAttribute('data-i18n', 'footer.cookies');
-    a.className = 'scp5';
+    a.className = privacy.className || '';
     a.style.cssText = 'display:block;height:auto;padding:0;border:0;background:transparent;color:#B7BCCB;font:inherit;font-size:var(--fs-small);cursor:pointer;text-align:left';
     a.textContent = lookup('footer.cookies', currentLang()) || 'Cookie settings';
     a.addEventListener('click', function () { showConsent(true); });

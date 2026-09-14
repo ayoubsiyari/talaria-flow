@@ -5,6 +5,12 @@
 
 html,body{overflow-x:hidden}
 
+footer [data-cookie-settings]:hover,
+footer [data-cookie-settings]:focus{
+  background:transparent!important;
+  color:#F2F4F8!important
+}
+
 /* Hide guest login/signup in chrome while a stored session is being restored. */
 html[data-tf-session] footer a[href*="/login/"],
 html[data-tf-session] footer a[href*="/signup/"],
