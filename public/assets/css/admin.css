@@ -13,15 +13,15 @@ button span,a[class*="btn"] span{white-space:nowrap!important}
 h1,h2,h3,p{margin:0}
 textarea::placeholder{color:#7C8296}
 .btn-primary,.btn-primary:hover,.btn-primary:focus,.btn-primary:focus-visible,.btn-primary:active,.btn-primary:disabled,.btn-primary.is-pending,.btn-primary.is-loading,.btn-primary *{color:#04141A!important;opacity:1}
-.btn-primary:hover,.btn-primary:focus-visible,.btn-primary:active{background:#8FF3FF!important;color:#04141A!important}
+.btn-primary:hover,.btn-primary:focus-visible,.btn-primary:active{background:#2EE8FF!important;color:#04141A!important}
 .btn-outline{border:1px solid #2EE8FF;color:#2EE8FF;background:transparent}
-.btn-outline:hover,.btn-outline:focus-visible,.btn-outline:active{background:rgba(46,232,255,.14)!important;color:#2EE8FF!important}
+.btn-outline:hover,.btn-outline:focus-visible,.btn-outline:active{background:transparent!important;color:#F2F4F8!important;border-color:#F2F4F8!important}
 .btn-neutral{border:1px solid rgba(255,255,255,.16);color:#F2F4F8;background:transparent}
 .btn-neutral:hover,.btn-neutral:focus-visible,.btn-neutral:active{border-color:#F2F4F8!important;color:#F2F4F8!important}
-.scp1:hover{background:rgba(46,232,255,0.14)!important;color:#2EE8FF!important}
+.scp1:hover{background:rgba(255,255,255,0.06)!important;color:#F2F4F8!important}
 .scp2:hover{background:rgba(255,255,255,0.03)!important}
 .scp3:focus{border-color:#2EE8FF!important}
-.scp4:hover{background:#8FF3FF!important;color:#04141A!important}
+.scp4:hover{background:#2EE8FF!important;color:#04141A!important}
 .scp5:hover{border-color:#F2F4F8!important}
 .scp6:hover{background:rgba(255,255,255,0.05)!important}
 [data-shell]{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
@@ -35,7 +35,7 @@ main[data-admin-main]{min-width:0;padding:28px clamp(20px,3vw,40px) 60px;display
 .tf-card-count{font-family:'Geist Mono',monospace;font-size:11px;color:#8B90A3}
 .tf-dot{width:6px;height:6px;display:inline-block;flex:none}
 .tf-card-link{border:0;background:none;color:#2EE8FF;font-family:Archivo,sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;line-height:1;padding:0}
-a.tf-card-link:hover{color:#8FF3FF}
+a.tf-card-link:hover{color:#F2F4F8}
 .tf-work{min-height:280px}
 .tf-kpi{display:flex;flex-direction:column;gap:10px;padding:16px 18px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#0E1017;color:inherit;text-align:left;cursor:pointer;font-family:inherit;min-width:0}
 .tf-kpi:hover{border-right-color:rgba(255,255,255,.2);border-bottom-color:rgba(255,255,255,.2);border-left-color:rgba(255,255,255,.2);background:rgba(255,255,255,.03)}

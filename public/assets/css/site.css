@@ -207,7 +207,7 @@ h2 + div:has([data-topic]){ margin-top:52px !important; }
   border-bottom:1px solid rgba(46,232,255,.4);
   text-decoration:none;
 }
-.tf-text-link:hover{ color:#2EE8FF; border-bottom-color:#2EE8FF }
+.tf-text-link:hover{ color:#F2F4F8; border-bottom-color:#F2F4F8 }
 .btn-outline{
   display:inline-flex;
   align-items:center;
@@ -410,7 +410,7 @@ a[data-signup]:hover, a[data-signup]:focus-visible, a[data-signup]:active,
 html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover,
 html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):focus-visible,
 html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):active {
-  background: #8FF3FF !important;
+  background: #2EE8FF !important;
   color: #04141A !important;
   opacity: 1 !important;
 }
@@ -443,7 +443,7 @@ html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral) * {
   font-family: Archivo, Cairo, sans-serif; box-sizing: border-box; cursor: pointer;
 }
 .btn-outline:hover, .btn-outline:focus, .btn-outline:focus-visible, .btn-outline:active {
-  background: rgba(46,232,255,.14) !important; color: #2EE8FF !important; border-color: #2EE8FF !important;
+  background: transparent !important; color: #F2F4F8 !important; border-color: #F2F4F8 !important;
 }
 .btn-outline:active { transform: translateY(1px); }
 .btn-outline:disabled, .btn-outline.is-pending, .btn-outline.is-loading {
@@ -549,7 +549,7 @@ html body button.btn-primary:is(:hover,:focus,:focus-visible,:active),
 html body a.btn-primary:is(:hover,:focus,:focus-visible,:active),
 html body [data-signup]:is(:hover,:focus,:focus-visible,:active),
 html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):is(:hover,:focus,:focus-visible,:active) {
-  background: #8FF3FF !important;
+  background: #2EE8FF !important;
   color: #04141A !important;
 }
 /* Text on cyan is #04141A in every state, including the tutorial play button; and no leaked hover
@@ -564,7 +564,9 @@ html body button.btn-neutral:is(:hover,:focus,:focus-visible,:active) {
 }
 html body a.btn-outline:is(:hover,:focus,:focus-visible,:active),
 html body button.btn-outline:is(:hover,:focus,:focus-visible,:active) {
-  background: rgba(46,232,255,.14) !important;
+  background: transparent !important;
+  color: #F2F4F8 !important;
+  border-color: #F2F4F8 !important;
 }
 
 @media (max-width:900px){
@@ -613,7 +615,7 @@ html[data-lang="ar"] [data-sec] > div > ul > li{text-align:right!important}
 #guide [data-tf-poster][hidden],#guide[data-tutorial-playing="1"] [data-tf-poster]{display:none!important}
 /* Paused state: 64px cyan play circle centred on the stage; nothing on the stage while playing. */
 #guide [data-tf-bigplay]{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border:0;border-radius:50%;padding:0;background:#2EE8FF;color:#04141A;display:grid;place-items:center;cursor:pointer;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-#guide [data-tf-bigplay]:hover{background:#8FF3FF}
+#guide [data-tf-bigplay]:hover{background:#2EE8FF}
 #guide[data-tutorial-playing="1"] [data-tf-bigplay]{display:none!important}
 #guide [data-player]{background:#07080C}
 /* Bottom bar: part of the stage card, same width as the stage, 16px side padding; time / 1x / full
@@ -626,7 +628,7 @@ html[data-lang="ar"] [data-sec] > div > ul > li{text-align:right!important}
 #guide [data-player]:fullscreen [data-tf-stage]{width:100%;max-width:calc((100vh - 56px) * 16 / 9);margin:0 auto}
 #guide [data-player]:fullscreen [data-tf-controls]{max-width:calc((100vh - 56px) * 16 / 9);margin:0 auto}
 #guide .tf-tut-play{width:36px;height:36px;border:0;border-radius:10px;background:#2EE8FF;color:#04141A;cursor:pointer;display:grid;place-items:center;padding:0;flex:none}
-#guide .tf-tut-play:hover{background:#8FF3FF}
+#guide .tf-tut-play:hover{background:#2EE8FF}
 #guide .tf-tut-speed,#guide .tf-tut-full{height:32px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:transparent;color:#B7BCCB;cursor:pointer;font-family:'Geist Mono',monospace;font-size:12px;flex:none}
 #guide .tf-tut-speed{padding:0 10px}
 #guide .tf-tut-full{width:32px;padding:0;display:grid;place-items:center;color:#B7BCCB}

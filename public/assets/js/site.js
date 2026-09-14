@@ -8,11 +8,11 @@
     s.textContent = [
       'a:not([class*="btn"]):not([data-signup]):hover{color:#F2F4F8}',
       'html body .btn-primary,html body .btn--primary,html body a.btn-primary,html body [data-signup],html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral){color:#04141A!important;background:#2EE8FF!important}',
-      'html body .btn-primary:hover,html body .btn-primary:focus,html body .btn-primary:focus-visible,html body .btn-primary:active,html body .btn--primary:hover,html body a.btn-primary:hover,html body a.btn-primary:focus-visible,html body [data-signup]:hover,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):focus-visible,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):active{background:#8FF3FF!important;color:#04141A!important}',
+      'html body .btn-primary:hover,html body .btn-primary:focus,html body .btn-primary:focus-visible,html body .btn-primary:active,html body .btn--primary:hover,html body a.btn-primary:hover,html body a.btn-primary:focus-visible,html body [data-signup]:hover,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):hover,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):focus-visible,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral):active{background:#2EE8FF!important;color:#04141A!important}',
       'html body .btn-primary:disabled,html body .btn-primary.is-pending,html body .btn-primary.is-loading,html body form button[type="submit"]:disabled{color:#04141A!important;background:#2EE8FF!important}',
       'html body .btn-primary *,html body [data-signup] *,html body form button[type="submit"]:not(.btn-outline):not(.btn-neutral) *{color:#04141A!important}',
       'html body .btn-outline{color:#2EE8FF!important;background:transparent!important;border-color:#2EE8FF!important}',
-      'html body .btn-outline:hover,html body .btn-outline:focus,html body .btn-outline:focus-visible,html body .btn-outline:active{background:rgba(46,232,255,.14)!important;color:#2EE8FF!important}',
+      'html body .btn-outline:hover,html body .btn-outline:focus,html body .btn-outline:focus-visible,html body .btn-outline:active{background:transparent!important;color:#F2F4F8!important;border-color:#F2F4F8!important}',
       'html body .btn-outline:disabled,html body .btn-outline.is-pending,html body .btn-outline.is-loading,html body .btn-outline *{color:#2EE8FF!important}',
       'html body .btn-neutral{color:#F2F4F8!important;background:transparent!important}',
       'html body .btn-neutral:hover,html body .btn-neutral:focus,html body .btn-neutral:focus-visible,html body .btn-neutral:active{border-color:#F2F4F8!important;color:#F2F4F8!important}',
@@ -23,7 +23,9 @@
       'button,a[class*="btn"],[data-signup],[data-login],[data-drawer-actions] a,[data-act],.dlg-actions button{white-space:nowrap!important;flex:none!important;padding-top:0!important;padding-bottom:0!important;line-height:1}',
       'button span,a[class*="btn"] span,[data-signup] span,[data-login] span,[data-drawer-actions] a span{white-space:nowrap!important}',
       '[data-hd] [data-signup] [data-label-short]{display:none}',
-      '@media (max-width:1100px){[data-hd] [data-signup] [data-label-full]{display:none!important}[data-hd] [data-signup] [data-label-short]{display:inline!important}}'
+      '@media (max-width:1100px){[data-hd] [data-signup] [data-label-full]{display:none!important}[data-hd] [data-signup] [data-label-short]{display:inline!important}}',
+      'html body [data-login]:is(:hover,:focus),html body [data-login]:is(:hover,:focus) *,html body a:not(.btn-primary):not([data-signup]):not(.btn-outline):is(:hover,:focus-visible),html body a:not(.btn-primary):not([data-signup]):not(.btn-outline):is(:hover,:focus-visible) *{color:#F2F4F8!important;background:transparent!important}',
+      '::selection{background:rgba(255,255,255,.22);color:#F2F4F8}'
     ].join('');
     (document.head || document.documentElement).appendChild(s);
   })();
